@@ -283,6 +283,7 @@
                     <span id="orderNumber"></span>
                 </div>
                 <p>Please show this number when you pick up your order.</p>
+                <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
             </div>
         </div>
     </div>
@@ -559,7 +560,8 @@
                     name: orderData.name,
                     items: orderData.items,
                     time: orderData.time,
-                    total: orderData.total
+                    total: orderData.total,
+                    forwardToBot: true // Flag to indicate this should be forwarded to another bot
                 };
                 
                 // Send data back to the bot
