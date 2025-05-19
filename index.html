@@ -1606,6 +1606,27 @@
             }
         });
 
+        // Add language button handlers
+        document.querySelectorAll('.language-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchLanguage(this.dataset.lang);
+            });
+        });
+
+        // Replace word count functionality with character count
+        function updateCharCount() {
+            const commentInput = document.getElementById('orderComment');
+            const charCountDisplay = document.getElementById('charCount');
+            const charCount = commentInput.value.length;
+            charCountDisplay.textContent = charCount;
+            
+            // Disable/enable confirm button based on character count
+            const confirmButton = document.getElementById('confirmStep3');
+            if (confirmButton) {
+                confirmButton.disabled = charCount > 90;
+            }
+        }
+
         // Add updateItemQuantity function
         function updateItemQuantity(item, change) {
             const id = item.dataset.id;
