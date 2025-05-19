@@ -1407,6 +1407,14 @@
             document.querySelector('[data-menu="food"]').textContent = t.menu.food;
             document.querySelector('#selectionSummary p').textContent = t.menu.selected;
 
+            // Update comment section
+            document.querySelector('#step3 .section h2').textContent = t.comment.title;
+            const commentInput = document.getElementById('orderComment');
+            if (commentInput) {
+                commentInput.placeholder = t.comment.placeholder;
+            }
+            document.querySelector('.word-count').innerHTML = `<span id="charCount">0</span>/90 ${t.comment.charCount}`;
+
             // Update time section
             document.querySelector('#step4 .section h2').textContent = t.time.title;
 
@@ -1433,14 +1441,6 @@
             document.querySelectorAll('.language-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.lang === lang);
             });
-
-            // Update comment section
-            document.querySelector('#step3 .section h2').textContent = t.comment.title;
-            const commentInput = document.getElementById('orderComment');
-            if (commentInput) {
-                commentInput.placeholder = t.comment.placeholder;
-            }
-            document.querySelector('.word-count').innerHTML = `<span id="charCount">0</span>/90 ${t.comment.charCount}`;
         }
 
         // Add language button handlers
@@ -1463,6 +1463,18 @@
                 confirmButton.disabled = charCount > 90;
             }
         }
+
+        // Initialize owl button text on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // ... existing initialization code ...
+            
+            // Set initial owl button text
+            const owlButton = document.querySelector('.owl-button');
+            if (owlButton) {
+                owlButton.textContent = translations[currentLang].thankYou.owl.button;
+                owlButton.href = "https://t.me/notwise_bot";
+            }
+        });
     </script>
 </body>
 </html>
