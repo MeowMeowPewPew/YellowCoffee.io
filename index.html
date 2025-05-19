@@ -490,11 +490,14 @@
         
         // Send message to user
         function sendMessageToUser(message, userId) {
+            // Create the message data object
             const messageData = {
-                action: 'forward_order',
-                to_user: userId,
-                order_text: message
+                command: 'send_order',
+                user_id: userId,
+                text: message
             };
+            
+            // Send the message data to the bot
             tg.sendData(JSON.stringify(messageData));
         }
         
@@ -519,7 +522,7 @@
                 total: 0,
                 botInfo: {
                     forwardToKitchen: true,
-                    kitchenBotUsername: "@ZakazYellow_bot",
+                    kitchenBotUsername: "ZakazYellow_bot",
                     targetUserId: "261442211",
                     recipientUserId: "261442211"
                 }
@@ -652,22 +655,18 @@
                 
                 // Prepare data to send back to the bot
                 const orderDetails = {
-                    action: 'new_order',
-                    order: {
-                        number: orderNumber,
-                        name: orderData.name,
-                        items: orderData.items,
-                        time: orderData.time,
-                        total: orderData.total,
-                        creator_id: currentUserId
-                    },
-                    forward: {
-                        to_users: [
-                            orderData.botInfo.recipientUserId,
-                            currentUserId
-                        ],
-                        message: formatOrderMessage(orderNumber, orderData)
-                    }
+                    command: 'new_order',
+                    order_number: orderNumber,
+                    customer_name: orderData.name,
+                    pickup_time: orderData.time,
+                    items: orderData.items.map(item => ({
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.price,
+                        total: item.price * item.quantity
+                    })),
+                    total_amount: orderData.total,
+                    send_to: orderData.botInfo.recipientUserId
                 };
                 
                 // Send order details to the bot
