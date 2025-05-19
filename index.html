@@ -645,13 +645,13 @@
             <h1 id="headerTitle">Place Your Order</h1>
         </div>
         
-        <!-- Step 1: Name -->
+        <!-- Step 1: Location -->
         <div class="step active" id="step1">
             <div class="welcome-section">
                 <div class="welcome-icon">☕</div>
                 <div class="welcome-title">Welcome to Yellow Coffee!</div>
                 <div class="welcome-text">
-                    We're excited to serve you today! Please select your preferred location and enter your name to start your order.<br>
+                    We're excited to serve you today! Please select your preferred location to start your order.<br>
                     Our delicious coffee and fresh food are waiting for you.
                 </div>
             </div>
@@ -670,18 +670,22 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Step 2: Name -->
+        <div class="step" id="step2">
             <div class="section">
                 <h2>Enter Your Name</h2>
                 <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15" aria-label="Enter your name">
                 <div class="error-message" id="nameError"></div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="confirmStep1">Confirm</button>
+                <button class="nav-button" id="confirmName">Confirm</button>
             </div>
         </div>
         
-        <!-- Step 2: Menu Selection -->
-        <div class="step" id="step2">
+        <!-- Step 3: Menu Selection -->
+        <div class="step" id="step3">
             <div class="section">
                 <h2>Select Drinks & Food</h2>
                 <div class="tab-buttons">
@@ -708,8 +712,8 @@
             </div>
         </div>
         
-        <!-- New Step 3: Comment -->
-        <div class="step" id="step3">
+        <!-- New Step 4: Comment -->
+        <div class="step" id="step4">
             <div class="section">
                 <h2>Add Comments (Optional)</h2>
                 <div class="comment-section">
@@ -722,8 +726,8 @@
             </div>
         </div>
         
-        <!-- Rename existing step3 to step4 -->
-        <div class="step" id="step4">
+        <!-- Rename existing step4 to step5 -->
+        <div class="step" id="step5">
             <div class="section">
                 <h2>Select Pickup Time</h2>
                 <div class="notification" id="shopClosedNotification" style="display: none;">
@@ -739,8 +743,8 @@
             </div>
         </div>
         
-        <!-- Rename existing step4 to step5 -->
-        <div class="step" id="step5">
+        <!-- Rename existing step5 to step6 -->
+        <div class="step" id="step6">
             <div class="section">
                 <h2>Order Confirmation</h2>
                 <div class="order-summary">
@@ -1244,96 +1248,6 @@
                 });
             });
             
-            // Navigation buttons
-            document.getElementById('confirmStep1').addEventListener('click', function() {
-                const nameInput = document.getElementById('customerName').value.trim();
-                const nameError = document.getElementById('nameError');
-                
-                if (nameInput.length === 0) {
-                    nameError.textContent = 'Please enter your name';
-                    return;
-                }
-
-                if (!orderData.location) {
-                    nameError.textContent = 'Please select a location';
-                    return;
-                }
-                
-                nameError.textContent = '';
-                orderData.name = nameInput;
-                this.classList.add('completed');
-                navigateToStep('2');
-            });
-            
-            document.getElementById('confirmStep2').addEventListener('click', function() {
-                this.classList.add('completed');
-                navigateToStep('3');
-            });
-            
-            document.getElementById('confirmStep3').addEventListener('click', function() {
-                orderData.comment = document.getElementById('orderComment').value.trim();
-                this.classList.add('completed');
-                navigateToStep('4');
-            });
-            
-            document.getElementById('confirmStep4').addEventListener('click', function() {
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-                generateOrderSummary();
-                this.classList.add('completed');
-                navigateToStep('5');
-            });
-            
-            document.getElementById('confirmOrder').addEventListener('click', async function() {
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-                
-                const orderNumber = generateOrderNumber();
-                document.getElementById('orderNumber').textContent = orderNumber;
-                
-                // Hide all steps and show confirmation screen
-                document.querySelectorAll('.step').forEach(step => {
-                    step.classList.remove('active');
-                });
-                const orderConfirmed = document.getElementById('orderConfirmed');
-                orderConfirmed.style.display = 'block';
-                
-                // Format the order message
-                const orderMessage = formatOrderMessage(orderNumber, orderData);
-                
-                // Send to bot
-                await sendTelegramMessage(orderData.botInfo.recipientUserId, orderMessage);
-                
-                // Send to order creator if we have their ID
-                if (currentUserId) {
-                    await sendTelegramMessage(currentUserId, orderMessage);
-                }
-
-                // Scroll to order number after a short delay
-                setTimeout(() => {
-                    const orderNumberElement = document.getElementById('orderNumber');
-                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-            });
-            
-            // New Order Button
-            document.getElementById('newOrderButton').addEventListener('click', function() {
-                resetOrderData();
-                navigateToStep('1');
-            });
-
             // Add location selection handlers
             document.querySelectorAll('.location-option').forEach(option => {
                 option.addEventListener('click', function() {
@@ -1348,13 +1262,28 @@
                     // Store selected location
                     orderData.location = this.dataset.location;
 
-                    // Scroll to name input after a short delay
+                    // Smooth transition to name input
                     setTimeout(() => {
+                        navigateToStep('2');
                         const nameInput = document.getElementById('customerName');
-                        nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         nameInput.focus();
                     }, 300);
                 });
+            });
+
+            // Add name confirmation handler
+            document.getElementById('confirmName').addEventListener('click', function() {
+                const nameInput = document.getElementById('customerName').value.trim();
+                const nameError = document.getElementById('nameError');
+                
+                if (nameInput.length === 0) {
+                    nameError.textContent = translations[currentLang].name.error;
+                    return;
+                }
+                
+                nameError.textContent = '';
+                orderData.name = nameInput;
+                navigateToStep('3');
             });
         }
         
@@ -1440,7 +1369,8 @@
                 name: {
                     title: "Enter Your Name",
                     placeholder: "Your name (max 15 letters)",
-                    error: "Please enter your name"
+                    error: "Please enter your name",
+                    confirm: "Confirm"
                 },
                 menu: {
                     title: "Select Drinks & Food",
@@ -1502,7 +1432,8 @@
                 name: {
                     title: "Введите Ваше Имя",
                     placeholder: "Ваше имя (макс. 15 букв)",
-                    error: "Пожалуйста, введите ваше имя"
+                    error: "Пожалуйста, введите ваше имя",
+                    confirm: "Подтвердить"
                 },
                 menu: {
                     title: "Выберите Напитки и Еду",
@@ -1570,11 +1501,12 @@
             document.querySelector('[data-location="tekhnopark"] .location-name').textContent = t.location.tekhnopark;
 
             // Update name section
-            document.querySelector('#step1 .section h2').textContent = t.name.title;
+            document.querySelector('#step2 .section h2').textContent = t.name.title;
             document.getElementById('customerName').placeholder = t.name.placeholder;
+            document.getElementById('confirmName').textContent = t.name.confirm;
 
             // Update menu section
-            document.querySelector('#step2 .section h2').textContent = t.menu.title;
+            document.querySelector('#step3 .section h2').textContent = t.menu.title;
             document.querySelector('[data-menu="drinks"]').textContent = t.menu.drinks;
             document.querySelector('[data-menu="food"]').textContent = t.menu.food;
             document.querySelector('#selectionSummary p').textContent = t.menu.selected;
@@ -1590,7 +1522,7 @@
             });
 
             // Update comment section
-            document.querySelector('#step3 .section h2').textContent = t.comment.title;
+            document.querySelector('#step4 .section h2').textContent = t.comment.title;
             const commentInput = document.getElementById('orderComment');
             if (commentInput) {
                 commentInput.placeholder = t.comment.placeholder;
@@ -1598,10 +1530,10 @@
             document.querySelector('.word-count').innerHTML = `<span id="charCount">0</span>/90 ${t.comment.charCount}`;
 
             // Update time section
-            document.querySelector('#step4 .section h2').textContent = t.time.title;
+            document.querySelector('#step5 .section h2').textContent = t.time.title;
 
             // Update order section
-            document.querySelector('#step5 .section h2').textContent = t.order.title;
+            document.querySelector('#step6 .section h2').textContent = t.order.title;
             document.getElementById('confirmOrder').textContent = t.order.confirm;
             document.querySelector('.forwarding-notice').textContent = t.order.forwarding;
 
