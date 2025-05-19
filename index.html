@@ -602,6 +602,13 @@
             }
         }
         
+        // Hide size selection modal
+        function hideSizeModal() {
+            const modal = document.getElementById('sizeModal');
+            modal.style.display = 'none';
+            selectedItem = null;
+        }
+        
         // Handle menu item click
         function handleMenuItemClick() {
             const type = this.dataset.type;
