@@ -63,6 +63,8 @@
             text-align: center;
             cursor: pointer;
             position: relative;
+            role: "button";
+            tabindex: "0";
         }
         .menu-item.selected {
             border-color: var(--tg-theme-button-color, #2481cc);
@@ -191,10 +193,28 @@
             margin-top: 5px;
             font-size: 14px;
         }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--tg-theme-bg-color, #fff);
+            border: 2px solid #FFD700;
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+            max-width: 80%;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="notification" id="shopClosedNotification">
+            I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow
+        </div>
         <div class="header">
             <h1>Place Your Order</h1>
         </div>
@@ -211,7 +231,7 @@
         <div class="step active" id="step1">
             <div class="section">
                 <h2>Enter Your Name</h2>
-                <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15">
+                <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15" aria-label="Enter your name">
                 <div class="error-message" id="nameError"></div>
             </div>
             <div class="navigation">
@@ -253,7 +273,7 @@
             <div class="section">
                 <h2>Select Pickup Time</h2>
                 <div class="time-selector">
-                    <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.25" value="12">
+                    <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.016666667" value="12" aria-label="Select pickup time">
                     <div class="time-display" id="timeDisplay">12:00</div>
                 </div>
             </div>
@@ -385,7 +405,7 @@
             menuData.drinks.forEach(drink => {
                 drinksMenu.innerHTML += `
                     <div class="menu-item" data-id="${drink.id}" data-name="${drink.name}" data-price="${drink.price}">
-                        <div class="menu-icon">${drink.icon}</div>
+                        <div class="menu-icon" aria-hidden="true">${drink.icon}</div>
                         <div class="menu-name">${drink.name}</div>
                         <div class="menu-price">$${drink.price.toFixed(2)}</div>
                     </div>
@@ -397,7 +417,7 @@
             menuData.food.forEach(food => {
                 foodMenu.innerHTML += `
                     <div class="menu-item" data-id="${food.id}" data-name="${food.name}" data-price="${food.price}">
-                        <div class="menu-icon">${food.icon}</div>
+                        <div class="menu-icon" aria-hidden="true">${food.icon}</div>
                         <div class="menu-name">${food.name}</div>
                         <div class="menu-price">$${food.price.toFixed(2)}</div>
                     </div>
@@ -587,32 +607,28 @@
             // Set initial time to current time + 10 minutes
             const now = new Date();
             now.setMinutes(now.getMinutes() + 10);
-            const currentHour = now.getHours();
+            let currentHour = now.getHours();
             const currentMinute = now.getMinutes();
             
-            // Round to nearest 15 minutes
-            let roundedMinute;
-            if (currentMinute < 7.5) {
-                roundedMinute = '00';
-            } else if (currentMinute < 22.5) {
-                roundedMinute = '15';
-            } else if (currentMinute < 37.5) {
-                roundedMinute = '30';
-            } else if (currentMinute < 52.5) {
-                roundedMinute = '45';
-            } else {
-                roundedMinute = '00';
-                currentHour = (currentHour + 1) % 24;
+            // Check if shop is closed
+            if (currentHour >= 20) {
+                showShopClosedNotification();
+                return;
             }
             
-            const roundedTime = `${currentHour}:${roundedMinute}`;
+            // Format time with minutes
+            const roundedTime = `${currentHour}:${currentMinute.toString().padStart(2, '0')}`;
             
             // Update time slider and display
             const timeSlider = document.getElementById('timeSlider');
             const timeDisplay = document.getElementById('timeDisplay');
             
-            // Convert time to slider value (8:00 to 20:00)
-            const sliderValue = currentHour;
+            // Set minimum value to current hour
+            timeSlider.min = currentHour;
+            timeSlider.max = 20; // Shop closes at 20:00
+            
+            // Convert time to slider value (hours + minutes as decimal)
+            const sliderValue = currentHour + (currentMinute / 60);
             timeSlider.value = sliderValue;
             timeDisplay.textContent = roundedTime;
             orderData.time = roundedTime;
@@ -620,18 +636,8 @@
             // Time slider event listener
             timeSlider.addEventListener('input', function() {
                 const hours = Math.floor(this.value);
-                const minutes = this.value % 1;
-                let minuteString;
-                if (minutes < 0.25) {
-                    minuteString = '00';
-                } else if (minutes < 0.5) {
-                    minuteString = '15';
-                } else if (minutes < 0.75) {
-                    minuteString = '30';
-                } else {
-                    minuteString = '45';
-                }
-                const timeString = `${hours}:${minuteString}`;
+                const minutes = Math.round((this.value % 1) * 60);
+                const timeString = `${hours}:${minutes.toString().padStart(2, '0')}`;
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
             });
@@ -700,6 +706,13 @@
             });
             
             document.getElementById('confirmOrder').addEventListener('click', async function() {
+                const currentHour = new Date().getHours();
+                
+                if (currentHour >= 20) {
+                    showShopClosedNotification();
+                    return;
+                }
+                
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
                 
@@ -741,6 +754,30 @@
                 s.classList.remove('active');
             });
             document.getElementById(`step${step}`).classList.add('active');
+        }
+        
+        // Add notification functions
+        function showShopClosedNotification() {
+            const notification = document.getElementById('shopClosedNotification');
+            notification.style.display = 'block';
+            
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Disable all navigation buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.disabled = true;
+            });
+            
+            // Hide tab buttons
+            document.querySelector('.tab-buttons').style.display = 'none';
+        }
+        
+        function hideShopClosedNotification() {
+            const notification = document.getElementById('shopClosedNotification');
+            notification.style.display = 'none';
         }
         
         // Initialize on page load
