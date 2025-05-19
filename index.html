@@ -525,7 +525,9 @@
                    orderData.items.map(item => 
                        `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
                    ).join('\n') +
-                   `\n\n<b>💰 Total:</b> $${orderData.total.toFixed(2)}`;
+                   `\n\n<b>💰 Total:</b> $${orderData.total.toFixed(2)}\n\n` +
+                   `🙏 Thank you for your order!\n` +
+                   `Would you like to make another order?`;
         }
         
         // Reset order data
