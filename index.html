@@ -609,6 +609,86 @@ function formatOrderMessage(data) {
   
   return message;
 }
+
+// Simple bot handler code for the main bot
+// This is a snippet that would be part of your bot's code
+
+const TelegramBot = require('node-telegram-bot-api');
+const token = '7706936820:AAEZ3M8T0ZvCDkfs8dvKq2rlf0CjbQ9qLyM';
+const bot = new TelegramBot(token, {polling: true});
+
+// Handle web app data (when user completes order)
+bot.on('web_app_data', async (msg) => {
+  try {
+    // Parse the data received from the Mini App
+    const data = JSON.parse(msg.web_app_data.data);
+    const chatId = msg.chat.id;
+    
+    // Send confirmation to the user
+    await bot.sendMessage(chatId, 
+      `✅ Order #${data.orderNumber} confirmed!\n\nThank you, ${data.name}. Your order will be ready for pickup at ${data.time}.`);
+    
+    // If this order should be forwarded to the kitchen bot
+    if (data.botInfo && data.botInfo.forwardToKitchen) {
+      // Method 1: Using the Telegram API directly
+      // This requires you to have the kitchen bot's token
+      const kitchenBotToken = '8157403295:AAHc6DUqvX1PgjVihwUGTcvYRrHVHeQ7QcY';
+      const kitchenChatId = '-2152072922'; // This could be a group chat ID
+      
+      const axios = require('axios');
+      await axios.post(`https://api.telegram.org/bot${kitchenBotToken}/sendMessage`, {
+        chat_id: kitchenChatId,
+        text: data.orderSummary,
+        parse_mode: 'HTML'
+      });
+      
+      // Method 2: Creating a deep link for the user to forward to another bot
+      // This is simpler but requires user interaction
+      const kitchenBotUsername = data.botInfo.kitchenBotUsername;
+      const deepLink = `https://t.me/${kitchenBotUsername}?start=order_${data.orderNumber}`;
+      
+      await bot.sendMessage(chatId, 
+        `Please tap the button below to send your order details to our kitchen staff:`, {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "Send to Kitchen", url: deepLink }]
+          ]
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error handling web app data:', error);
+    bot.sendMessage(msg.chat.id, "Sorry, there was an error processing your order.");
+  }
+});
+
+// Handle /start command 
+bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id;
+  bot.sendMessage(chatId, 'Welcome! Click the button below to place your order:', {
+    reply_markup: {
+      keyboard: [
+        [{text: '🍽️ Place an Order', web_app: {url: 'YOUR_WEBAPP_URL'}}]
+      ],
+      resize_keyboard: true
+    }
+  });
+});
+
+// Basic handler for the kitchen bot
+// This would be in a separate file/project
+function setupKitchenBot() {
+  const kitchenToken = 'YOUR_KITCHEN_BOT_TOKEN';
+  const kitchenBot = new TelegramBot(kitchenToken, {polling: true});
+  
+  kitchenBot.onText(/\/start order_(.+)/, (msg, match) => {
+    const chatId = msg.chat.id;
+    const orderNumber = match[1];
+    
+    // Here you would look up the order details in your database
+    kitchenBot.sendMessage(chatId, `Received order #${orderNumber}. Please process this order.`);
+  });
+}
         
     </script>
 </body>
