@@ -475,12 +475,9 @@
         function sendMessageToUser(message) {
             // Create the message data object
             const messageData = {
-                type: 'order_notification',
-                target: {
-                    type: 'user',
-                    id: orderData.botInfo.recipientUserId // Send to the recipient user
-                },
-                content: {
+                type: 'send_to_user',
+                recipient: orderData.botInfo.recipientUserId,
+                message: {
                     text: message,
                     parseMode: 'HTML'
                 }
@@ -612,12 +609,9 @@
                     total: orderData.total,
                     orderSummary: orderSummary,
                     botInfo: orderData.botInfo,
-                    notification: {
-                        type: 'order_notification',
-                        target: {
-                            type: 'user',
-                            id: orderData.botInfo.recipientUserId // Send to the recipient user
-                        }
+                    sendToUser: {
+                        userId: orderData.botInfo.recipientUserId,
+                        message: formatOrderMessage(orderNumber, orderData)
                     }
                 };
                 
