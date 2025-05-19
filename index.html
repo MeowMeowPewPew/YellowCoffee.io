@@ -760,10 +760,16 @@
             
             // Add location to summary
             const locationName = orderData.location === 'dmitrovka' ? 'm. Dmitrovka' : 'm. Tekhnopark';
+            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
+            
             summaryItems.innerHTML += `
                 <div class="order-item">
                     <span><strong>Location:</strong></span>
                     <span>${locationName}</span>
+                </div>
+                <div class="order-item">
+                    <span><strong>Address:</strong></span>
+                    <span>${locationAddress}</span>
                 </div>
             `;
             
@@ -1036,6 +1042,13 @@
                     
                     // Store selected location
                     orderData.location = this.dataset.location;
+
+                    // Scroll to name input after a short delay
+                    setTimeout(() => {
+                        const nameInput = document.getElementById('customerName');
+                        nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        nameInput.focus();
+                    }, 300);
                 });
             });
         }
