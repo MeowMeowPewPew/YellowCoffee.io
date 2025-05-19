@@ -688,38 +688,38 @@
         // Menu data - can be replaced with actual items
         const menuData = {
             drinks: [
-                { id: "d1", name: "Coffee", price: 3.50, icon: "☕" },
-                { id: "d2", name: "Tea", price: 2.50, icon: "🍵" },
-                { id: "d3", name: "Orange Juice", price: 4.00, icon: "🍊" },
-                { id: "d4", name: "Latte", price: 4.50, icon: "☕" },
-                { id: "d5", name: "Hot Chocolate", price: 4.00, icon: "🍫" },
-                { id: "d6", name: "Espresso", price: 3.00, icon: "☕" },
-                { id: "d7", name: "Cappuccino", price: 4.50, icon: "☕" },
-                { id: "d8", name: "Smoothie", price: 5.00, icon: "🥤" },
-                { id: "d9", name: "Milkshake", price: 5.50, icon: "🥛" },
-                { id: "d10", name: "Lemonade", price: 3.00, icon: "🍋" },
-                { id: "d11", name: "Iced Tea", price: 3.00, icon: "🧊" },
-                { id: "d12", name: "Water", price: 1.50, icon: "💧" },
-                { id: "d13", name: "Soda", price: 2.00, icon: "🥤" },
-                { id: "d14", name: "Green Tea", price: 3.00, icon: "🍵" },
-                { id: "d15", name: "Mocha", price: 5.00, icon: "☕" }
+                { id: "d1", name: "Coffee", price: 350, icon: "☕" },
+                { id: "d2", name: "Tea", price: 250, icon: "🍵" },
+                { id: "d3", name: "Orange Juice", price: 400, icon: "🍊" },
+                { id: "d4", name: "Latte", price: 450, icon: "☕" },
+                { id: "d5", name: "Hot Chocolate", price: 400, icon: "🍫" },
+                { id: "d6", name: "Espresso", price: 300, icon: "☕" },
+                { id: "d7", name: "Cappuccino", price: 450, icon: "☕" },
+                { id: "d8", name: "Smoothie", price: 500, icon: "🥤" },
+                { id: "d9", name: "Milkshake", price: 550, icon: "🥛" },
+                { id: "d10", name: "Lemonade", price: 300, icon: "🍋" },
+                { id: "d11", name: "Iced Tea", price: 300, icon: "🧊" },
+                { id: "d12", name: "Water", price: 150, icon: "💧" },
+                { id: "d13", name: "Soda", price: 200, icon: "🥤" },
+                { id: "d14", name: "Green Tea", price: 300, icon: "🍵" },
+                { id: "d15", name: "Mocha", price: 500, icon: "☕" }
             ],
             food: [
-                { id: "f1", name: "Sandwich", price: 6.50, icon: "🥪" },
-                { id: "f2", name: "Salad", price: 7.00, icon: "🥗" },
-                { id: "f3", name: "Pasta", price: 9.00, icon: "🍝" },
-                { id: "f4", name: "Pizza", price: 10.00, icon: "🍕" },
-                { id: "f5", name: "Burger", price: 8.50, icon: "🍔" },
-                { id: "f6", name: "Croissant", price: 3.00, icon: "🥐" },
-                { id: "f7", name: "Bagel", price: 4.00, icon: "🥯" },
-                { id: "f8", name: "Muffin", price: 3.50, icon: "🧁" },
-                { id: "f9", name: "Cake", price: 5.00, icon: "🍰" },
-                { id: "f10", name: "Pancakes", price: 6.00, icon: "🥞" },
-                { id: "f11", name: "Wrap", price: 7.00, icon: "🌯" },
-                { id: "f12", name: "Soup", price: 5.00, icon: "🍲" },
-                { id: "f13", name: "Sushi", price: 12.00, icon: "🍣" },
-                { id: "f14", name: "Fries", price: 3.50, icon: "🍟" },
-                { id: "f15", name: "Donut", price: 2.50, icon: "🍩" }
+                { id: "f1", name: "Sandwich", price: 650, icon: "🥪" },
+                { id: "f2", name: "Salad", price: 700, icon: "🥗" },
+                { id: "f3", name: "Pasta", price: 900, icon: "🍝" },
+                { id: "f4", name: "Pizza", price: 1000, icon: "🍕" },
+                { id: "f5", name: "Burger", price: 850, icon: "🍔" },
+                { id: "f6", name: "Croissant", price: 300, icon: "🥐" },
+                { id: "f7", name: "Bagel", price: 400, icon: "🥯" },
+                { id: "f8", name: "Muffin", price: 350, icon: "🧁" },
+                { id: "f9", name: "Cake", price: 500, icon: "🍰" },
+                { id: "f10", name: "Pancakes", price: 600, icon: "🥞" },
+                { id: "f11", name: "Wrap", price: 700, icon: "🌯" },
+                { id: "f12", name: "Soup", price: 500, icon: "🍲" },
+                { id: "f13", name: "Sushi", price: 1200, icon: "🍣" },
+                { id: "f14", name: "Fries", price: 350, icon: "🍟" },
+                { id: "f15", name: "Donut", price: 250, icon: "🍩" }
             ]
         };
         
@@ -735,7 +735,7 @@
                     <div class="menu-item" data-id="${drink.id}" data-name="${drink.name}" data-price="${drink.price}">
                         <div class="menu-icon" aria-hidden="true">${drink.icon}</div>
                         <div class="menu-name">${drink.name}</div>
-                        <div class="menu-price">$${drink.price.toFixed(2)}</div>
+                        <div class="menu-price">${drink.price} ₽</div>
                     </div>
                 `;
             });
@@ -747,7 +747,7 @@
                     <div class="menu-item" data-id="${food.id}" data-name="${food.name}" data-price="${food.price}">
                         <div class="menu-icon" aria-hidden="true">${food.icon}</div>
                         <div class="menu-name">${food.name}</div>
-                        <div class="menu-price">$${food.price.toFixed(2)}</div>
+                        <div class="menu-price">${food.price} ₽</div>
                     </div>
                 `;
             });
@@ -825,16 +825,16 @@
             summaryItems.innerHTML = '';
             
             // Add location to summary
-            const locationName = orderData.location === 'dmitrovka' ? 'm. Dmitrovka' : 'm. Tekhnopark';
+            const locationName = orderData.location === 'dmitrovka' ? translations[currentLang].location.dmitrovka : translations[currentLang].location.tekhnopark;
             const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
             
             summaryItems.innerHTML += `
                 <div class="order-item">
-                    <span><strong>Location:</strong></span>
+                    <span><strong>${translations[currentLang].order.location}:</strong></span>
                     <span>${locationName}</span>
                 </div>
                 <div class="order-item">
-                    <span><strong>Address:</strong></span>
+                    <span><strong>${translations[currentLang].order.address}:</strong></span>
                     <span>${locationAddress}</span>
                 </div>
             `;
@@ -847,13 +847,13 @@
                     summaryItems.innerHTML += `
                         <div class="order-item">
                             <span>${item.quantity}x ${item.name}</span>
-                            <span>$${itemTotal.toFixed(2)}</span>
+                            <span>${itemTotal} ₽</span>
                         </div>
                     `;
                 });
             }
             
-            document.getElementById('summaryTotal').textContent = `$${orderData.total.toFixed(2)}`;
+            document.getElementById('summaryTotal').textContent = `${orderData.total} ₽`;
         }
         
         // Generate a random order number
@@ -893,19 +893,20 @@
         
         // Format order message for user
         function formatOrderMessage(orderNumber, orderData) {
-            const locationName = orderData.location === 'dmitrovka' ? 'm. Dmitrovka' : 'm. Tekhnopark';
+            const t = translations[currentLang];
+            const locationName = orderData.location === 'dmitrovka' ? t.location.dmitrovka : t.location.tekhnopark;
             const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
             
-            return `<b>🆕 New Order #${orderNumber}</b>\n\n` +
-                   `<b>👤 Customer:</b> ${orderData.name}\n` +
-                   `<b>📍 Location:</b> ${locationName}\n` +
-                   `<b>🏠 Address:</b> ${locationAddress}\n` +
-                   `<b>⏰ Pickup Time:</b> ${orderData.time}\n\n` +
-                   `<b>📋 Order Items:</b>\n` +
+            return `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
+                   `<b>👤 ${t.order.name}:</b> ${orderData.name}\n` +
+                   `<b>📍 ${t.order.location}:</b> ${locationName}\n` +
+                   `<b>🏠 ${t.order.address}:</b> ${locationAddress}\n` +
+                   `<b>⏰ ${t.order.time}:</b> ${orderData.time}\n\n` +
+                   `<b>📋 ${t.order.items}:</b>\n` +
                    orderData.items.map(item => 
-                       `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
+                       `• ${item.quantity}x ${item.name} - ${item.price * item.quantity} ₽`
                    ).join('\n') +
-                   `\n\n<b>💰 Total:</b> $${orderData.total.toFixed(2)}`;
+                   `\n\n<b>💰 ${t.order.total}:</b> ${orderData.total} ₽`;
         }
         
         // Reset order data
@@ -1146,9 +1147,9 @@
             const currentTime = currentHour + (currentMinutes / 60);
 
             if (currentTime >= 20) {
-                notification.textContent = 'I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow';
+                notification.textContent = translations[currentLang].shopClosed.evening;
             } else if (currentTime < 7.5) {
-                notification.textContent = 'I apologize, the coffee shop is closed until 7:30 AM. Please place your order after 7:30 AM.';
+                notification.textContent = translations[currentLang].shopClosed.morning;
             }
             
             notification.style.display = 'block';
@@ -1377,9 +1378,9 @@
                    `<b>⏰ ${t.order.time}:</b> ${orderData.time}\n\n` +
                    `<b>📋 ${t.order.items}:</b>\n` +
                    orderData.items.map(item => 
-                       `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
+                       `• ${item.quantity}x ${item.name} - ${item.price * item.quantity} ₽`
                    ).join('\n') +
-                   `\n\n<b>💰 ${t.order.total}:</b> $${orderData.total.toFixed(2)}`;
+                   `\n\n<b>💰 ${t.order.total}:</b> ${orderData.total} ₽`;
         }
     </script>
 </body>
