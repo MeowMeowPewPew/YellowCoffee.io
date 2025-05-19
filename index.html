@@ -304,11 +304,11 @@
         // Menu data - can be replaced with actual items
         const menuData = {
             drinks: [
-                { id: "d1", name: "Coffee", price: 3.50, icon: "☕" },
-                { id: "d2", name: "Tea", price: 2.50, icon: "🍵" },
-                { id: "d3", name: "Orange Juice", price: 4.00, icon: "🍊" },
-                { id: "d4", name: "Latte", price: 4.50, icon: "☕" },
-                { id: "d5", name: "Hot Chocolate", price: 4.00, icon: "🍫" },
+                { id: "d1", name: "Эспрессо", price: 3.50, icon: "☕" },
+                { id: "d2", name: "Американо 200", price: 99, icon: "🍵" },
+                { id: "d3", name: "Американо 300", price: 139, icon: "🍊" },
+                { id: "d4", name: "Американо 400", price: 179, icon: "☕" },
+                { id: "d5", name: "Американо 600", price: 239, icon: "🍫" },
                 { id: "d6", name: "Espresso", price: 3.00, icon: "☕" },
                 { id: "d7", name: "Cappuccino", price: 4.50, icon: "☕" },
                 { id: "d8", name: "Smoothie", price: 5.00, icon: "🥤" },
@@ -461,7 +461,7 @@
         function generateOrderNumber() {
             const date = new Date();
             const dateStr = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-            const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            const randomNum = Math.floor(Math.random() * 100).toString().padStart(3, '0');
             return `${dateStr}-${randomNum}`;
         }
         
