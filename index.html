@@ -929,13 +929,17 @@
             document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`.tab-button[data-step="${step}"]`).classList.add('active');
+            document.querySelector(`.tab-button[data-step="${step}"]`)?.classList.add('active');
             
             // Update visible step
             document.querySelectorAll('.step').forEach(s => {
                 s.classList.remove('active');
             });
-            document.getElementById(`step${step}`).classList.add('active');
+            const nextStep = document.getElementById(`step${step}`);
+            nextStep.classList.add('active');
+            
+            // Smooth scroll to the top of the next step
+            nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         // Add notification functions
@@ -966,6 +970,9 @@
             const minutes = Math.round((value % 1) * 60);
             return `${hours}:${minutes.toString().padStart(2, '0')}`;
         }
+        
+        // Add smooth scrolling to the page
+        document.documentElement.style.scrollBehavior = 'smooth';
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', init);
