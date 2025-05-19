@@ -110,28 +110,6 @@
             font-weight: bold;
             margin: 10px 0;
         }
-        .time-unavailable {
-            color: var(--tg-theme-hint-color, #999);
-            font-style: italic;
-        }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .loading-spinner {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
         .order-summary {
             margin-top: 10px;
         }
@@ -323,13 +301,6 @@
                 <div class="screenshot-notice">Please take a screenshot of your order number</div>
                 <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
                 <button class="button" id="newOrderButton">Make Another Order</button>
-            </div>
-        </div>
-        
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="loading-spinner">
-                Sending order...
             </div>
         </div>
     </div>
@@ -619,15 +590,6 @@
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
             
-            // Check if current time is after business hours
-            if (currentHour >= 20) {
-                const timeDisplay = document.getElementById('timeDisplay');
-                timeDisplay.innerHTML = '<span class="time-unavailable">Sorry, we are closed for today</span>';
-                document.getElementById('timeSlider').style.display = 'none';
-                document.getElementById('nextToStep4').disabled = true;
-                return;
-            }
-            
             // Round to nearest 15 minutes
             let roundedMinute;
             if (currentMinute < 7.5) {
@@ -649,10 +611,7 @@
             const timeSlider = document.getElementById('timeSlider');
             const timeDisplay = document.getElementById('timeDisplay');
             
-            // Set minimum time to current hour
-            timeSlider.min = currentHour;
-            
-            // Convert time to slider value (current hour to 20:00)
+            // Convert time to slider value (8:00 to 20:00)
             const sliderValue = currentHour;
             timeSlider.value = sliderValue;
             timeDisplay.textContent = roundedTime;
@@ -663,40 +622,15 @@
                 const hours = Math.floor(this.value);
                 const minutes = this.value % 1;
                 let minuteString;
-                
-                // If selected hour is current hour, check minutes
-                if (hours === currentHour) {
-                    if (currentMinute < 7.5 && minutes < 0.25) {
-                        minuteString = '00';
-                        timeDisplay.innerHTML = '<span class="time-unavailable">This time is not available</span>';
-                        return;
-                    } else if (currentMinute < 22.5 && minutes < 0.5) {
-                        minuteString = '15';
-                        timeDisplay.innerHTML = '<span class="time-unavailable">This time is not available</span>';
-                        return;
-                    } else if (currentMinute < 37.5 && minutes < 0.75) {
-                        minuteString = '30';
-                        timeDisplay.innerHTML = '<span class="time-unavailable">This time is not available</span>';
-                        return;
-                    } else if (currentMinute < 52.5) {
-                        minuteString = '45';
-                    } else {
-                        minuteString = '00';
-                        this.value = currentHour + 1;
-                    }
+                if (minutes < 0.25) {
+                    minuteString = '00';
+                } else if (minutes < 0.5) {
+                    minuteString = '15';
+                } else if (minutes < 0.75) {
+                    minuteString = '30';
                 } else {
-                    // For future hours, allow all 15-minute intervals
-                    if (minutes < 0.25) {
-                        minuteString = '00';
-                    } else if (minutes < 0.5) {
-                        minuteString = '15';
-                    } else if (minutes < 0.75) {
-                        minuteString = '30';
-                    } else {
-                        minuteString = '45';
-                    }
+                    minuteString = '45';
                 }
-                
                 const timeString = `${hours}:${minuteString}`;
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
@@ -769,32 +703,21 @@
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
                 
-                // Show loading overlay
-                document.getElementById('loadingOverlay').style.display = 'flex';
+                // Hide all steps and show confirmation screen
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                });
+                document.getElementById('orderConfirmed').style.display = 'block';
                 
-                try {
-                    // Format the order message
-                    const orderMessage = formatOrderMessage(orderNumber, orderData);
-                    
-                    // Send to bot
-                    await sendTelegramMessage(orderData.botInfo.recipientUserId, orderMessage);
-                    
-                    // Send to order creator if we have their ID
-                    if (currentUserId) {
-                        await sendTelegramMessage(currentUserId, orderMessage);
-                    }
-                    
-                    // Hide all steps and show confirmation screen
-                    document.querySelectorAll('.step').forEach(step => {
-                        step.classList.remove('active');
-                    });
-                    document.getElementById('orderConfirmed').style.display = 'block';
-                } catch (error) {
-                    console.error('Error sending order:', error);
-                    alert('There was an error sending your order. Please try again.');
-                } finally {
-                    // Hide loading overlay
-                    document.getElementById('loadingOverlay').style.display = 'none';
+                // Format the order message
+                const orderMessage = formatOrderMessage(orderNumber, orderData);
+                
+                // Send to bot
+                await sendTelegramMessage(orderData.botInfo.recipientUserId, orderMessage);
+                
+                // Send to order creator if we have their ID
+                if (currentUserId) {
+                    await sendTelegramMessage(currentUserId, orderMessage);
                 }
             });
             
