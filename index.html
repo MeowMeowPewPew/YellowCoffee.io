@@ -405,6 +405,58 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
+
+        .location-section {
+            margin-bottom: 30px;
+        }
+
+        .location-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .location-option {
+            background: var(--secondary-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .location-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .location-option.selected {
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+            border-color: var(--secondary-color);
+        }
+
+        .location-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .location-address {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .location-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -419,8 +471,23 @@
                 <div class="welcome-icon">☕</div>
                 <div class="welcome-title">Welcome to Yellow Coffee!</div>
                 <div class="welcome-text">
-                    We're excited to serve you today! Please enter your name to start your order.<br>
+                    We're excited to serve you today! Please select your preferred location and enter your name to start your order.<br>
                     Our delicious coffee and fresh food are waiting for you.
+                </div>
+            </div>
+            <div class="section location-section">
+                <h2>Select Location</h2>
+                <div class="location-options">
+                    <div class="location-option" data-location="dmitrovka">
+                        <div class="location-name">m. Dmitrovka</div>
+                        <div class="location-address">Dmitrovka Street, 7</div>
+                        <div class="location-icon">📍</div>
+                    </div>
+                    <div class="location-option" data-location="tekhnopark">
+                        <div class="location-name">m. Tekhnopark</div>
+                        <div class="location-address">Tekhnopark Street, 15</div>
+                        <div class="location-icon">📍</div>
+                    </div>
                 </div>
             </div>
             <div class="section">
@@ -539,6 +606,7 @@
         // Variables to store order data
         let orderData = {
             name: "",
+            location: "",
             items: [],
             time: "12:00",
             total: 0,
@@ -690,8 +758,17 @@
             const summaryItems = document.getElementById('summaryItems');
             summaryItems.innerHTML = '';
             
+            // Add location to summary
+            const locationName = orderData.location === 'dmitrovka' ? 'm. Dmitrovka' : 'm. Tekhnopark';
+            summaryItems.innerHTML += `
+                <div class="order-item">
+                    <span><strong>Location:</strong></span>
+                    <span>${locationName}</span>
+                </div>
+            `;
+            
             if (orderData.items.length === 0) {
-                summaryItems.innerHTML = '<p>No items selected</p>';
+                summaryItems.innerHTML += '<p>No items selected</p>';
             } else {
                 orderData.items.forEach(item => {
                     const itemTotal = item.price * item.quantity;
@@ -758,6 +835,7 @@
         function resetOrderData() {
             orderData = {
                 name: "",
+                location: "",
                 items: [],
                 time: "12:00",
                 total: 0,
@@ -865,6 +943,11 @@
                     nameError.textContent = 'Please enter your name';
                     return;
                 }
+
+                if (!orderData.location) {
+                    nameError.textContent = 'Please select a location';
+                    return;
+                }
                 
                 nameError.textContent = '';
                 orderData.name = nameInput;
@@ -873,15 +956,19 @@
             });
             
             document.getElementById('confirmStep2').addEventListener('click', function() {
-                const currentHour = new Date().getHours();
-                if (currentHour >= 20) {
-                    showShopClosedNotification();
-                }
                 this.classList.add('completed');
                 navigateToStep('3');
             });
             
             document.getElementById('confirmStep3').addEventListener('click', function() {
+                const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
+                
+                if (currentTime >= 20 || currentTime < 7.5) {
+                    showShopClosedNotification();
+                    return;
+                }
                 generateOrderSummary();
                 this.classList.add('completed');
                 navigateToStep('4');
@@ -889,8 +976,10 @@
             
             document.getElementById('confirmOrder').addEventListener('click', async function() {
                 const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
                 
-                if (currentHour >= 20) {
+                if (currentTime >= 20 || currentTime < 7.5) {
                     showShopClosedNotification();
                     return;
                 }
@@ -902,7 +991,8 @@
                 document.querySelectorAll('.step').forEach(step => {
                     step.classList.remove('active');
                 });
-                document.getElementById('orderConfirmed').style.display = 'block';
+                const orderConfirmed = document.getElementById('orderConfirmed');
+                orderConfirmed.style.display = 'block';
                 
                 // Format the order message
                 const orderMessage = formatOrderMessage(orderNumber, orderData);
@@ -914,12 +1004,34 @@
                 if (currentUserId) {
                     await sendTelegramMessage(currentUserId, orderMessage);
                 }
+
+                // Scroll to order number after a short delay
+                setTimeout(() => {
+                    const orderNumberElement = document.getElementById('orderNumber');
+                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
             });
             
             // New Order Button
             document.getElementById('newOrderButton').addEventListener('click', function() {
                 resetOrderData();
                 navigateToStep('1');
+            });
+
+            // Add location selection handlers
+            document.querySelectorAll('.location-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    document.querySelectorAll('.location-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    // Store selected location
+                    orderData.location = this.dataset.location;
+                });
             });
         }
         
@@ -945,9 +1057,19 @@
         // Add notification functions
         function showShopClosedNotification() {
             const notification = document.getElementById('shopClosedNotification');
+            const currentHour = new Date().getHours();
+            const currentMinutes = new Date().getMinutes();
+            const currentTime = currentHour + (currentMinutes / 60);
+
+            if (currentTime >= 20) {
+                notification.textContent = 'I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow';
+            } else if (currentTime < 7.5) {
+                notification.textContent = 'I apologize, the coffee shop is closed until 7:30 AM. Please place your order after 7:30 AM.';
+            }
+            
             notification.style.display = 'block';
             
-            // Disable the Next button
+            // Disable the confirm button
             document.getElementById('confirmStep3').disabled = true;
             
             // Hide notification after 5 seconds
@@ -960,7 +1082,7 @@
             const notification = document.getElementById('shopClosedNotification');
             notification.style.display = 'none';
             
-            // Re-enable the Next button
+            // Re-enable the confirm button
             document.getElementById('confirmStep3').disabled = false;
         }
         
