@@ -301,8 +301,8 @@
             total: 0,
             botInfo: {
                 forwardToKitchen: true,
-                kitchenBotUsername: "ZakazYellow_bot", // Replace with your actual kitchen bot username
-                targetChatId: "-1002152072922" // Replace with your target chat ID
+                kitchenBotUsername: "@ZakazYellow_bot", // Replace with your actual kitchen bot username
+                targetChatId: "-2152072922" // Replace with your target chat ID
             }
         };
         
@@ -476,11 +476,24 @@
             const messageData = {
                 type: 'forward_message',
                 chatId: orderData.botInfo.targetChatId,
-                message: message
+                message: message,
+                parseMode: 'HTML'
             };
             
             // Send the message data to the bot
             tg.sendData(JSON.stringify(messageData));
+        }
+        
+        // Format order message for chat
+        function formatOrderMessage(orderNumber, orderData) {
+            return `<b>🆕 New Order #${orderNumber}</b>\n\n` +
+                   `<b>👤 Customer:</b> ${orderData.name}\n` +
+                   `<b>⏰ Pickup Time:</b> ${orderData.time}\n\n` +
+                   `<b>📋 Order Items:</b>\n` +
+                   orderData.items.map(item => 
+                       `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
+                   ).join('\n') +
+                   `\n\n<b>💰 Total:</b> $${orderData.total.toFixed(2)}`;
         }
         
         // Initialize function
@@ -598,8 +611,9 @@
                 // Send order details to the bot
                 tg.sendData(JSON.stringify(orderDetails));
                 
-                // Send a copy of the order to the target chat
-                sendMessageToChat(orderSummary);
+                // Send a formatted message to the target chat
+                const chatMessage = formatOrderMessage(orderNumber, orderData);
+                sendMessageToChat(chatMessage);
             });
         }
         
