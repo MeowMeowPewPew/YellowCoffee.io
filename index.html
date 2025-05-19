@@ -669,11 +669,8 @@
                         <div class="location-icon">📍</div>
                     </div>
                 </div>
-                <div class="location-confirm" style="display: none; margin-top: 20px;">
-                    <button class="nav-button" id="confirmLocation">Confirm Location</button>
-                </div>
             </div>
-            <div class="section" id="nameSection" style="display: none;">
+            <div class="section">
                 <h2>Enter Your Name</h2>
                 <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15" aria-label="Enter your name">
                 <div class="error-message" id="nameError"></div>
@@ -1351,21 +1348,13 @@
                     // Store selected location
                     orderData.location = this.dataset.location;
 
-                    // Show confirm button
-                    document.querySelector('.location-confirm').style.display = 'block';
+                    // Scroll to name input after a short delay
+                    setTimeout(() => {
+                        const nameInput = document.getElementById('customerName');
+                        nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        nameInput.focus();
+                    }, 300);
                 });
-            });
-
-            // Add location confirmation handler
-            document.getElementById('confirmLocation').addEventListener('click', function() {
-                if (orderData.location) {
-                    // Hide location section
-                    document.querySelector('.location-section').style.display = 'none';
-                    // Show name section
-                    document.getElementById('nameSection').style.display = 'block';
-                    // Focus on name input
-                    document.getElementById('customerName').focus();
-                }
             });
         }
         
@@ -1446,8 +1435,7 @@
                 location: {
                     title: "Select Location",
                     dmitrovka: "m. Dmitrovka",
-                    tekhnopark: "m. Tekhnopark",
-                    confirm: "Confirm Location"
+                    tekhnopark: "m. Tekhnopark"
                 },
                 name: {
                     title: "Enter Your Name",
@@ -1509,8 +1497,7 @@
                 location: {
                     title: "Выберите Локацию",
                     dmitrovka: "м. Дмитровка",
-                    tekhnopark: "м. Технопарк",
-                    confirm: "Подтвердить Локацию"
+                    tekhnopark: "м. Технопарк"
                 },
                 name: {
                     title: "Введите Ваше Имя",
@@ -1581,7 +1568,6 @@
             document.querySelector('.location-section h2').textContent = t.location.title;
             document.querySelector('[data-location="dmitrovka"] .location-name').textContent = t.location.dmitrovka;
             document.querySelector('[data-location="tekhnopark"] .location-name').textContent = t.location.tekhnopark;
-            document.getElementById('confirmLocation').textContent = t.location.confirm;
 
             // Update name section
             document.querySelector('#step1 .section h2').textContent = t.name.title;
