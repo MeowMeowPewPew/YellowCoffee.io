@@ -1326,10 +1326,13 @@
             document.getElementById('newOrderButton').textContent = t.thankYou.newOrder;
 
             // Update owl section
-            document.querySelector('.owl-message').textContent = t.thankYou.owl.message;
+            const owlMessage = document.querySelector('.owl-message');
             const owlButton = document.querySelector('.owl-button');
-            owlButton.textContent = t.thankYou.owl.button;
-            owlButton.href = "https://t.me/notwise_bot";
+            if (owlMessage && owlButton) {
+                owlMessage.textContent = t.thankYou.owl.message;
+                owlButton.textContent = t.thankYou.owl.button;
+                owlButton.href = "https://t.me/notwise_bot";
+            }
 
             // Update language buttons
             document.querySelectorAll('.language-btn').forEach(btn => {
