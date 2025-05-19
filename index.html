@@ -297,6 +297,18 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
+        // Get current user ID from initData
+        let currentUserId = null;
+        try {
+            const initData = tg.initData;
+            const initDataObj = JSON.parse(initData);
+            if (initDataObj && initDataObj.user && initDataObj.user.id) {
+                currentUserId = initDataObj.user.id.toString();
+            }
+        } catch (e) {
+            console.error('Error parsing initData:', e);
+        }
+        
         // Variables to store order data
         let orderData = {
             name: "",
@@ -476,18 +488,12 @@
         }
         
         // Send message to user
-        function sendMessageToUser(message) {
-            // Create the message data object
+        function sendMessageToUser(message, userId) {
             const messageData = {
-                type: 'send_to_user',
-                recipient: orderData.botInfo.recipientUserId,
-                message: {
-                    text: message,
-                    parseMode: 'HTML'
-                }
+                action: 'forward_order',
+                to_user: userId,
+                order_text: message
             };
-            
-            // Send the message data to the bot
             tg.sendData(JSON.stringify(messageData));
         }
         
@@ -606,15 +612,20 @@
                 
                 // Prepare data to send back to the bot
                 const orderDetails = {
-                    orderNumber: orderNumber,
-                    name: orderData.name,
-                    items: orderData.items,
-                    time: orderData.time,
-                    total: orderData.total,
-                    orderSummary: orderSummary,
-                    botInfo: orderData.botInfo,
-                    sendToUser: {
-                        userId: orderData.botInfo.recipientUserId,
+                    action: 'new_order',
+                    order: {
+                        number: orderNumber,
+                        name: orderData.name,
+                        items: orderData.items,
+                        time: orderData.time,
+                        total: orderData.total,
+                        creator_id: currentUserId
+                    },
+                    forward: {
+                        to_users: [
+                            orderData.botInfo.recipientUserId,
+                            currentUserId
+                        ],
                         message: formatOrderMessage(orderNumber, orderData)
                     }
                 };
@@ -622,9 +633,14 @@
                 // Send order details to the bot
                 tg.sendData(JSON.stringify(orderDetails));
                 
-                // Send a formatted message to the target user
+                // Send a formatted message to both users
                 const userMessage = formatOrderMessage(orderNumber, orderData);
-                sendMessageToUser(userMessage);
+                // Send to recipient
+                sendMessageToUser(userMessage, orderData.botInfo.recipientUserId);
+                // Send to order creator if we have their ID
+                if (currentUserId) {
+                    sendMessageToUser(userMessage, currentUserId);
+                }
             });
         }
         
