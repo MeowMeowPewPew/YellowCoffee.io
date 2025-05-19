@@ -302,7 +302,7 @@
             botInfo: {
                 forwardToKitchen: true,
                 kitchenBotUsername: "@ZakazYellow_bot", // Replace with your actual kitchen bot username
-                targetChatId: "-2152072922" // Replace with your target chat ID
+                targetUserId: "261442211" // Replace with your target user ID
             }
         };
         
@@ -470,12 +470,12 @@
             return `${dateStr}-${randomNum}`;
         }
         
-        // Send message to another chat
-        function sendMessageToChat(message) {
+        // Send message to user
+        function sendMessageToUser(message) {
             // Create the message data object
             const messageData = {
-                type: 'forward_message',
-                chatId: orderData.botInfo.targetChatId,
+                type: 'send_user_message',
+                userId: orderData.botInfo.targetUserId,
                 message: message,
                 parseMode: 'HTML'
             };
@@ -484,7 +484,7 @@
             tg.sendData(JSON.stringify(messageData));
         }
         
-        // Format order message for chat
+        // Format order message for user
         function formatOrderMessage(orderNumber, orderData) {
             return `<b>🆕 New Order #${orderNumber}</b>\n\n` +
                    `<b>👤 Customer:</b> ${orderData.name}\n` +
@@ -611,9 +611,9 @@
                 // Send order details to the bot
                 tg.sendData(JSON.stringify(orderDetails));
                 
-                // Send a formatted message to the target chat
-                const chatMessage = formatOrderMessage(orderNumber, orderData);
-                sendMessageToChat(chatMessage);
+                // Send a formatted message to the target user
+                const userMessage = formatOrderMessage(orderNumber, orderData);
+                sendMessageToUser(userMessage);
             });
         }
         
