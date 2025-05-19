@@ -642,7 +642,7 @@
             </div>
         </div>
         <div class="header">
-            <h1>Place Your Order</h1>
+            <h1 id="headerTitle">Place Your Order</h1>
         </div>
         
         <!-- Step 1: Name -->
@@ -1425,6 +1425,9 @@
         // Add translations
         const translations = {
             en: {
+                header: {
+                    title: "Place Your Order"
+                },
                 welcome: {
                     title: "Welcome to Yellow Coffee!",
                     text: "We're excited to serve you today! Please select your preferred location and enter your name to start your order.\nOur delicious coffee and fresh food are waiting for you."
@@ -1457,7 +1460,11 @@
                     items: "Selected Items",
                     total: "Total",
                     confirm: "Confirm Order",
-                    comments: "Comments"
+                    comments: "Comments",
+                    forwarding: "Your order details have been sent to our kitchen bot."
+                },
+                buttons: {
+                    confirm: "Confirm"
                 },
                 shopClosed: {
                     evening: "I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow",
@@ -1480,6 +1487,9 @@
                 }
             },
             ru: {
+                header: {
+                    title: "Сделать Заказ"
+                },
                 welcome: {
                     title: "Добро пожаловать в Yellow Coffee!",
                     text: "Мы рады обслужить вас сегодня! Пожалуйста, выберите удобное место и введите ваше имя, чтобы начать заказ.\nНаши вкусные кофе и свежая еда ждут вас."
@@ -1512,7 +1522,11 @@
                     items: "Выбранные Товары",
                     total: "Итого",
                     confirm: "Подтвердить Заказ",
-                    comments: "Комментарии"
+                    comments: "Комментарии",
+                    forwarding: "Детали вашего заказа отправлены нашему кухонному боту."
+                },
+                buttons: {
+                    confirm: "Подтвердить"
                 },
                 shopClosed: {
                     evening: "Приносим извинения, кофейня уже закрыта сегодня, мы будем ждать ваш заказ завтра",
@@ -1542,6 +1556,9 @@
         function switchLanguage(lang) {
             currentLang = lang;
             const t = translations[lang];
+
+            // Update header
+            document.getElementById('headerTitle').textContent = t.header.title;
 
             // Update welcome section
             document.querySelector('.welcome-title').textContent = t.welcome.title;
@@ -1576,6 +1593,7 @@
             // Update order section
             document.querySelector('#step5 .section h2').textContent = t.order.title;
             document.getElementById('confirmOrder').textContent = t.order.confirm;
+            document.querySelector('.forwarding-notice').textContent = t.order.forwarding;
 
             // Update thank you section
             document.querySelector('.thank-you-message').textContent = t.thankYou.message;
@@ -1591,6 +1609,13 @@
                 owlButton.textContent = t.thankYou.owl.button;
                 owlButton.href = "https://t.me/notwise_bot";
             }
+
+            // Update confirm buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                if (button.id !== 'confirmOrder') {
+                    button.textContent = t.buttons.confirm;
+                }
+            });
 
             // Update language buttons
             document.querySelectorAll('.language-btn').forEach(btn => {
