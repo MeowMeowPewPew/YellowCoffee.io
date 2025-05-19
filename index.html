@@ -320,7 +320,8 @@
                 forwardToKitchen: true,
                 kitchenBotUsername: "@ZakazYellow_bot", // Replace with your actual kitchen bot username
                 targetUserId: "261442211", // Replace with your target user ID
-                recipientUserId: "261442211" // ID of the user who should receive the order message
+                recipientUserId: "261442211", // ID of the user who should receive the order message
+                meowmeowpewUsername: "@meowmeowpew" // Username to send order to
             }
         };
         
@@ -488,17 +489,31 @@
             return `${dateStr}-${randomNum}`;
         }
         
-        // Send message to user
-        function sendMessageToUser(message, userId) {
-            // Create the message data object
-            const messageData = {
-                command: 'send_order',
-                user_id: userId,
-                text: message
-            };
+        // Send message using Telegram Bot API
+        async function sendTelegramMessage(chatId, text) {
+            const botToken = "8157403295:AAHd1WwtupOBw_-jFD-vQopThdd_1_OqMms";
+            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
             
-            // Send the message data to the bot
-            tg.sendData(JSON.stringify(messageData));
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: text,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Error sending message:', data);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
         
         // Format order message for user
@@ -524,7 +539,8 @@
                     forwardToKitchen: true,
                     kitchenBotUsername: "ZakazYellow_bot",
                     targetUserId: "261442211",
-                    recipientUserId: "261442211"
+                    recipientUserId: "261442211",
+                    meowmeowpewUsername: "@meowmeowpew"
                 }
             };
             
@@ -631,7 +647,7 @@
                 navigateToStep('3');
             });
             
-            document.getElementById('confirmOrder').addEventListener('click', function() {
+            document.getElementById('confirmOrder').addEventListener('click', async function() {
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
                 
@@ -644,21 +660,12 @@
                 // Format the order message
                 const orderMessage = formatOrderMessage(orderNumber, orderData);
                 
-                // Send the order message to the bot
-                const botMessage = {
-                    text: orderMessage,
-                    parse_mode: 'HTML'
-                };
-                
                 // Send to bot
-                tg.sendData(JSON.stringify(botMessage));
+                await sendTelegramMessage(orderData.botInfo.recipientUserId, orderMessage);
                 
-                // Send a formatted message to both users
-                // Send to recipient
-                sendMessageToUser(orderMessage, orderData.botInfo.recipientUserId);
                 // Send to order creator if we have their ID
                 if (currentUserId) {
-                    sendMessageToUser(orderMessage, currentUserId);
+                    await sendTelegramMessage(currentUserId, orderMessage);
                 }
             });
             
