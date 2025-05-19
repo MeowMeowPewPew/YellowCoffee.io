@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://telegram.org; script-src 'self' https://telegram.org; style-src 'self' 'unsafe-inline';">
     <title>Food & Drink Order Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -100,6 +101,25 @@
             flex-direction: column;
             margin-top: 10px;
         }
+        .time-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .time-button {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .time-button:disabled {
+            background-color: var(--tg-theme-hint-color, #ccc);
+            cursor: not-allowed;
+        }
         .time-slider {
             width: 100%;
             margin: 10px 0;
@@ -109,6 +129,28 @@
             font-size: 18px;
             font-weight: bold;
             margin: 10px 0;
+        }
+        .time-unavailable {
+            color: var(--tg-theme-hint-color, #999);
+            font-style: italic;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .loading-spinner {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
         }
         .order-summary {
             margin-top: 10px;
@@ -191,6 +233,102 @@
             margin-top: 5px;
             font-size: 14px;
         }
+        .order-summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #eee);
+        }
+        .order-summary-item:last-child {
+            border-bottom: none;
+        }
+        .order-total {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid var(--tg-theme-hint-color, #eee);
+        }
+        .error-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .size-modal {
+            background: var(--tg-theme-bg-color, #fff);
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 300px;
+        }
+        .size-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .size-option {
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border: 2px solid var(--tg-theme-button-color, #2481cc);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .size-option:hover {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: white;
+        }
+        .size-option.selected {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: white;
+        }
+        .modal-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .modal-button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+        }
+        .modal-button.cancel {
+            background: var(--tg-theme-hint-color, #ccc);
+            color: white;
+        }
+        .modal-button.confirm {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -211,11 +349,13 @@
         <div class="step active" id="step1">
             <div class="section">
                 <h2>Enter Your Name</h2>
-                <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15">
-                <div class="error-message" id="nameError"></div>
-            </div>
-            <div class="navigation">
-                <button class="nav-button" id="nextToStep2" style="width: 100%;">Next</button>
+                <form id="nameForm" onsubmit="return false;">
+                    <input type="text" class="input" id="customerName" name="customerName" placeholder="Your name (max 15 letters)" maxlength="15" required>
+                    <div class="error-message" id="nameError"></div>
+                    <div class="navigation">
+                        <button type="submit" class="nav-button" id="nextToStep2" style="width: 100%;">Next</button>
+                    </div>
+                </form>
             </div>
         </div>
         
@@ -253,8 +393,12 @@
             <div class="section">
                 <h2>Select Pickup Time</h2>
                 <div class="time-selector">
-                    <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.25" value="12">
+                    <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.016666667" value="12">
                     <div class="time-display" id="timeDisplay">12:00</div>
+                    <div class="time-controls">
+                        <button class="time-button" id="decreaseTime">-5 min</button>
+                        <button class="time-button" id="increaseTime">+5 min</button>
+                    </div>
                 </div>
             </div>
             <div class="navigation">
@@ -303,6 +447,41 @@
                 <button class="button" id="newOrderButton">Make Another Order</button>
             </div>
         </div>
+        
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner">
+                Sending order...
+            </div>
+        </div>
+        
+        <!-- Error Toast -->
+        <div class="error-toast" id="errorToast"></div>
+        
+        <!-- Size Selection Modal -->
+        <div class="modal-overlay" id="sizeModal">
+            <div class="size-modal">
+                <div class="modal-title">Select Size</div>
+                <div class="size-options">
+                    <div class="size-option" data-size="200">200 ml</div>
+                    <div class="size-option" data-size="300">300 ml</div>
+                    <div class="size-option" data-size="400">400 ml</div>
+                    <div class="size-option" data-size="600">600 ml</div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-button cancel" id="cancelSize">Cancel</button>
+                    <button class="modal-button confirm" id="confirmSize">Confirm</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- After Hours Modal -->
+        <div class="modal-overlay" id="afterHoursModal" style="display: none;">
+            <div class="size-modal">
+                <div class="modal-title">Sorry, our coffee shop is no longer open today</div>
+                <div style="text-align:center; margin: 20px 0; font-size: 16px;">We'll be waiting for your orders tomorrow!</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -314,9 +493,15 @@
         let currentUserId = null;
         try {
             const initData = tg.initData;
-            const initDataObj = JSON.parse(initData);
-            if (initDataObj && initDataObj.user && initDataObj.user.id) {
-                currentUserId = initDataObj.user.id.toString();
+            if (initData) {
+                const urlParams = new URLSearchParams(initData);
+                const userData = urlParams.get('user');
+                if (userData) {
+                    const user = JSON.parse(userData);
+                    if (user && user.id) {
+                        currentUserId = user.id.toString();
+                    }
+                }
             }
         } catch (e) {
             console.error('Error parsing initData:', e);
@@ -330,31 +515,34 @@
             total: 0,
             botInfo: {
                 forwardToKitchen: true,
-                kitchenBotUsername: "@ZakazYellow_bot", // Replace with your actual kitchen bot username
-                targetUserId: "261442211", // Replace with your target user ID
-                recipientUserId: "261442211", // ID of the user who should receive the order message
-                meowmeowpewUsername: "@meowmeowpew" // Username to send order to
+                kitchenBotUsername: "@ZakazYellow_bot",
+                targetUserId: "261442211",
+                recipientUserId: "261442211",
+                meowmeowpewUsername: "@meowmeowpew"
             }
         };
+        
+        // Store selected item for size selection
+        let selectedItem = null;
         
         // Menu data - can be replaced with actual items
         const menuData = {
             drinks: [
-                { id: "d1", name: "Coffee", price: 3.50, icon: "☕" },
-                { id: "d2", name: "Tea", price: 2.50, icon: "🍵" },
-                { id: "d3", name: "Orange Juice", price: 4.00, icon: "🍊" },
-                { id: "d4", name: "Latte", price: 4.50, icon: "☕" },
-                { id: "d5", name: "Hot Chocolate", price: 4.00, icon: "🍫" },
-                { id: "d6", name: "Espresso", price: 3.00, icon: "☕" },
-                { id: "d7", name: "Cappuccino", price: 4.50, icon: "☕" },
-                { id: "d8", name: "Smoothie", price: 5.00, icon: "🥤" },
-                { id: "d9", name: "Milkshake", price: 5.50, icon: "🥛" },
-                { id: "d10", name: "Lemonade", price: 3.00, icon: "🍋" },
-                { id: "d11", name: "Iced Tea", price: 3.00, icon: "🧊" },
-                { id: "d12", name: "Water", price: 1.50, icon: "💧" },
-                { id: "d13", name: "Soda", price: 2.00, icon: "🥤" },
-                { id: "d14", name: "Green Tea", price: 3.00, icon: "🍵" },
-                { id: "d15", name: "Mocha", price: 5.00, icon: "☕" }
+                { id: "d1", name: "Coffee", icon: "☕", prices: { "200": 3.50, "300": 4.50, "400": 5.50, "600": 6.50 } },
+                { id: "d2", name: "Tea", icon: "🍵", prices: { "200": 2.50, "300": 3.50, "400": 4.50, "600": 5.50 } },
+                { id: "d3", name: "Orange Juice", icon: "🍊", prices: { "200": 4.00, "300": 5.00, "400": 6.00, "600": 7.00 } },
+                { id: "d4", name: "Latte", icon: "☕", prices: { "200": 4.50, "300": 5.50, "400": 6.50, "600": 7.50 } },
+                { id: "d5", name: "Hot Chocolate", icon: "🍫", prices: { "200": 4.00, "300": 5.00, "400": 6.00, "600": 7.00 } },
+                { id: "d6", name: "Espresso", icon: "☕", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d7", name: "Cappuccino", icon: "☕", prices: { "200": 4.50, "300": 5.50, "400": 6.50, "600": 7.50 } },
+                { id: "d8", name: "Smoothie", icon: "🥤", prices: { "200": 5.00, "300": 6.00, "400": 7.00, "600": 8.00 } },
+                { id: "d9", name: "Milkshake", icon: "🥛", prices: { "200": 5.50, "300": 6.50, "400": 7.50, "600": 8.50 } },
+                { id: "d10", name: "Lemonade", icon: "��", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d11", name: "Iced Tea", icon: "🧊", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d12", name: "Water", icon: "💧", prices: { "200": 1.50, "300": 2.50, "400": 3.50, "600": 4.50 } },
+                { id: "d13", name: "Soda", icon: "🥤", prices: { "200": 2.00, "300": 3.00, "400": 4.00, "600": 5.00 } },
+                { id: "d14", name: "Green Tea", icon: "🍵", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d15", name: "Mocha", icon: "☕", prices: { "200": 5.00, "300": 6.00, "400": 7.00, "600": 8.00 } }
             ],
             food: [
                 { id: "f1", name: "Sandwich", price: 6.50, icon: "🥪" },
@@ -384,10 +572,10 @@
             drinksMenu.innerHTML = '';
             menuData.drinks.forEach(drink => {
                 drinksMenu.innerHTML += `
-                    <div class="menu-item" data-id="${drink.id}" data-name="${drink.name}" data-price="${drink.price}">
+                    <div class="menu-item" data-id="${drink.id}" data-name="${drink.name}" data-type="drink">
                         <div class="menu-icon">${drink.icon}</div>
                         <div class="menu-name">${drink.name}</div>
-                        <div class="menu-price">$${drink.price.toFixed(2)}</div>
+                        <div class="menu-price">From $${drink.prices["200"].toFixed(2)}</div>
                     </div>
                 `;
             });
@@ -396,7 +584,7 @@
             foodMenu.innerHTML = '';
             menuData.food.forEach(food => {
                 foodMenu.innerHTML += `
-                    <div class="menu-item" data-id="${food.id}" data-name="${food.name}" data-price="${food.price}">
+                    <div class="menu-item" data-id="${food.id}" data-name="${food.name}" data-price="${food.price}" data-type="food">
                         <div class="menu-icon">${food.icon}</div>
                         <div class="menu-name">${food.name}</div>
                         <div class="menu-price">$${food.price.toFixed(2)}</div>
@@ -406,48 +594,105 @@
             
             // Add event listeners to menu items
             document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', toggleMenuItem);
+                item.addEventListener('click', handleMenuItemClick);
             });
         }
         
-        // Toggle menu item selection
-        function toggleMenuItem() {
-            const id = this.dataset.id;
-            const name = this.dataset.name;
-            const price = parseFloat(this.dataset.price);
+        // Show size selection modal
+        function showSizeModal() {
+            const modal = document.getElementById('sizeModal');
+            modal.style.display = 'flex';
+            
+            // Reset size selection
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Update prices for each size
+            const drink = menuData.drinks.find(d => d.id === selectedItem.id);
+            if (drink) {
+                document.querySelectorAll('.size-option').forEach(option => {
+                    const size = option.dataset.size;
+                    const price = drink.prices[size].toFixed(2);
+                    option.textContent = `${size} ml - $${price}`;
+                });
+            }
+        }
+        
+        // Hide size selection modal
+        function hideSizeModal() {
+            const modal = document.getElementById('sizeModal');
+            modal.style.display = 'none';
+            selectedItem = null;
+        }
+        
+        // Handle menu item click
+        function handleMenuItemClick() {
+            const type = this.dataset.type;
+            
+            if (type === 'drink') {
+                // Show size selection modal for drinks
+                selectedItem = {
+                    id: this.dataset.id,
+                    name: this.dataset.name,
+                    type: 'drink'
+                };
+                showSizeModal();
+            } else {
+                // Directly add food items
+                addItemToOrder({
+                    id: this.dataset.id,
+                    name: this.dataset.name,
+                    price: parseFloat(this.dataset.price),
+                    type: 'food'
+                });
+            }
+        }
+        
+        // Add item to order with size
+        function addItemToOrder(item) {
+            // Get price for drinks based on size
+            if (item.type === 'drink' && item.size) {
+                const drink = menuData.drinks.find(d => d.id === item.id);
+                if (drink) {
+                    item.price = drink.prices[item.size];
+                }
+            }
             
             // Check if item is already selected
-            const existingItem = orderData.items.find(item => item.id === id);
+            const existingItem = orderData.items.find(i => 
+                i.id === item.id && (!item.size || i.size === item.size)
+            );
             
             if (existingItem) {
                 // Item exists, increase quantity
                 existingItem.quantity += 1;
                 
-                // Update or add selection count badge
-                let countBadge = this.querySelector('.selection-count');
+                // Update selection count badge
+                const menuItem = document.querySelector(`.menu-item[data-id="${item.id}"]`);
+                let countBadge = menuItem.querySelector('.selection-count');
                 if (countBadge) {
                     countBadge.textContent = existingItem.quantity;
                 } else {
                     const badge = document.createElement('div');
                     badge.className = 'selection-count';
                     badge.textContent = existingItem.quantity;
-                    this.appendChild(badge);
+                    menuItem.appendChild(badge);
                 }
             } else {
                 // Add new item
                 orderData.items.push({
-                    id: id,
-                    name: name,
-                    price: price,
+                    ...item,
                     quantity: 1
                 });
                 
                 // Add selection class and count badge
-                this.classList.add('selected');
+                const menuItem = document.querySelector(`.menu-item[data-id="${item.id}"]`);
+                menuItem.classList.add('selected');
                 const badge = document.createElement('div');
                 badge.className = 'selection-count';
                 badge.textContent = '1';
-                this.appendChild(badge);
+                menuItem.appendChild(badge);
             }
             
             // Update total and selection count
@@ -482,7 +727,7 @@
                 orderData.items.forEach(item => {
                     const itemTotal = item.price * item.quantity;
                     summaryItems.innerHTML += `
-                        <div class="order-item">
+                        <div class="order-summary-item">
                             <span>${item.quantity}x ${item.name}</span>
                             <span>$${itemTotal.toFixed(2)}</span>
                         </div>
@@ -490,7 +735,12 @@
                 });
             }
             
-            document.getElementById('summaryTotal').textContent = `$${orderData.total.toFixed(2)}`;
+            document.getElementById('summaryTotal').innerHTML = `
+                <div class="order-total">
+                    <span>Total:</span>
+                    <span>$${orderData.total.toFixed(2)}</span>
+                </div>
+            `;
         }
         
         // Generate a random order number
@@ -582,6 +832,7 @@
         
         // Initialize function
         function init() {
+            console.log('Initializing app...');
             populateMenus();
             
             // Set initial time to current time + 10 minutes
@@ -590,22 +841,15 @@
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
             
-            // Round to nearest 15 minutes
-            let roundedMinute;
-            if (currentMinute < 7.5) {
-                roundedMinute = '00';
-            } else if (currentMinute < 22.5) {
-                roundedMinute = '15';
-            } else if (currentMinute < 37.5) {
-                roundedMinute = '30';
-            } else if (currentMinute < 52.5) {
-                roundedMinute = '45';
-            } else {
-                roundedMinute = '00';
-                currentHour = (currentHour + 1) % 24;
+            // Check if current time is after business hours
+            if (currentHour >= 20) {
+                document.getElementById('afterHoursModal').style.display = 'flex';
+                // Optionally hide the main container
+                document.querySelector('.container').style.filter = 'blur(2px)';
+                return;
             }
             
-            const roundedTime = `${currentHour}:${roundedMinute}`;
+            const roundedTime = `${currentHour}:${currentMinute.toString().padStart(2, '0')}`;
             
             // Update time slider and display
             const timeSlider = document.getElementById('timeSlider');
@@ -615,48 +859,45 @@
             timeSlider.min = currentHour;
             
             // Convert time to slider value (current hour to 20:00)
-            const sliderValue = currentHour;
+            const sliderValue = currentHour + (currentMinute / 60);
             timeSlider.value = sliderValue;
             timeDisplay.textContent = roundedTime;
             orderData.time = roundedTime;
             
             // Time slider event listener
             timeSlider.addEventListener('input', function() {
-                const hours = Math.floor(this.value);
-                const minutes = this.value % 1;
-                let minuteString;
+                updateTimeDisplay(this.value);
+            });
+            
+            // Time control buttons
+            document.getElementById('decreaseTime').addEventListener('click', function() {
+                const currentValue = parseFloat(timeSlider.value);
+                const newValue = Math.max(currentValue - (5/60), timeSlider.min);
+                timeSlider.value = newValue;
+                updateTimeDisplay(newValue);
+            });
+            
+            document.getElementById('increaseTime').addEventListener('click', function() {
+                const currentValue = parseFloat(timeSlider.value);
+                const newValue = Math.min(currentValue + (5/60), timeSlider.max);
+                timeSlider.value = newValue;
+                updateTimeDisplay(newValue);
+            });
+            
+            function updateTimeDisplay(value) {
+                const hours = Math.floor(value);
+                const minutes = Math.round((value % 1) * 60);
                 
                 // If selected hour is current hour, check minutes
-                if (hours === currentHour) {
-                    if (currentMinute < 7.5 && minutes < 0.25) {
-                        minuteString = '00';
-                    } else if (currentMinute < 22.5 && minutes < 0.5) {
-                        minuteString = '15';
-                    } else if (currentMinute < 37.5 && minutes < 0.75) {
-                        minuteString = '30';
-                    } else if (currentMinute < 52.5) {
-                        minuteString = '45';
-                    } else {
-                        minuteString = '00';
-                        this.value = currentHour + 1;
-                    }
-                } else {
-                    // For future hours, allow all 15-minute intervals
-                    if (minutes < 0.25) {
-                        minuteString = '00';
-                    } else if (minutes < 0.5) {
-                        minuteString = '15';
-                    } else if (minutes < 0.75) {
-                        minuteString = '30';
-                    } else {
-                        minuteString = '45';
-                    }
+                if (hours === currentHour && minutes <= currentMinute) {
+                    timeDisplay.innerHTML = '<span class="time-unavailable">This time is not available</span>';
+                    return;
                 }
                 
-                const timeString = `${hours}:${minuteString}`;
+                const timeString = `${hours}:${minutes.toString().padStart(2, '0')}`;
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
-            });
+            }
             
             // Step navigation
             document.querySelectorAll('.tab-button[data-step]').forEach(button => {
@@ -686,19 +927,29 @@
             });
             
             // Navigation buttons
-            document.getElementById('nextToStep2').addEventListener('click', function() {
-                const nameInput = document.getElementById('customerName').value.trim();
-                const nameError = document.getElementById('nameError');
-                
-                if (nameInput.length === 0) {
-                    nameError.textContent = 'Please enter your name';
-                    return;
-                }
-                
-                nameError.textContent = '';
-                orderData.name = nameInput;
-                navigateToStep('2');
-            });
+            const nextToStep2Button = document.getElementById('nextToStep2');
+            console.log('Next button element:', nextToStep2Button);
+            
+            if (nextToStep2Button) {
+                nextToStep2Button.addEventListener('click', function() {
+                    console.log('Next button clicked');
+                    const nameInput = document.getElementById('customerName').value.trim();
+                    const nameError = document.getElementById('nameError');
+                    
+                    console.log('Name input value:', nameInput);
+                    
+                    if (nameInput.length === 0) {
+                        nameError.textContent = 'Please enter your name';
+                        return;
+                    }
+                    
+                    nameError.textContent = '';
+                    orderData.name = nameInput;
+                    navigateToStep('2');
+                });
+            } else {
+                console.error('Next button not found!');
+            }
             
             document.getElementById('backToStep1').addEventListener('click', function() {
                 navigateToStep('1');
@@ -722,24 +973,40 @@
             });
             
             document.getElementById('confirmOrder').addEventListener('click', async function() {
+                if (orderData.items.length === 0) {
+                    showError('Please select at least one item');
+                    return;
+                }
+                
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
                 
-                // Hide all steps and show confirmation screen
-                document.querySelectorAll('.step').forEach(step => {
-                    step.classList.remove('active');
-                });
-                document.getElementById('orderConfirmed').style.display = 'block';
+                // Show loading overlay
+                document.getElementById('loadingOverlay').style.display = 'flex';
                 
-                // Format the order message
-                const orderMessage = formatOrderMessage(orderNumber, orderData);
-                
-                // Send to bot
-                await sendTelegramMessage(orderData.botInfo.recipientUserId, orderMessage);
-                
-                // Send to order creator if we have their ID
-                if (currentUserId) {
-                    await sendTelegramMessage(currentUserId, orderMessage);
+                try {
+                    // Format the order message
+                    const orderMessage = formatOrderMessage(orderNumber, orderData);
+                    
+                    // Send to bot
+                    await sendTelegramMessage(orderData.botInfo.recipientUserId, orderMessage);
+                    
+                    // Send to order creator if we have their ID
+                    if (currentUserId) {
+                        await sendTelegramMessage(currentUserId, orderMessage);
+                    }
+                    
+                    // Hide all steps and show confirmation screen
+                    document.querySelectorAll('.step').forEach(step => {
+                        step.classList.remove('active');
+                    });
+                    document.getElementById('orderConfirmed').style.display = 'block';
+                } catch (error) {
+                    console.error('Error sending order:', error);
+                    showError('Failed to send order. Please try again.');
+                } finally {
+                    // Hide loading overlay
+                    document.getElementById('loadingOverlay').style.display = 'none';
                 }
             });
             
@@ -748,10 +1015,49 @@
                 resetOrderData();
                 navigateToStep('1');
             });
+            
+            // Size selection modal event listeners
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.size-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+            
+            document.getElementById('cancelSize').addEventListener('click', hideSizeModal);
+            
+            document.getElementById('confirmSize').addEventListener('click', function() {
+                const selectedSize = document.querySelector('.size-option.selected');
+                if (selectedSize && selectedItem) {
+                    addItemToOrder({
+                        ...selectedItem,
+                        size: selectedSize.dataset.size,
+                        name: `${selectedItem.name} (${selectedSize.dataset.size}ml)`
+                    });
+                    hideSizeModal();
+                } else {
+                    showError('Please select a size');
+                }
+            });
+            
+            // Show error toast
+            function showError(message) {
+                const toast = document.getElementById('errorToast');
+                toast.textContent = message;
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }
+            
+            console.log('App initialization complete');
         }
         
         // Navigate to specific step
         function navigateToStep(step) {
+            console.log('Navigating to step:', step);
             // Update tab buttons
             document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
                 btn.classList.remove('active');
@@ -766,7 +1072,10 @@
         }
         
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            init();
+        });
         
     </script>
 </body>
