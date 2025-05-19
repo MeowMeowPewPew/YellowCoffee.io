@@ -511,21 +511,21 @@
         // Menu data - can be replaced with actual items
         const menuData = {
             drinks: [
-                { id: "d1", name: "Coffee", price: 3.50, icon: "☕" },
-                { id: "d2", name: "Tea", price: 2.50, icon: "🍵" },
-                { id: "d3", name: "Orange Juice", price: 4.00, icon: "🍊" },
-                { id: "d4", name: "Latte", price: 4.50, icon: "☕" },
-                { id: "d5", name: "Hot Chocolate", price: 4.00, icon: "🍫" },
-                { id: "d6", name: "Espresso", price: 3.00, icon: "☕" },
-                { id: "d7", name: "Cappuccino", price: 4.50, icon: "☕" },
-                { id: "d8", name: "Smoothie", price: 5.00, icon: "🥤" },
-                { id: "d9", name: "Milkshake", price: 5.50, icon: "🥛" },
-                { id: "d10", name: "Lemonade", price: 3.00, icon: "🍋" },
-                { id: "d11", name: "Iced Tea", price: 3.00, icon: "🧊" },
-                { id: "d12", name: "Water", price: 1.50, icon: "💧" },
-                { id: "d13", name: "Soda", price: 2.00, icon: "🥤" },
-                { id: "d14", name: "Green Tea", price: 3.00, icon: "🍵" },
-                { id: "d15", name: "Mocha", price: 5.00, icon: "☕" }
+                { id: "d1", name: "Coffee", icon: "☕", prices: { "200": 3.50, "300": 4.50, "400": 5.50, "600": 6.50 } },
+                { id: "d2", name: "Tea", icon: "🍵", prices: { "200": 2.50, "300": 3.50, "400": 4.50, "600": 5.50 } },
+                { id: "d3", name: "Orange Juice", icon: "🍊", prices: { "200": 4.00, "300": 5.00, "400": 6.00, "600": 7.00 } },
+                { id: "d4", name: "Latte", icon: "☕", prices: { "200": 4.50, "300": 5.50, "400": 6.50, "600": 7.50 } },
+                { id: "d5", name: "Hot Chocolate", icon: "🍫", prices: { "200": 4.00, "300": 5.00, "400": 6.00, "600": 7.00 } },
+                { id: "d6", name: "Espresso", icon: "☕", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d7", name: "Cappuccino", icon: "☕", prices: { "200": 4.50, "300": 5.50, "400": 6.50, "600": 7.50 } },
+                { id: "d8", name: "Smoothie", icon: "🥤", prices: { "200": 5.00, "300": 6.00, "400": 7.00, "600": 8.00 } },
+                { id: "d9", name: "Milkshake", icon: "🥛", prices: { "200": 5.50, "300": 6.50, "400": 7.50, "600": 8.50 } },
+                { id: "d10", name: "Lemonade", icon: "🍋", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d11", name: "Iced Tea", icon: "🧊", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d12", name: "Water", icon: "💧", prices: { "200": 1.50, "300": 2.50, "400": 3.50, "600": 4.50 } },
+                { id: "d13", name: "Soda", icon: "🥤", prices: { "200": 2.00, "300": 3.00, "400": 4.00, "600": 5.00 } },
+                { id: "d14", name: "Green Tea", icon: "🍵", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d15", name: "Mocha", icon: "☕", prices: { "200": 5.00, "300": 6.00, "400": 7.00, "600": 8.00 } }
             ],
             food: [
                 { id: "f1", name: "Sandwich", price: 6.50, icon: "🥪" },
@@ -555,10 +555,10 @@
             drinksMenu.innerHTML = '';
             menuData.drinks.forEach(drink => {
                 drinksMenu.innerHTML += `
-                    <div class="menu-item" data-id="${drink.id}" data-name="${drink.name}" data-price="${drink.price}" data-type="drink">
+                    <div class="menu-item" data-id="${drink.id}" data-name="${drink.name}" data-type="drink">
                         <div class="menu-icon">${drink.icon}</div>
                         <div class="menu-name">${drink.name}</div>
-                        <div class="menu-price">$${drink.price.toFixed(2)}</div>
+                        <div class="menu-price">From $${drink.prices["200"].toFixed(2)}</div>
                     </div>
                 `;
             });
@@ -581,6 +581,27 @@
             });
         }
         
+        // Show size selection modal
+        function showSizeModal() {
+            const modal = document.getElementById('sizeModal');
+            modal.style.display = 'flex';
+            
+            // Reset size selection
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Update prices for each size
+            const drink = menuData.drinks.find(d => d.id === selectedItem.id);
+            if (drink) {
+                document.querySelectorAll('.size-option').forEach(option => {
+                    const size = option.dataset.size;
+                    const price = drink.prices[size].toFixed(2);
+                    option.textContent = `${size} ml - $${price}`;
+                });
+            }
+        }
+        
         // Handle menu item click
         function handleMenuItemClick() {
             const type = this.dataset.type;
@@ -590,7 +611,6 @@
                 selectedItem = {
                     id: this.dataset.id,
                     name: this.dataset.name,
-                    price: parseFloat(this.dataset.price),
                     type: 'drink'
                 };
                 showSizeModal();
@@ -605,26 +625,16 @@
             }
         }
         
-        // Show size selection modal
-        function showSizeModal() {
-            const modal = document.getElementById('sizeModal');
-            modal.style.display = 'flex';
-            
-            // Reset size selection
-            document.querySelectorAll('.size-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-        }
-        
-        // Hide size selection modal
-        function hideSizeModal() {
-            const modal = document.getElementById('sizeModal');
-            modal.style.display = 'none';
-            selectedItem = null;
-        }
-        
         // Add item to order with size
         function addItemToOrder(item) {
+            // Get price for drinks based on size
+            if (item.type === 'drink' && item.size) {
+                const drink = menuData.drinks.find(d => d.id === item.id);
+                if (drink) {
+                    item.price = drink.prices[item.size];
+                }
+            }
+            
             // Check if item is already selected
             const existingItem = orderData.items.find(i => 
                 i.id === item.id && (!item.size || i.size === item.size)
