@@ -173,6 +173,19 @@
             background-color: var(--tg-theme-secondary-bg-color, #f5f5f5);
             border-radius: 8px;
         }
+        .thank-you-message {
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+            color: var(--tg-theme-text-color, #222);
+        }
+        .screenshot-notice {
+            text-align: center;
+            font-size: 16px;
+            margin: 15px 0;
+            color: var(--tg-theme-hint-color, #666);
+            font-style: italic;
+        }
         .error-message {
             color: #e74c3c;
             margin-top: 5px;
@@ -280,13 +293,12 @@
         <!-- Order Confirmed Screen -->
         <div class="step" id="orderConfirmed" style="display: none;">
             <div class="section">
-                <h2>Order Confirmed!</h2>
-                <p>Thank you for your order.</p>
+                <div class="thank-you-message">Thank you for your order!</div>
                 <div class="order-number">
                     <p>Your Order Number:</p>
                     <span id="orderNumber"></span>
                 </div>
-                <p>Please show this number when you pick up your order.</p>
+                <div class="screenshot-notice">Please take a screenshot of your order number</div>
                 <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
                 <button class="button" id="newOrderButton">Make Another Order</button>
             </div>
@@ -525,9 +537,7 @@
                    orderData.items.map(item => 
                        `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
                    ).join('\n') +
-                   `\n\n<b>💰 Total:</b> $${orderData.total.toFixed(2)}\n\n` +
-                   `🙏 Thank you for your order!\n` +
-                   `Would you like to make another order?`;
+                   `\n\n<b>💰 Total:</b> $${orderData.total.toFixed(2)}`;
         }
         
         // Reset order data
