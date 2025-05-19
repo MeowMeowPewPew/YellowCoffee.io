@@ -374,7 +374,7 @@
                 <div class="error-message" id="nameError"></div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="nextToStep2" style="width: 100%;">Next</button>
+                <button class="nav-button" id="confirmStep1">Confirm</button>
             </div>
         </div>
         
@@ -402,8 +402,7 @@
                 </div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="backToStep1">Back</button>
-                <button class="nav-button" id="nextToStep3">Next</button>
+                <button class="nav-button" id="confirmStep2">Confirm</button>
             </div>
         </div>
         
@@ -420,8 +419,7 @@
                 </div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="backToStep2">Back</button>
-                <button class="nav-button" id="nextToStep4">Next</button>
+                <button class="nav-button" id="confirmStep3">Confirm</button>
             </div>
         </div>
         
@@ -447,7 +445,6 @@
                 </div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="backToStep3">Back</button>
                 <button class="nav-button" id="confirmOrder">Confirm Order</button>
             </div>
         </div>
@@ -806,7 +803,7 @@
             });
             
             // Navigation buttons
-            document.getElementById('nextToStep2').addEventListener('click', function() {
+            document.getElementById('confirmStep1').addEventListener('click', function() {
                 const nameInput = document.getElementById('customerName').value.trim();
                 const nameError = document.getElementById('nameError');
                 
@@ -821,11 +818,7 @@
                 navigateToStep('2');
             });
             
-            document.getElementById('backToStep1').addEventListener('click', function() {
-                navigateToStep('1');
-            });
-            
-            document.getElementById('nextToStep3').addEventListener('click', function() {
+            document.getElementById('confirmStep2').addEventListener('click', function() {
                 const currentHour = new Date().getHours();
                 if (currentHour >= 20) {
                     showShopClosedNotification();
@@ -834,18 +827,10 @@
                 navigateToStep('3');
             });
             
-            document.getElementById('backToStep2').addEventListener('click', function() {
-                navigateToStep('2');
-            });
-            
-            document.getElementById('nextToStep4').addEventListener('click', function() {
+            document.getElementById('confirmStep3').addEventListener('click', function() {
                 generateOrderSummary();
                 this.classList.add('completed');
                 navigateToStep('4');
-            });
-            
-            document.getElementById('backToStep3').addEventListener('click', function() {
-                navigateToStep('3');
             });
             
             document.getElementById('confirmOrder').addEventListener('click', async function() {
@@ -905,7 +890,7 @@
             notification.style.display = 'block';
             
             // Disable the Next button
-            document.getElementById('nextToStep4').disabled = true;
+            document.getElementById('confirmStep3').disabled = true;
             
             // Hide notification after 5 seconds
             setTimeout(() => {
@@ -918,7 +903,7 @@
             notification.style.display = 'none';
             
             // Re-enable the Next button
-            document.getElementById('nextToStep4').disabled = false;
+            document.getElementById('confirmStep3').disabled = false;
         }
         
         // Initialize on page load
