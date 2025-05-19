@@ -1247,7 +1247,7 @@
                     }
                 });
             });
-            
+
             // Add location selection handlers
             document.querySelectorAll('.location-option').forEach(option => {
                 option.addEventListener('click', function() {
@@ -1284,6 +1284,79 @@
                 nameError.textContent = '';
                 orderData.name = nameInput;
                 navigateToStep('3');
+            });
+
+            // Menu confirmation handler
+            document.getElementById('confirmStep2').addEventListener('click', function() {
+                this.classList.add('completed');
+                navigateToStep('4');
+            });
+            
+            // Comment confirmation handler
+            document.getElementById('confirmStep3').addEventListener('click', function() {
+                orderData.comment = document.getElementById('orderComment').value.trim();
+                this.classList.add('completed');
+                navigateToStep('5');
+            });
+            
+            // Time confirmation handler
+            document.getElementById('confirmStep4').addEventListener('click', function() {
+                const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
+                
+                if (currentTime >= 20 || currentTime < 7.5) {
+                    showShopClosedNotification();
+                    return;
+                }
+                generateOrderSummary();
+                this.classList.add('completed');
+                navigateToStep('6');
+            });
+            
+            // Final order confirmation handler
+            document.getElementById('confirmOrder').addEventListener('click', async function() {
+                const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
+                
+                if (currentTime >= 20 || currentTime < 7.5) {
+                    showShopClosedNotification();
+                    return;
+                }
+                
+                const orderNumber = generateOrderNumber();
+                document.getElementById('orderNumber').textContent = orderNumber;
+                
+                // Hide all steps and show confirmation screen
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                });
+                const orderConfirmed = document.getElementById('orderConfirmed');
+                orderConfirmed.style.display = 'block';
+                
+                // Format the order message
+                const orderMessage = formatOrderMessage(orderNumber, orderData);
+                
+                // Send to bot
+                await sendTelegramMessage(orderData.botInfo.recipientUserId, orderMessage);
+                
+                // Send to order creator if we have their ID
+                if (currentUserId) {
+                    await sendTelegramMessage(currentUserId, orderMessage);
+                }
+
+                // Scroll to order number after a short delay
+                setTimeout(() => {
+                    const orderNumberElement = document.getElementById('orderNumber');
+                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            });
+            
+            // New Order Button
+            document.getElementById('newOrderButton').addEventListener('click', function() {
+                resetOrderData();
+                navigateToStep('1');
             });
         }
         
