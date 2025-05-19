@@ -348,11 +348,13 @@
         <div class="step active" id="step1">
             <div class="section">
                 <h2>Enter Your Name</h2>
-                <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15">
-                <div class="error-message" id="nameError"></div>
-            </div>
-            <div class="navigation">
-                <button class="nav-button" id="nextToStep2" style="width: 100%;">Next</button>
+                <form id="nameForm" onsubmit="return false;">
+                    <input type="text" class="input" id="customerName" name="customerName" placeholder="Your name (max 15 letters)" maxlength="15" required>
+                    <div class="error-message" id="nameError"></div>
+                    <div class="navigation">
+                        <button type="submit" class="nav-button" id="nextToStep2" style="width: 100%;">Next</button>
+                    </div>
+                </form>
             </div>
         </div>
         
