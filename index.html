@@ -488,6 +488,31 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
+        .owl-message {
+            text-align: center;
+            font-size: 18px;
+            margin: 20px 0;
+            color: var(--text-color);
+            font-style: italic;
+        }
+
+        .owl-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #0088cc, #00a2ff);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            margin: 10px 0 20px;
+            transition: var(--transition);
+        }
+
+        .owl-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
@@ -614,6 +639,8 @@
                     <span id="orderNumber"></span>
                 </div>
                 <div class="screenshot-notice">Please take a screenshot of your order number</div>
+                <div class="owl-message">Maybe you want to pet and feed your owl while your coffee is brewing?</div>
+                <a href="https://t.me/notwise_bot" class="owl-button" target="_blank">Visit Your Owl 🦉</a>
                 <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
                 <button class="button" id="newOrderButton">Make Another Order</button>
             </div>
@@ -1195,6 +1222,13 @@
                     message: "Thank you for your order!",
                     number: "Your Order Number:",
                     screenshot: "Please take a screenshot of your order number",
+                    newOrder: "Make Another Order",
+                    owl: {
+                        message: "Maybe you want to pet and feed your owl while your coffee is brewing?",
+                        button: "Visit Your Owl 🦉"
+                    }
+                }
+            },
                     newOrder: "Make Another Order"
                 }
             },
