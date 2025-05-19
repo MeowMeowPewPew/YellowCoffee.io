@@ -275,7 +275,7 @@
             <div class="section">
                 <h2>Select Pickup Time</h2>
                 <div class="time-selector">
-                    <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.25" value="12">
+                    <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.016666667" value="12">
                     <div class="time-display" id="timeDisplay">12:00</div>
                 </div>
             </div>
@@ -628,22 +628,7 @@
                 return;
             }
             
-            // Round to nearest 15 minutes
-            let roundedMinute;
-            if (currentMinute < 7.5) {
-                roundedMinute = '00';
-            } else if (currentMinute < 22.5) {
-                roundedMinute = '15';
-            } else if (currentMinute < 37.5) {
-                roundedMinute = '30';
-            } else if (currentMinute < 52.5) {
-                roundedMinute = '45';
-            } else {
-                roundedMinute = '00';
-                currentHour = (currentHour + 1) % 24;
-            }
-            
-            const roundedTime = `${currentHour}:${roundedMinute}`;
+            const roundedTime = `${currentHour}:${currentMinute.toString().padStart(2, '0')}`;
             
             // Update time slider and display
             const timeSlider = document.getElementById('timeSlider');
@@ -653,7 +638,7 @@
             timeSlider.min = currentHour;
             
             // Convert time to slider value (current hour to 20:00)
-            const sliderValue = currentHour;
+            const sliderValue = currentHour + (currentMinute / 60);
             timeSlider.value = sliderValue;
             timeDisplay.textContent = roundedTime;
             orderData.time = roundedTime;
@@ -661,43 +646,15 @@
             // Time slider event listener
             timeSlider.addEventListener('input', function() {
                 const hours = Math.floor(this.value);
-                const minutes = this.value % 1;
-                let minuteString;
+                const minutes = Math.round((this.value % 1) * 60);
                 
                 // If selected hour is current hour, check minutes
-                if (hours === currentHour) {
-                    if (currentMinute < 7.5 && minutes < 0.25) {
-                        minuteString = '00';
-                        timeDisplay.innerHTML = '<span class="time-unavailable">This time is not available</span>';
-                        return;
-                    } else if (currentMinute < 22.5 && minutes < 0.5) {
-                        minuteString = '15';
-                        timeDisplay.innerHTML = '<span class="time-unavailable">This time is not available</span>';
-                        return;
-                    } else if (currentMinute < 37.5 && minutes < 0.75) {
-                        minuteString = '30';
-                        timeDisplay.innerHTML = '<span class="time-unavailable">This time is not available</span>';
-                        return;
-                    } else if (currentMinute < 52.5) {
-                        minuteString = '45';
-                    } else {
-                        minuteString = '00';
-                        this.value = currentHour + 1;
-                    }
-                } else {
-                    // For future hours, allow all 15-minute intervals
-                    if (minutes < 0.25) {
-                        minuteString = '00';
-                    } else if (minutes < 0.5) {
-                        minuteString = '15';
-                    } else if (minutes < 0.75) {
-                        minuteString = '30';
-                    } else {
-                        minuteString = '45';
-                    }
+                if (hours === currentHour && minutes <= currentMinute) {
+                    timeDisplay.innerHTML = '<span class="time-unavailable">This time is not available</span>';
+                    return;
                 }
                 
-                const timeString = `${hours}:${minuteString}`;
+                const timeString = `${hours}:${minutes.toString().padStart(2, '0')}`;
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
             });
@@ -826,3 +783,4 @@
     </script>
 </body>
 </html>
+
