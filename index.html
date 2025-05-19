@@ -611,7 +611,10 @@
             const timeSlider = document.getElementById('timeSlider');
             const timeDisplay = document.getElementById('timeDisplay');
             
-            // Convert time to slider value (8:00 to 20:00)
+            // Set minimum time to current hour
+            timeSlider.min = currentHour;
+            
+            // Convert time to slider value (current hour to 20:00)
             const sliderValue = currentHour;
             timeSlider.value = sliderValue;
             timeDisplay.textContent = roundedTime;
@@ -622,15 +625,34 @@
                 const hours = Math.floor(this.value);
                 const minutes = this.value % 1;
                 let minuteString;
-                if (minutes < 0.25) {
-                    minuteString = '00';
-                } else if (minutes < 0.5) {
-                    minuteString = '15';
-                } else if (minutes < 0.75) {
-                    minuteString = '30';
+                
+                // If selected hour is current hour, check minutes
+                if (hours === currentHour) {
+                    if (currentMinute < 7.5 && minutes < 0.25) {
+                        minuteString = '00';
+                    } else if (currentMinute < 22.5 && minutes < 0.5) {
+                        minuteString = '15';
+                    } else if (currentMinute < 37.5 && minutes < 0.75) {
+                        minuteString = '30';
+                    } else if (currentMinute < 52.5) {
+                        minuteString = '45';
+                    } else {
+                        minuteString = '00';
+                        this.value = currentHour + 1;
+                    }
                 } else {
-                    minuteString = '45';
+                    // For future hours, allow all 15-minute intervals
+                    if (minutes < 0.25) {
+                        minuteString = '00';
+                    } else if (minutes < 0.5) {
+                        minuteString = '15';
+                    } else if (minutes < 0.75) {
+                        minuteString = '30';
+                    } else {
+                        minuteString = '45';
+                    }
                 }
+                
                 const timeString = `${hours}:${minuteString}`;
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
