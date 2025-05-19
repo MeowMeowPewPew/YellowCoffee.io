@@ -301,7 +301,8 @@
             total: 0,
             botInfo: {
                 forwardToKitchen: true,
-                kitchenBotUsername: "@ZakazYellow_bot" // Replace with your actual kitchen bot username
+                kitchenBotUsername: "@ZakazYellow_bot", // Replace with your actual kitchen bot username
+                targetChatId: "-2152072922" // Replace with your target chat ID
             }
         };
         
@@ -469,6 +470,19 @@
             return `${dateStr}-${randomNum}`;
         }
         
+        // Send message to another chat
+        function sendMessageToChat(message) {
+            // Create the message data object
+            const messageData = {
+                type: 'forward_message',
+                chatId: orderData.botInfo.targetChatId,
+                message: message
+            };
+            
+            // Send the message data to the bot
+            tg.sendData(JSON.stringify(messageData));
+        }
+        
         // Initialize function
         function init() {
             populateMenus();
@@ -581,8 +595,11 @@
                     botInfo: orderData.botInfo
                 };
                 
-                // Send data back to the bot
+                // Send order details to the bot
                 tg.sendData(JSON.stringify(orderDetails));
+                
+                // Send a copy of the order to the target chat
+                sendMessageToChat(orderSummary);
             });
         }
         
