@@ -334,6 +334,19 @@
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
+
+        .nav-button.completed {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            position: relative;
+        }
+
+        .nav-button.completed::after {
+            content: "✓ Done";
+            position: absolute;
+            right: 10px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -804,6 +817,7 @@
                 
                 nameError.textContent = '';
                 orderData.name = nameInput;
+                this.classList.add('completed');
                 navigateToStep('2');
             });
             
@@ -816,6 +830,7 @@
                 if (currentHour >= 20) {
                     showShopClosedNotification();
                 }
+                this.classList.add('completed');
                 navigateToStep('3');
             });
             
@@ -825,6 +840,7 @@
             
             document.getElementById('nextToStep4').addEventListener('click', function() {
                 generateOrderSummary();
+                this.classList.add('completed');
                 navigateToStep('4');
             });
             
