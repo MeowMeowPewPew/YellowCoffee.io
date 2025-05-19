@@ -609,52 +609,6 @@ function formatOrderMessage(data) {
   
   return message;
 }
-
-// Simple bot handler code for the main bot
-// This is a snippet that would be part of your bot's code
-
-const TelegramBot = require('node-telegram-bot-api');
-const token = '7706936820:AAEZ3M8T0ZvCDkfs8dvKq2rlf0CjbQ9qLyM';
-const bot = new TelegramBot(token, {polling: true});
-
-// Handle web app data (when user completes order)
-bot.on('web_app_data', async (msg) => {
-  try {
-    // Parse the data received from the Mini App
-    const data = JSON.parse(msg.web_app_data.data);
-    const chatId = msg.chat.id;
-    
-    // Send confirmation to the user
-    await bot.sendMessage(chatId, 
-      `✅ Order #${data.orderNumber} confirmed!\n\nThank you, ${data.name}. Your order will be ready for pickup at ${data.time}.`);
-    
-    // If this order should be forwarded to the kitchen bot
-    if (data.botInfo && data.botInfo.forwardToKitchen) {
-      // Method 1: Using the Telegram API directly
-      // This requires you to have the kitchen bot's token
-      const kitchenBotToken = '8157403295:AAHc6DUqvX1PgjVihwUGTcvYRrHVHeQ7QcY';
-      const kitchenChatId = '-2152072922'; // This could be a group chat ID
-      
-      const axios = require('axios');
-      await axios.post(`https://api.telegram.org/bot${kitchenBotToken}/sendMessage`, {
-        chat_id: kitchenChatId,
-        text: data.orderSummary,
-        parse_mode: 'HTML'
-      });
-      
-
-// Handle /start command 
-bot.onText(/\/start/, (msg) => {
-  const chatId = msg.chat.id;
-  bot.sendMessage(chatId, 'Welcome! Click the button below to place your order:', {
-    reply_markup: {
-      keyboard: [
-        [{text: '🍽️ Place an Order', web_app: {url: 'https://meowmeowpewpew.github.io/YellowCoffee.io/'}}]
-      ],
-      resize_keyboard: true
-    }
-  });
-});
         
     </script>
 </body>
