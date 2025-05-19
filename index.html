@@ -100,6 +100,25 @@
             flex-direction: column;
             margin-top: 10px;
         }
+        .time-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .time-button {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .time-button:disabled {
+            background-color: var(--tg-theme-hint-color, #ccc);
+            cursor: not-allowed;
+        }
         .time-slider {
             width: 100%;
             margin: 10px 0;
@@ -213,6 +232,35 @@
             margin-top: 5px;
             font-size: 14px;
         }
+        .order-summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #eee);
+        }
+        .order-summary-item:last-child {
+            border-bottom: none;
+        }
+        .order-total {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid var(--tg-theme-hint-color, #eee);
+        }
+        .error-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -277,6 +325,10 @@
                 <div class="time-selector">
                     <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.016666667" value="12">
                     <div class="time-display" id="timeDisplay">12:00</div>
+                    <div class="time-controls">
+                        <button class="time-button" id="decreaseTime">-5 min</button>
+                        <button class="time-button" id="increaseTime">+5 min</button>
+                    </div>
                 </div>
             </div>
             <div class="navigation">
@@ -332,6 +384,9 @@
                 Sending order...
             </div>
         </div>
+        
+        <!-- Error Toast -->
+        <div class="error-toast" id="errorToast"></div>
     </div>
 
     <script>
@@ -511,7 +566,7 @@
                 orderData.items.forEach(item => {
                     const itemTotal = item.price * item.quantity;
                     summaryItems.innerHTML += `
-                        <div class="order-item">
+                        <div class="order-summary-item">
                             <span>${item.quantity}x ${item.name}</span>
                             <span>$${itemTotal.toFixed(2)}</span>
                         </div>
@@ -519,7 +574,12 @@
                 });
             }
             
-            document.getElementById('summaryTotal').textContent = `$${orderData.total.toFixed(2)}`;
+            document.getElementById('summaryTotal').innerHTML = `
+                <div class="order-total">
+                    <span>Total:</span>
+                    <span>$${orderData.total.toFixed(2)}</span>
+                </div>
+            `;
         }
         
         // Generate a random order number
@@ -645,8 +705,27 @@
             
             // Time slider event listener
             timeSlider.addEventListener('input', function() {
-                const hours = Math.floor(this.value);
-                const minutes = Math.round((this.value % 1) * 60);
+                updateTimeDisplay(this.value);
+            });
+            
+            // Time control buttons
+            document.getElementById('decreaseTime').addEventListener('click', function() {
+                const currentValue = parseFloat(timeSlider.value);
+                const newValue = Math.max(currentValue - (5/60), timeSlider.min);
+                timeSlider.value = newValue;
+                updateTimeDisplay(newValue);
+            });
+            
+            document.getElementById('increaseTime').addEventListener('click', function() {
+                const currentValue = parseFloat(timeSlider.value);
+                const newValue = Math.min(currentValue + (5/60), timeSlider.max);
+                timeSlider.value = newValue;
+                updateTimeDisplay(newValue);
+            });
+            
+            function updateTimeDisplay(value) {
+                const hours = Math.floor(value);
+                const minutes = Math.round((value % 1) * 60);
                 
                 // If selected hour is current hour, check minutes
                 if (hours === currentHour && minutes <= currentMinute) {
@@ -657,7 +736,7 @@
                 const timeString = `${hours}:${minutes.toString().padStart(2, '0')}`;
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
-            });
+            }
             
             // Step navigation
             document.querySelectorAll('.tab-button[data-step]').forEach(button => {
@@ -723,6 +802,11 @@
             });
             
             document.getElementById('confirmOrder').addEventListener('click', async function() {
+                if (orderData.items.length === 0) {
+                    showError('Please select at least one item');
+                    return;
+                }
+                
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
                 
@@ -748,7 +832,7 @@
                     document.getElementById('orderConfirmed').style.display = 'block';
                 } catch (error) {
                     console.error('Error sending order:', error);
-                    alert('There was an error sending your order. Please try again.');
+                    showError('Failed to send order. Please try again.');
                 } finally {
                     // Hide loading overlay
                     document.getElementById('loadingOverlay').style.display = 'none';
@@ -760,6 +844,16 @@
                 resetOrderData();
                 navigateToStep('1');
             });
+            
+            // Show error toast
+            function showError(message) {
+                const toast = document.getElementById('errorToast');
+                toast.textContent = message;
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }
         }
         
         // Navigate to specific step
@@ -783,4 +877,3 @@
     </script>
 </body>
 </html>
-
