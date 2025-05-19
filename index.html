@@ -302,7 +302,8 @@
             botInfo: {
                 forwardToKitchen: true,
                 kitchenBotUsername: "@ZakazYellow_bot", // Replace with your actual kitchen bot username
-                targetUserId: "261442211" // Replace with your target user ID
+                targetUserId: "261442211", // Replace with your target user ID
+                recipientUserId: "261442211" // ID of the user who should receive the order message
             }
         };
         
@@ -474,10 +475,15 @@
         function sendMessageToUser(message) {
             // Create the message data object
             const messageData = {
-                type: 'send_user_message',
-                userId: orderData.botInfo.targetUserId,
-                message: message,
-                parseMode: 'HTML'
+                type: 'order_notification',
+                target: {
+                    type: 'user',
+                    id: orderData.botInfo.recipientUserId // Send to the recipient user
+                },
+                content: {
+                    text: message,
+                    parseMode: 'HTML'
+                }
             };
             
             // Send the message data to the bot
@@ -605,7 +611,14 @@
                     time: orderData.time,
                     total: orderData.total,
                     orderSummary: orderSummary,
-                    botInfo: orderData.botInfo
+                    botInfo: orderData.botInfo,
+                    notification: {
+                        type: 'order_notification',
+                        target: {
+                            type: 'user',
+                            id: orderData.botInfo.recipientUserId // Send to the recipient user
+                        }
+                    }
                 };
                 
                 // Send order details to the bot
