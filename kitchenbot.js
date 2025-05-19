@@ -8,8 +8,8 @@ bot.on('web_app_data', async (msg) => {
     const orderMessage = formatOrderMessage(data);
     
     // Send to kitchen bot (using Telegram Bot API)
-    await axios.post(`https://api.telegram.org/bot${KITCHEN_BOT_TOKEN}/sendMessage`, {
-      chat_id: KITCHEN_CHAT_ID,  // This could be a group chat ID or specific user ID
+    await axios.post(`https://api.telegram.org/bot${8157403295:AAHc6DUqvX1PgjVihwUGTcvYRrHVHeQ7QcY}/sendMessage`, {
+      chat_id: t.me/ZakazYellow_bot,  // This could be a group chat ID or specific user ID
       text: orderMessage,
       parse_mode: 'HTML'
     });
