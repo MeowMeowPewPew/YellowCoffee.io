@@ -1230,7 +1230,7 @@
                     newOrder: "Make Another Order",
                     owl: {
                         message: "🦉 Would you like to pet and feed your owl while your coffee is being prepared?",
-                        button: "🦉 Visit Owl Bot"
+                        button: "🦉 Play with Owl"
                     }
                 }
             },
@@ -1326,7 +1326,9 @@
 
             // Update owl section
             document.querySelector('.owl-message').textContent = t.thankYou.owl.message;
-            document.querySelector('.owl-button').textContent = t.thankYou.owl.button;
+            const owlButton = document.querySelector('.owl-button');
+            owlButton.textContent = t.thankYou.owl.button;
+            owlButton.href = "https://t.me/notwise_bot";
 
             // Update language buttons
             document.querySelectorAll('.language-btn').forEach(btn => {
