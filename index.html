@@ -637,8 +637,8 @@
     <div class="container">
         <div class="header">
             <div class="language-selector">
-                <button class="language-btn active" data-lang="en">EN</button>
-                <button class="language-btn" data-lang="ru">RU</button>
+                <button class="language-btn" data-lang="en">EN</button>
+                <button class="language-btn active" data-lang="ru">RU</button>
             </div>
         </div>
         <div class="header">
@@ -1182,6 +1182,10 @@
         function init() {
             populateMenus();
             
+            // Set initial language to Russian
+            currentLang = 'ru';
+            switchLanguage('ru');
+            
             // Set initial time to current time + 10 minutes
             const now = new Date();
             now.setMinutes(now.getMinutes() + 10);
@@ -1532,7 +1536,7 @@
             }
         };
 
-        let currentLang = 'en';
+        let currentLang = 'ru';
 
         // Language switching function
         function switchLanguage(lang) {
