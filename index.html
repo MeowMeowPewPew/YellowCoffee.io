@@ -1591,34 +1591,13 @@
             });
         }
 
-        // Add language button handlers
-        document.querySelectorAll('.language-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                switchLanguage(this.dataset.lang);
-            });
-        });
-
-        // Replace word count functionality with character count
-        function updateCharCount() {
-            const commentInput = document.getElementById('orderComment');
-            const charCountDisplay = document.getElementById('charCount');
-            const charCount = commentInput.value.length;
-            charCountDisplay.textContent = charCount;
-            
-            // Disable/enable confirm button based on character count
-            const confirmButton = document.getElementById('confirmStep3');
-            if (confirmButton) {
-                confirmButton.disabled = charCount > 90;
-            }
-        }
-
         // Initialize owl button text on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // ... existing initialization code ...
-            
             // Set initial owl button text
+            const owlMessage = document.querySelector('.owl-message');
             const owlButton = document.querySelector('.owl-button');
-            if (owlButton) {
+            if (owlMessage && owlButton) {
+                owlMessage.textContent = translations[currentLang].thankYou.owl.message;
                 owlButton.textContent = translations[currentLang].thankYou.owl.button;
                 owlButton.href = "https://t.me/notwise_bot";
             }
