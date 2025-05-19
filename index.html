@@ -552,6 +552,82 @@
             margin-top: 5px;
             opacity: 0.7;
         }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .quantity-btn {
+            background: var(--secondary-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.95);
+        }
+
+        .quantity-display {
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .selection-summary {
+            margin-top: 16px;
+            padding: 15px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .selection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .selection-item:last-child {
+            border-bottom: none;
+        }
+
+        .selection-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-item-price {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -790,6 +866,11 @@
                         <div class="menu-icon" aria-hidden="true">${drink.icon}</div>
                         <div class="menu-name">${drink.name}</div>
                         <div class="menu-price">${drink.price} ₽</div>
+                        <div class="quantity-controls">
+                            <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
+                            <div class="quantity-display">0</div>
+                            <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
+                        </div>
                     </div>
                 `;
             });
@@ -802,13 +883,30 @@
                         <div class="menu-icon" aria-hidden="true">${food.icon}</div>
                         <div class="menu-name">${food.name}</div>
                         <div class="menu-price">${food.price} ₽</div>
+                        <div class="quantity-controls">
+                            <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
+                            <div class="quantity-display">0</div>
+                            <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
+                        </div>
                     </div>
                 `;
             });
             
             // Add event listeners to menu items
             document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', toggleMenuItem);
+                const decreaseBtn = item.querySelector('.decrease');
+                const increaseBtn = item.querySelector('.increase');
+                const quantityDisplay = item.querySelector('.quantity-display');
+                
+                decreaseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateItemQuantity(item, -1);
+                });
+                
+                increaseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateItemQuantity(item, 1);
+                });
             });
         }
         
@@ -861,16 +959,58 @@
             let total = 0;
             let count = 0;
             
+            const summaryContainer = document.getElementById('selectionSummary');
+            summaryContainer.innerHTML = '';
+            
+            if (orderData.items.length === 0) {
+                summaryContainer.innerHTML = `<p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>`;
+                return;
+            }
+            
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'selection-summary';
+            
             orderData.items.forEach(item => {
-                total += item.price * item.quantity;
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
                 count += item.quantity;
+                
+                summaryDiv.innerHTML += `
+                    <div class="selection-item">
+                        <div class="selection-item-controls">
+                            <div class="selection-item-quantity">
+                                <div class="quantity-btn decrease" data-id="${item.id}" aria-label="Decrease quantity">-</div>
+                                <div class="quantity-display">${item.quantity}</div>
+                                <div class="quantity-btn increase" data-id="${item.id}" aria-label="Increase quantity">+</div>
+                            </div>
+                            <div class="selection-item-name">${item.name}</div>
+                        </div>
+                        <div class="selection-item-price">${itemTotal} ₽</div>
+                    </div>
+                `;
+            });
+            
+            summaryDiv.innerHTML += `
+                <div class="selection-item" style="margin-top: 10px; border-top: 2px solid var(--primary-color);">
+                    <div>${translations[currentLang].menu.selected} <span id="selectedCount">${count}</span></div>
+                    <div class="selection-item-price">${total} ₽</div>
+                </div>
+            `;
+            
+            summaryContainer.appendChild(summaryDiv);
+            
+            // Add event listeners to summary quantity controls
+            summaryDiv.querySelectorAll('.quantity-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = btn.dataset.id;
+                    const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+                    if (menuItem) {
+                        updateItemQuantity(menuItem, btn.classList.contains('increase') ? 1 : -1);
+                    }
+                });
             });
             
             orderData.total = total;
-            const selectedCountElement = document.getElementById('selectedCount');
-            if (selectedCountElement) {
-                selectedCountElement.textContent = count;
-            }
         }
         
         // Generate order summary for confirmation
@@ -1483,6 +1623,45 @@
                 owlButton.href = "https://t.me/notwise_bot";
             }
         });
+
+        // Add updateItemQuantity function
+        function updateItemQuantity(item, change) {
+            const id = item.dataset.id;
+            const name = item.dataset.name;
+            const price = parseFloat(item.dataset.price);
+            const quantityDisplay = item.querySelector('.quantity-display');
+            const currentQuantity = parseInt(quantityDisplay.textContent);
+            const newQuantity = Math.max(0, currentQuantity + change);
+            
+            // Update display
+            quantityDisplay.textContent = newQuantity;
+            
+            // Update order data
+            const existingItem = orderData.items.find(item => item.id === id);
+            
+            if (newQuantity === 0) {
+                // Remove item if quantity is 0
+                if (existingItem) {
+                    orderData.items = orderData.items.filter(item => item.id !== id);
+                    item.classList.remove('selected');
+                }
+            } else {
+                if (existingItem) {
+                    existingItem.quantity = newQuantity;
+                } else {
+                    orderData.items.push({
+                        id: id,
+                        name: name,
+                        price: price,
+                        quantity: newQuantity
+                    });
+                    item.classList.add('selected');
+                }
+            }
+            
+            // Update summary
+            updateOrderSummary();
+        }
     </script>
 </body>
 </html>
