@@ -347,6 +347,32 @@
             font-size: 14px;
             opacity: 0.9;
         }
+
+        .navigation {
+            position: sticky;
+            bottom: 0;
+            background: var(--bg-color);
+            padding: 16px;
+            margin-top: 20px;
+            box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: #FFFFFF;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -403,7 +429,7 @@
                     I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow
                 </div>
                 <div class="time-selector">
-                    <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.016666667" value="12" aria-label="Select pickup time">
+                    <input type="range" class="time-slider" id="timeSlider" min="7.5" max="20" step="0.016666667" value="12" aria-label="Select pickup time">
                     <div class="time-display" id="timeDisplay">12:00</div>
                 </div>
             </div>
@@ -745,21 +771,20 @@
             const timeSlider = document.getElementById('timeSlider');
             const timeDisplay = document.getElementById('timeDisplay');
             
-            // Set minimum value to current hour
-            timeSlider.min = currentHour;
+            // Set minimum value to 7:30 (7.5 hours)
+            timeSlider.min = 7.5;
             timeSlider.max = 20; // Shop closes at 20:00
             
             // Convert time to slider value (hours + minutes as decimal)
-            const sliderValue = currentHour + (currentMinute / 60);
+            const sliderValue = Math.max(7.5, currentHour + (currentMinute / 60));
             timeSlider.value = sliderValue;
-            timeDisplay.textContent = roundedTime;
-            orderData.time = roundedTime;
+            timeDisplay.textContent = formatTime(sliderValue);
+            orderData.time = formatTime(sliderValue);
             
             // Time slider event listener
             timeSlider.addEventListener('input', function() {
-                const hours = Math.floor(this.value);
-                const minutes = Math.round((this.value % 1) * 60);
-                const timeString = `${hours}:${minutes.toString().padStart(2, '0')}`;
+                const value = parseFloat(this.value);
+                const timeString = formatTime(value);
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
             });
@@ -893,6 +918,13 @@
             
             // Re-enable the Next button
             document.getElementById('confirmStep3').disabled = false;
+        }
+        
+        // Helper function to format time
+        function formatTime(value) {
+            const hours = Math.floor(value);
+            const minutes = Math.round((value % 1) * 60);
+            return `${hours}:${minutes.toString().padStart(2, '0')}`;
         }
         
         // Initialize on page load
