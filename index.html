@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://telegram.org; script-src 'self' 'unsafe-eval' https://telegram.org; style-src 'self' 'unsafe-inline';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://telegram.org; script-src 'self' https://telegram.org; style-src 'self' 'unsafe-inline';">
     <title>Food & Drink Order Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -485,9 +485,15 @@
         let currentUserId = null;
         try {
             const initData = tg.initData;
-            const initDataObj = JSON.parse(initData);
-            if (initDataObj && initDataObj.user && initDataObj.user.id) {
-                currentUserId = initDataObj.user.id.toString();
+            if (initData) {
+                const urlParams = new URLSearchParams(initData);
+                const userData = urlParams.get('user');
+                if (userData) {
+                    const user = JSON.parse(userData);
+                    if (user && user.id) {
+                        currentUserId = user.id.toString();
+                    }
+                }
             }
         } catch (e) {
             console.error('Error parsing initData:', e);
