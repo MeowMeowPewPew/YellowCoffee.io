@@ -513,6 +513,45 @@
             transition: var(--transition);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
+        .owl-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .comment-section {
+            margin-top: 20px;
+        }
+
+        .comment-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 14px;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        .word-count {
+            text-align: right;
+            font-size: 14px;
+            color: var(--text-color);
+            margin-top: 5px;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -590,8 +629,22 @@
             </div>
         </div>
         
-        <!-- Step 3: Time Selection -->
+        <!-- New Step 3: Comment -->
         <div class="step" id="step3">
+            <div class="section">
+                <h2>Add Comments (Optional)</h2>
+                <div class="comment-section">
+                    <textarea class="comment-input" id="orderComment" placeholder="Enter any special requests or comments about your order (max 90 characters)" maxlength="90" aria-label="Order comments"></textarea>
+                    <div class="word-count"><span id="charCount">0</span>/90 characters</div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="confirmStep3">Confirm</button>
+            </div>
+        </div>
+        
+        <!-- Rename existing step3 to step4 -->
+        <div class="step" id="step4">
             <div class="section">
                 <h2>Select Pickup Time</h2>
                 <div class="notification" id="shopClosedNotification" style="display: none;">
@@ -603,12 +656,12 @@
                 </div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="confirmStep3">Confirm</button>
+                <button class="nav-button" id="confirmStep4">Confirm</button>
             </div>
         </div>
         
-        <!-- Step 4: Order Confirmation -->
-        <div class="step" id="step4">
+        <!-- Rename existing step4 to step5 -->
+        <div class="step" id="step5">
             <div class="section">
                 <h2>Order Confirmation</h2>
                 <div class="order-summary">
@@ -674,6 +727,7 @@
             name: "",
             location: "",
             items: [],
+            comment: "",
             time: "12:00",
             total: 0,
             botInfo: {
@@ -853,6 +907,15 @@
                 });
             }
             
+            if (orderData.comment) {
+                summaryItems.innerHTML += `
+                    <div class="order-item">
+                        <span><strong>${translations[currentLang].order.comments || 'Comments'}:</strong></span>
+                        <span>${orderData.comment}</span>
+                    </div>
+                `;
+            }
+            
             document.getElementById('summaryTotal').textContent = `${orderData.total} ₽`;
         }
         
@@ -897,7 +960,7 @@
             const locationName = orderData.location === 'dmitrovka' ? t.location.dmitrovka : t.location.tekhnopark;
             const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
             
-            return `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
+            let message = `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
                    `<b>👤 ${t.order.name}:</b> ${orderData.name}\n` +
                    `<b>📍 ${t.order.location}:</b> ${locationName}\n` +
                    `<b>🏠 ${t.order.address}:</b> ${locationAddress}\n` +
@@ -907,6 +970,12 @@
                        `• ${item.quantity}x ${item.name} - ${item.price * item.quantity} ₽`
                    ).join('\n') +
                    `\n\n<b>💰 ${t.order.total}:</b> ${orderData.total} ₽`;
+
+            if (orderData.comment) {
+                message += `\n\n<b>💭 ${t.order.comments || 'Comments'}:</b>\n${orderData.comment}`;
+            }
+
+            return message;
         }
         
         // Reset order data
@@ -915,6 +984,7 @@
                 name: "",
                 location: "",
                 items: [],
+                comment: "",
                 time: "12:00",
                 total: 0,
                 botInfo: {
@@ -948,6 +1018,13 @@
                 btn.classList.remove('active');
             });
             document.querySelector('.tab-button[data-menu="drinks"]').classList.add('active');
+            
+            // Reset comment input
+            const commentInput = document.getElementById('orderComment');
+            if (commentInput) {
+                commentInput.value = '';
+                updateCharCount();
+            }
         }
         
         // Initialize function
@@ -1039,6 +1116,12 @@
             });
             
             document.getElementById('confirmStep3').addEventListener('click', function() {
+                orderData.comment = document.getElementById('orderComment').value.trim();
+                this.classList.add('completed');
+                navigateToStep('4');
+            });
+            
+            document.getElementById('confirmStep4').addEventListener('click', function() {
                 const currentHour = new Date().getHours();
                 const currentMinutes = new Date().getMinutes();
                 const currentTime = currentHour + (currentMinutes / 60);
@@ -1049,7 +1132,7 @@
                 }
                 generateOrderSummary();
                 this.classList.add('completed');
-                navigateToStep('4');
+                navigateToStep('5');
             });
             
             document.getElementById('confirmOrder').addEventListener('click', async function() {
@@ -1155,7 +1238,7 @@
             notification.style.display = 'block';
             
             // Disable the confirm button
-            document.getElementById('confirmStep3').disabled = true;
+            document.getElementById('confirmStep4').disabled = true;
             
             // Hide notification after 5 seconds
             setTimeout(() => {
@@ -1168,7 +1251,7 @@
             notification.style.display = 'none';
             
             // Re-enable the confirm button
-            document.getElementById('confirmStep3').disabled = false;
+            document.getElementById('confirmStep4').disabled = false;
         }
         
         // Helper function to format time
@@ -1218,7 +1301,8 @@
                     time: "Pickup Time",
                     items: "Selected Items",
                     total: "Total",
-                    confirm: "Confirm Order"
+                    confirm: "Confirm Order",
+                    comments: "Comments"
                 },
                 shopClosed: {
                     evening: "I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow",
@@ -1233,6 +1317,11 @@
                         message: "🦉 Would you like to pet and feed your owl while your coffee is being prepared?",
                         button: "🦉 Play with Owl"
                     }
+                },
+                comment: {
+                    title: "Add Comments (Optional)",
+                    placeholder: "Enter any special requests or comments about your order (max 90 characters)",
+                    charCount: "characters"
                 }
             },
             ru: {
@@ -1267,7 +1356,8 @@
                     time: "Время Получения",
                     items: "Выбранные Товары",
                     total: "Итого",
-                    confirm: "Подтвердить Заказ"
+                    confirm: "Подтвердить Заказ",
+                    comments: "Комментарии"
                 },
                 shopClosed: {
                     evening: "Приносим извинения, кофейня уже закрыта сегодня, мы будем ждать ваш заказ завтра",
@@ -1282,6 +1372,11 @@
                         message: "🦉 Может хотите погладить и покормить свою сову, пока ваш кофе готовится?",
                         button: "🦉 Перейти к Сове"
                     }
+                },
+                comment: {
+                    title: "Добавить Комментарии (Необязательно)",
+                    placeholder: "Введите особые пожелания или комментарии к заказу (макс. 90 символов)",
+                    charCount: "символов"
                 }
             }
         };
@@ -1313,10 +1408,10 @@
             document.querySelector('#selectionSummary p').textContent = t.menu.selected;
 
             // Update time section
-            document.querySelector('#step3 .section h2').textContent = t.time.title;
+            document.querySelector('#step4 .section h2').textContent = t.time.title;
 
             // Update order section
-            document.querySelector('#step4 .section h2').textContent = t.order.title;
+            document.querySelector('#step5 .section h2').textContent = t.order.title;
             document.getElementById('confirmOrder').textContent = t.order.confirm;
 
             // Update thank you section
@@ -1338,6 +1433,14 @@
             document.querySelectorAll('.language-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.lang === lang);
             });
+
+            // Update comment section
+            document.querySelector('#step3 .section h2').textContent = t.comment.title;
+            const commentInput = document.getElementById('orderComment');
+            if (commentInput) {
+                commentInput.placeholder = t.comment.placeholder;
+            }
+            document.querySelector('.word-count').innerHTML = `<span id="charCount">0</span>/90 ${t.comment.charCount}`;
         }
 
         // Add language button handlers
@@ -1347,43 +1450,18 @@
             });
         });
 
-        // Update shop closed notification text
-        function showShopClosedNotification() {
-            const notification = document.getElementById('shopClosedNotification');
-            const currentHour = new Date().getHours();
-            const currentMinutes = new Date().getMinutes();
-            const currentTime = currentHour + (currentMinutes / 60);
-
-            if (currentTime >= 20) {
-                notification.textContent = translations[currentLang].shopClosed.evening;
-            } else if (currentTime < 7.5) {
-                notification.textContent = translations[currentLang].shopClosed.morning;
+        // Replace word count functionality with character count
+        function updateCharCount() {
+            const commentInput = document.getElementById('orderComment');
+            const charCountDisplay = document.getElementById('charCount');
+            const charCount = commentInput.value.length;
+            charCountDisplay.textContent = charCount;
+            
+            // Disable/enable confirm button based on character count
+            const confirmButton = document.getElementById('confirmStep3');
+            if (confirmButton) {
+                confirmButton.disabled = charCount > 90;
             }
-            
-            notification.style.display = 'block';
-            document.getElementById('confirmStep3').disabled = true;
-            
-            setTimeout(() => {
-                hideShopClosedNotification();
-            }, 5000);
-        }
-
-        // Update order message format
-        function formatOrderMessage(orderNumber, orderData) {
-            const t = translations[currentLang];
-            const locationName = orderData.location === 'dmitrovka' ? t.location.dmitrovka : t.location.tekhnopark;
-            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
-            
-            return `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
-                   `<b>👤 ${t.order.name}:</b> ${orderData.name}\n` +
-                   `<b>📍 ${t.order.location}:</b> ${locationName}\n` +
-                   `<b>🏠 ${t.order.address}:</b> ${locationAddress}\n` +
-                   `<b>⏰ ${t.order.time}:</b> ${orderData.time}\n\n` +
-                   `<b>📋 ${t.order.items}:</b>\n` +
-                   orderData.items.map(item => 
-                       `• ${item.quantity}x ${item.name} - ${item.price * item.quantity} ₽`
-                   ).join('\n') +
-                   `\n\n<b>💰 ${t.order.total}:</b> ${orderData.total} ₽`;
         }
     </script>
 </body>
