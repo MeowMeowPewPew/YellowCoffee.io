@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food & Drink Order Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--tg-theme-text-color, #222);
+            background-color: var(--tg-theme-bg-color, #fff);
+        }
+        .container {
+            max-width: 100%;
+            padding: 16px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .section {
+            background-color: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .button {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            background-color: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #222);
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .menu-item {
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .menu-item.selected {
+            border-color: var(--tg-theme-button-color, #2481cc);
+            background-color: rgba(36, 129, 204, 0.1);
+        }
+        .menu-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .menu-name {
+            font-size: 14px;
+            margin-bottom: 4px;
+            min-height: 28px;
+        }
+        .menu-price {
+            font-weight: bold;
+        }
+        .selection-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .time-selector {
+            display: flex;
+            flex-direction: column;
+            margin-top: 10px;
+        }
+        .time-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .time-display {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .order-summary {
+            margin-top: 10px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background-color: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+        }
+        .tab-button:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+        .tab-button:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+        }
+        .nav-button {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 48%;
+        }
+        .order-number {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border-radius: 8px;
+        }
+        .error-message {
+            color: #e74c3c;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Place Your Order</h1>
+        </div>
+        
+        <!-- Step navigation -->
+        <div class="tab-buttons">
+            <div class="tab-button active" data-step="1">1. Name</div>
+            <div class="tab-button" data-step="2">2. Menu</div>
+            <div class="tab-button" data-step="3">3. Time</div>
+            <div class="tab-button" data-step="4">4. Confirm</div>
+        </div>
+        
+        <!-- Step 1: Name -->
+        <div class="step active" id="step1">
+            <div class="section">
+                <h2>Enter Your Name</h2>
+                <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15">
+                <div class="error-message" id="nameError"></div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="nextToStep2" style="width: 100%;">Next</button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Menu Selection -->
+        <div class="step" id="step2">
+            <div class="section">
+                <h2>Select Drinks & Food</h2>
+                <div class="tab-buttons">
+                    <div class="tab-button active" data-menu="drinks">Drinks</div>
+                    <div class="tab-button" data-menu="food">Food</div>
+                </div>
+                
+                <!-- Drinks Menu -->
+                <div class="menu-grid" id="drinksMenu">
+                    <!-- Drinks will be populated here -->
+                </div>
+                
+                <!-- Food Menu -->
+                <div class="menu-grid" id="foodMenu" style="display: none;">
+                    <!-- Food will be populated here -->
+                </div>
+                
+                <div id="selectionSummary" class="order-summary" style="margin-top: 16px;">
+                    <p>Selected items: <span id="selectedCount">0</span></p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="backToStep1">Back</button>
+                <button class="nav-button" id="nextToStep3">Next</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Time Selection -->
+        <div class="step" id="step3">
+            <div class="section">
+                <h2>Select Pickup Time</h2>
+                <div class="time-selector">
+                    <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.5" value="12">
+                    <div class="time-display" id="timeDisplay">12:00</div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="backToStep2">Back</button>
+                <button class="nav-button" id="nextToStep4">Next</button>
+            </div>
+        </div>
+        
+        <!-- Step 4: Order Confirmation -->
+        <div class="step" id="step4">
+            <div class="section">
+                <h2>Order Confirmation</h2>
+                <div class="order-summary">
+                    <div class="order-item">
+                        <span><strong>Name:</strong></span>
+                        <span id="summaryName"></span>
+                    </div>
+                    <div class="order-item">
+                        <span><strong>Pickup Time:</strong></span>
+                        <span id="summaryTime"></span>
+                    </div>
+                    <h3>Selected Items:</h3>
+                    <div id="summaryItems"></div>
+                    <div class="order-item" style="margin-top: 10px;">
+                        <span><strong>Total:</strong></span>
+                        <span id="summaryTotal"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="backToStep3">Back</button>
+                <button class="nav-button" id="confirmOrder">Confirm Order</button>
+            </div>
+        </div>
+        
+        <!-- Order Confirmed Screen -->
+        <div class="step" id="orderConfirmed" style="display: none;">
+            <div class="section">
+                <h2>Order Confirmed!</h2>
+                <p>Thank you for your order.</p>
+                <div class="order-number">
+                    <p>Your Order Number:</p>
+                    <span id="orderNumber"></span>
+                </div>
+                <p>Please show this number when you pick up your order.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Variables to store order data
+        let orderData = {
+            name: "",
+            items: [],
+            time: "12:00",
+            total: 0
+        };
+        
+        // Menu data - can be replaced with actual items
+        const menuData = {
+            drinks: [
+                { id: "d1", name: "Coffee", price: 3.50, icon: "☕" },
+                { id: "d2", name: "Tea", price: 2.50, icon: "🍵" },
+                { id: "d3", name: "Orange Juice", price: 4.00, icon: "🍊" },
+                { id: "d4", name: "Latte", price: 4.50, icon: "☕" },
+                { id: "d5", name: "Hot Chocolate", price: 4.00, icon: "🍫" },
+                { id: "d6", name: "Espresso", price: 3.00, icon: "☕" },
+                { id: "d7", name: "Cappuccino", price: 4.50, icon: "☕" },
+                { id: "d8", name: "Smoothie", price: 5.00, icon: "🥤" },
+                { id: "d9", name: "Milkshake", price: 5.50, icon: "🥛" },
+                { id: "d10", name: "Lemonade", price: 3.00, icon: "🍋" },
+                { id: "d11", name: "Iced Tea", price: 3.00, icon: "🧊" },
+                { id: "d12", name: "Water", price: 1.50, icon: "💧" },
+                { id: "d13", name: "Soda", price: 2.00, icon: "🥤" },
+                { id: "d14", name: "Green Tea", price: 3.00, icon: "🍵" },
+                { id: "d15", name: "Mocha", price: 5.00, icon: "☕" }
+            ],
+            food: [
+                { id: "f1", name: "Sandwich", price: 6.50, icon: "🥪" },
+                { id: "f2", name: "Salad", price: 7.00, icon: "🥗" },
+                { id: "f3", name: "Pasta", price: 9.00, icon: "🍝" },
+                { id: "f4", name: "Pizza", price: 10.00, icon: "🍕" },
+                { id: "f5", name: "Burger", price: 8.50, icon: "🍔" },
+                { id: "f6", name: "Croissant", price: 3.00, icon: "🥐" },
+                { id: "f7", name: "Bagel", price: 4.00, icon: "🥯" },
+                { id: "f8", name: "Muffin", price: 3.50, icon: "🧁" },
+                { id: "f9", name: "Cake", price: 5.00, icon: "🍰" },
+                { id: "f10", name: "Pancakes", price: 6.00, icon: "🥞" },
+                { id: "f11", name: "Wrap", price: 7.00, icon: "🌯" },
+                { id: "f12", name: "Soup", price: 5.00, icon: "🍲" },
+                { id: "f13", name: "Sushi", price: 12.00, icon: "🍣" },
+                { id: "f14", name: "Fries", price: 3.50, icon: "🍟" },
+                { id: "f15", name: "Donut", price: 2.50, icon: "🍩" }
+            ]
+        };
+        
+        // Populate menus
+        function populateMenus() {
+            const drinksMenu = document.getElementById('drinksMenu');
+            const foodMenu = document.getElementById('foodMenu');
+            
+            // Populate drinks
+            drinksMenu.innerHTML = '';
+            menuData.drinks.forEach(drink => {
+                drinksMenu.innerHTML += `
+                    <div class="menu-item" data-id="${drink.id}" data-name="${drink.name}" data-price="${drink.price}">
+                        <div class="menu-icon">${drink.icon}</div>
+                        <div class="menu-name">${drink.name}</div>
+                        <div class="menu-price">$${drink.price.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            // Populate foods
+            foodMenu.innerHTML = '';
+            menuData.food.forEach(food => {
+                foodMenu.innerHTML += `
+                    <div class="menu-item" data-id="${food.id}" data-name="${food.name}" data-price="${food.price}">
+                        <div class="menu-icon">${food.icon}</div>
+                        <div class="menu-name">${food.name}</div>
+                        <div class="menu-price">$${food.price.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            // Add event listeners to menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', toggleMenuItem);
+            });
+        }
+        
+        // Toggle menu item selection
+        function toggleMenuItem() {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const price = parseFloat(this.dataset.price);
+            
+            // Check if item is already selected
+            const existingItem = orderData.items.find(item => item.id === id);
+            
+            if (existingItem) {
+                // Item exists, increase quantity
+                existingItem.quantity += 1;
+                
+                // Update or add selection count badge
+                let countBadge = this.querySelector('.selection-count');
+                if (countBadge) {
+                    countBadge.textContent = existingItem.quantity;
+                } else {
+                    const badge = document.createElement('div');
+                    badge.className = 'selection-count';
+                    badge.textContent = existingItem.quantity;
+                    this.appendChild(badge);
+                }
+            } else {
+                // Add new item
+                orderData.items.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    quantity: 1
+                });
+                
+                // Add selection class and count badge
+                this.classList.add('selected');
+                const badge = document.createElement('div');
+                badge.className = 'selection-count';
+                badge.textContent = '1';
+                this.appendChild(badge);
+            }
+            
+            // Update total and selection count
+            updateOrderSummary();
+        }
+        
+        // Update order summary
+        function updateOrderSummary() {
+            let total = 0;
+            let count = 0;
+            
+            orderData.items.forEach(item => {
+                total += item.price * item.quantity;
+                count += item.quantity;
+            });
+            
+            orderData.total = total;
+            document.getElementById('selectedCount').textContent = count;
+        }
+        
+        // Generate order summary for confirmation
+        function generateOrderSummary() {
+            document.getElementById('summaryName').textContent = orderData.name;
+            document.getElementById('summaryTime').textContent = orderData.time;
+            
+            const summaryItems = document.getElementById('summaryItems');
+            summaryItems.innerHTML = '';
+            
+            if (orderData.items.length === 0) {
+                summaryItems.innerHTML = '<p>No items selected</p>';
+            } else {
+                orderData.items.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    summaryItems.innerHTML += `
+                        <div class="order-item">
+                            <span>${item.quantity}x ${item.name}</span>
+                            <span>$${itemTotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('summaryTotal').textContent = `$${orderData.total.toFixed(2)}`;
+        }
+        
+        // Generate a random order number
+        function generateOrderNumber() {
+            const date = new Date();
+            const dateStr = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+            const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `${dateStr}-${randomNum}`;
+        }
+        
+        // Initialize function
+        function init() {
+            populateMenus();
+            
+            // Step navigation
+            document.querySelectorAll('.tab-button[data-step]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const step = this.dataset.step;
+                    navigateToStep(step);
+                });
+            });
+            
+            // Menu tabs
+            document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const menu = this.dataset.menu;
+                    document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    if (menu === 'drinks') {
+                        document.getElementById('drinksMenu').style.display = 'grid';
+                        document.getElementById('foodMenu').style.display = 'none';
+                    } else {
+                        document.getElementById('drinksMenu').style.display = 'none';
+                        document.getElementById('foodMenu').style.display = 'grid';
+                    }
+                });
+            });
+            
+            // Time slider
+            const timeSlider = document.getElementById('timeSlider');
+            const timeDisplay = document.getElementById('timeDisplay');
+            
+            timeSlider.addEventListener('input', function() {
+                const hours = Math.floor(this.value);
+                const minutes = this.value % 1 === 0.5 ? '30' : '00';
+                const timeString = `${hours}:${minutes}`;
+                timeDisplay.textContent = timeString;
+                orderData.time = timeString;
+            });
+            
+            // Navigation buttons
+            document.getElementById('nextToStep2').addEventListener('click', function() {
+                const nameInput = document.getElementById('customerName').value.trim();
+                const nameError = document.getElementById('nameError');
+                
+                if (nameInput.length === 0) {
+                    nameError.textContent = 'Please enter your name';
+                    return;
+                }
+                
+                nameError.textContent = '';
+                orderData.name = nameInput;
+                navigateToStep('2');
+            });
+            
+            document.getElementById('backToStep1').addEventListener('click', function() {
+                navigateToStep('1');
+            });
+            
+            document.getElementById('nextToStep3').addEventListener('click', function() {
+                navigateToStep('3');
+            });
+            
+            document.getElementById('backToStep2').addEventListener('click', function() {
+                navigateToStep('2');
+            });
+            
+            document.getElementById('nextToStep4').addEventListener('click', function() {
+                generateOrderSummary();
+                navigateToStep('4');
+            });
+            
+            document.getElementById('backToStep3').addEventListener('click', function() {
+                navigateToStep('3');
+            });
+            
+            document.getElementById('confirmOrder').addEventListener('click', function() {
+                const orderNumber = generateOrderNumber();
+                document.getElementById('orderNumber').textContent = orderNumber;
+                
+                // Hide all steps and show confirmation screen
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                });
+                document.getElementById('orderConfirmed').style.display = 'block';
+                
+                // Prepare data to send back to the bot
+                const orderDetails = {
+                    orderNumber: orderNumber,
+                    name: orderData.name,
+                    items: orderData.items,
+                    time: orderData.time,
+                    total: orderData.total
+                };
+                
+                // Send data back to the bot
+                tg.sendData(JSON.stringify(orderDetails));
+            });
+        }
+        
+        // Navigate to specific step
+        function navigateToStep(step) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.tab-button[data-step="${step}"]`).classList.add('active');
+            
+            // Update visible step
+            document.querySelectorAll('.step').forEach(s => {
+                s.classList.remove('active');
+            });
+            document.getElementById(`step${step}`).classList.add('active');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
