@@ -272,6 +272,9 @@
         <div class="step" id="step3">
             <div class="section">
                 <h2>Select Pickup Time</h2>
+                <div class="notification" id="shopClosedNotification" style="display: none;">
+                    I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow
+                </div>
                 <div class="time-selector">
                     <input type="range" class="time-slider" id="timeSlider" min="8" max="20" step="0.016666667" value="12" aria-label="Select pickup time">
                     <div class="time-display" id="timeDisplay">12:00</div>
@@ -610,12 +613,6 @@
             let currentHour = now.getHours();
             const currentMinute = now.getMinutes();
             
-            // Check if shop is closed
-            if (currentHour >= 20) {
-                showShopClosedNotification();
-                return;
-            }
-            
             // Format time with minutes
             const roundedTime = `${currentHour}:${currentMinute.toString().padStart(2, '0')}`;
             
@@ -689,6 +686,10 @@
             });
             
             document.getElementById('nextToStep3').addEventListener('click', function() {
+                const currentHour = new Date().getHours();
+                if (currentHour >= 20) {
+                    showShopClosedNotification();
+                }
                 navigateToStep('3');
             });
             
@@ -761,23 +762,16 @@
             const notification = document.getElementById('shopClosedNotification');
             notification.style.display = 'block';
             
-            // Hide all steps
-            document.querySelectorAll('.step').forEach(step => {
-                step.classList.remove('active');
-            });
-            
-            // Disable all navigation buttons
-            document.querySelectorAll('.nav-button').forEach(button => {
-                button.disabled = true;
-            });
-            
-            // Hide tab buttons
-            document.querySelector('.tab-buttons').style.display = 'none';
+            // Disable the Next button
+            document.getElementById('nextToStep4').disabled = true;
         }
         
         function hideShopClosedNotification() {
             const notification = document.getElementById('shopClosedNotification');
             notification.style.display = 'none';
+            
+            // Re-enable the Next button
+            document.getElementById('nextToStep4').disabled = false;
         }
         
         // Initialize on page load
