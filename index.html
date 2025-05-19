@@ -488,6 +488,32 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
+        .owl-message {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            color: var(--text-color);
+            animation: fadeIn 1s ease;
+        }
+
+        .owl-button {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            margin-top: 15px;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .owl-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
@@ -617,6 +643,8 @@
                     <span id="orderNumber"></span>
                 </div>
                 <div class="screenshot-notice">Please take a screenshot of your order number</div>
+                <div class="owl-message"></div>
+                <a href="https://t.me/notwise_bot" class="owl-button" target="_blank"></a>
                 <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
                 <button class="button" id="newOrderButton">Make Another Order</button>
             </div>
@@ -1198,7 +1226,11 @@
                     message: "Thank you for your order!",
                     number: "Your Order Number:",
                     screenshot: "Please take a screenshot of your order number",
-                    newOrder: "Make Another Order"
+                    newOrder: "Make Another Order",
+                    owl: {
+                        message: "Would you like to pet and feed your owl while your coffee is being prepared?",
+                        button: "Visit Owl Bot"
+                    }
                 }
             },
             ru: {
@@ -1243,7 +1275,11 @@
                     message: "Спасибо за ваш заказ!",
                     number: "Номер Вашего Заказа:",
                     screenshot: "Пожалуйста, сделайте скриншот номера заказа",
-                    newOrder: "Сделать Новый Заказ"
+                    newOrder: "Сделать Новый Заказ",
+                    owl: {
+                        message: "Может хотите погладить и покормить свою сову, пока ваш кофе готовится?",
+                        button: "Перейти к Сове"
+                    }
                 }
             }
         };
@@ -1286,6 +1322,10 @@
             document.querySelector('.order-number p').textContent = t.thankYou.number;
             document.querySelector('.screenshot-notice').textContent = t.thankYou.screenshot;
             document.getElementById('newOrderButton').textContent = t.thankYou.newOrder;
+
+            // Update owl section
+            document.querySelector('.owl-message').textContent = t.thankYou.owl.message;
+            document.querySelector('.owl-button').textContent = t.thankYou.owl.button;
 
             // Update language buttons
             document.querySelectorAll('.language-btn').forEach(btn => {
