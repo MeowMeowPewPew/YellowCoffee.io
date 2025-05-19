@@ -288,6 +288,7 @@
                 </div>
                 <p>Please show this number when you pick up your order.</p>
                 <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
+                <button class="button" id="newOrderButton">Make Another Order</button>
             </div>
         </div>
     </div>
@@ -509,6 +510,45 @@
                    `\n\n<b>💰 Total:</b> $${orderData.total.toFixed(2)}`;
         }
         
+        // Reset order data
+        function resetOrderData() {
+            orderData = {
+                name: "",
+                items: [],
+                time: "12:00",
+                total: 0,
+                botInfo: {
+                    forwardToKitchen: true,
+                    kitchenBotUsername: "@ZakazYellow_bot",
+                    targetUserId: "261442211",
+                    recipientUserId: "261442211"
+                }
+            };
+            
+            // Reset UI elements
+            document.getElementById('customerName').value = '';
+            document.getElementById('timeSlider').value = 12;
+            document.getElementById('timeDisplay').textContent = '12:00';
+            document.getElementById('selectedCount').textContent = '0';
+            
+            // Clear selected items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('selected');
+                const badge = item.querySelector('.selection-count');
+                if (badge) {
+                    badge.remove();
+                }
+            });
+            
+            // Reset menu display
+            document.getElementById('drinksMenu').style.display = 'grid';
+            document.getElementById('foodMenu').style.display = 'none';
+            document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.tab-button[data-menu="drinks"]').classList.add('active');
+        }
+        
         // Initialize function
         function init() {
             populateMenus();
@@ -641,6 +681,12 @@
                 if (currentUserId) {
                     sendMessageToUser(userMessage, currentUserId);
                 }
+            });
+            
+            // New Order Button
+            document.getElementById('newOrderButton').addEventListener('click', function() {
+                resetOrderData();
+                navigateToStep('1');
             });
         }
         
