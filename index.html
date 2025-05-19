@@ -815,6 +815,7 @@
         
         // Initialize function
         function init() {
+            console.log('Initializing app...');
             populateMenus();
             
             // Set initial time to current time + 10 minutes
@@ -910,19 +911,29 @@
             });
             
             // Navigation buttons
-            document.getElementById('nextToStep2').addEventListener('click', function() {
-                const nameInput = document.getElementById('customerName').value.trim();
-                const nameError = document.getElementById('nameError');
-                
-                if (nameInput.length === 0) {
-                    nameError.textContent = 'Please enter your name';
-                    return;
-                }
-                
-                nameError.textContent = '';
-                orderData.name = nameInput;
-                navigateToStep('2');
-            });
+            const nextToStep2Button = document.getElementById('nextToStep2');
+            console.log('Next button element:', nextToStep2Button);
+            
+            if (nextToStep2Button) {
+                nextToStep2Button.addEventListener('click', function() {
+                    console.log('Next button clicked');
+                    const nameInput = document.getElementById('customerName').value.trim();
+                    const nameError = document.getElementById('nameError');
+                    
+                    console.log('Name input value:', nameInput);
+                    
+                    if (nameInput.length === 0) {
+                        nameError.textContent = 'Please enter your name';
+                        return;
+                    }
+                    
+                    nameError.textContent = '';
+                    orderData.name = nameInput;
+                    navigateToStep('2');
+                });
+            } else {
+                console.error('Next button not found!');
+            }
             
             document.getElementById('backToStep1').addEventListener('click', function() {
                 navigateToStep('1');
@@ -1024,10 +1035,13 @@
                     toast.style.display = 'none';
                 }, 3000);
             }
+            
+            console.log('App initialization complete');
         }
         
         // Navigate to specific step
         function navigateToStep(step) {
+            console.log('Navigating to step:', step);
             // Update tab buttons
             document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
                 btn.classList.remove('active');
@@ -1043,8 +1057,8 @@
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
             init();
-            console.log('App initialized');
         });
         
     </script>
