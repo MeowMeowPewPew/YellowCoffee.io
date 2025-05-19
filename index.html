@@ -642,25 +642,6 @@ bot.on('web_app_data', async (msg) => {
         parse_mode: 'HTML'
       });
       
-      // Method 2: Creating a deep link for the user to forward to another bot
-      // This is simpler but requires user interaction
-      const kitchenBotUsername = data.botInfo.kitchenBotUsername;
-      const deepLink = `https://t.me/${kitchenBotUsername}?start=order_${data.orderNumber}`;
-      
-      await bot.sendMessage(chatId, 
-        `Please tap the button below to send your order details to our kitchen staff:`, {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: "Send to Kitchen", url: deepLink }]
-          ]
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Error handling web app data:', error);
-    bot.sendMessage(msg.chat.id, "Sorry, there was an error processing your order.");
-  }
-});
 
 // Handle /start command 
 bot.onText(/\/start/, (msg) => {
@@ -668,7 +649,7 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, 'Welcome! Click the button below to place your order:', {
     reply_markup: {
       keyboard: [
-        [{text: '🍽️ Place an Order', web_app: {url: 'YOUR_WEBAPP_URL'}}]
+        [{text: '🍽️ Place an Order', web_app: {url: 'https://meowmeowpewpew.github.io/YellowCoffee.io/'}}]
       ],
       resize_keyboard: true
     }
@@ -678,7 +659,7 @@ bot.onText(/\/start/, (msg) => {
 // Basic handler for the kitchen bot
 // This would be in a separate file/project
 function setupKitchenBot() {
-  const kitchenToken = 'YOUR_KITCHEN_BOT_TOKEN';
+  const kitchenToken = '8157403295:AAHc6DUqvX1PgjVihwUGTcvYRrHVHeQ7QcY';
   const kitchenBot = new TelegramBot(kitchenToken, {polling: true});
   
   kitchenBot.onText(/\/start order_(.+)/, (msg, match) => {
