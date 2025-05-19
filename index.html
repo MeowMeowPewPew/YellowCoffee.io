@@ -497,6 +497,11 @@
             animation: fadeIn 1s ease;
         }
 
+        .owl-button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
         .owl-button {
             display: inline-block;
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
@@ -505,14 +510,8 @@
             padding: 12px 24px;
             border-radius: var(--border-radius);
             font-weight: bold;
-            margin-top: 15px;
             transition: var(--transition);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .owl-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -644,7 +643,9 @@
                 </div>
                 <div class="screenshot-notice">Please take a screenshot of your order number</div>
                 <div class="owl-message"></div>
-                <a href="https://t.me/notwise_bot" class="owl-button" target="_blank"></a>
+                <div class="owl-button-container">
+                    <a href="https://t.me/notwise_bot" class="owl-button" target="_blank"></a>
+                </div>
                 <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
                 <button class="button" id="newOrderButton">Make Another Order</button>
             </div>
@@ -1228,8 +1229,8 @@
                     screenshot: "Please take a screenshot of your order number",
                     newOrder: "Make Another Order",
                     owl: {
-                        message: "Would you like to pet and feed your owl while your coffee is being prepared?",
-                        button: "Visit Owl Bot"
+                        message: "🦉 Would you like to pet and feed your owl while your coffee is being prepared?",
+                        button: "🦉 Visit Owl Bot"
                     }
                 }
             },
@@ -1277,8 +1278,8 @@
                     screenshot: "Пожалуйста, сделайте скриншот номера заказа",
                     newOrder: "Сделать Новый Заказ",
                     owl: {
-                        message: "Может хотите погладить и покормить свою сову, пока ваш кофе готовится?",
-                        button: "Перейти к Сове"
+                        message: "🦉 Может хотите погладить и покормить свою сову, пока ваш кофе готовится?",
+                        button: "🦉 Перейти к Сове"
                     }
                 }
             }
