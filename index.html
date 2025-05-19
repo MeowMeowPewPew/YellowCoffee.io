@@ -641,44 +641,24 @@
                 });
                 document.getElementById('orderConfirmed').style.display = 'block';
                 
-                // Create a detailed order summary
-                let orderSummary = `Order #${orderNumber}\n`;
-                orderSummary += `Customer: ${orderData.name}\n`;
-                orderSummary += `Pickup Time: ${orderData.time}\n\n`;
-                orderSummary += `Items:\n`;
+                // Format the order message
+                const orderMessage = formatOrderMessage(orderNumber, orderData);
                 
-                orderData.items.forEach(item => {
-                    orderSummary += `- ${item.quantity}x ${item.name}: ${(item.price * item.quantity).toFixed(2)}\n`;
-                });
-                
-                orderSummary += `\nTotal: ${orderData.total.toFixed(2)}`;
-                
-                // Prepare data to send back to the bot
-                const orderDetails = {
-                    command: 'new_order',
-                    order_number: orderNumber,
-                    customer_name: orderData.name,
-                    pickup_time: orderData.time,
-                    items: orderData.items.map(item => ({
-                        name: item.name,
-                        quantity: item.quantity,
-                        price: item.price,
-                        total: item.price * item.quantity
-                    })),
-                    total_amount: orderData.total,
-                    send_to: orderData.botInfo.recipientUserId
+                // Send the order message to the bot
+                const botMessage = {
+                    text: orderMessage,
+                    parse_mode: 'HTML'
                 };
                 
-                // Send order details to the bot
-                tg.sendData(JSON.stringify(orderDetails));
+                // Send to bot
+                tg.sendData(JSON.stringify(botMessage));
                 
                 // Send a formatted message to both users
-                const userMessage = formatOrderMessage(orderNumber, orderData);
                 // Send to recipient
-                sendMessageToUser(userMessage, orderData.botInfo.recipientUserId);
+                sendMessageToUser(orderMessage, orderData.botInfo.recipientUserId);
                 // Send to order creator if we have their ID
                 if (currentUserId) {
-                    sendMessageToUser(userMessage, currentUserId);
+                    sendMessageToUser(orderMessage, currentUserId);
                 }
             });
             
