@@ -764,6 +764,11 @@
             
             // Disable the Next button
             document.getElementById('nextToStep4').disabled = true;
+            
+            // Hide notification after 5 seconds
+            setTimeout(() => {
+                hideShopClosedNotification();
+            }, 5000);
         }
         
         function hideShopClosedNotification() {
