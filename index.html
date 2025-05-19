@@ -474,14 +474,6 @@
                 </div>
             </div>
         </div>
-        
-        <!-- After Hours Modal -->
-        <div class="modal-overlay" id="afterHoursModal" style="display: none;">
-            <div class="size-modal">
-                <div class="modal-title">Sorry, our coffee shop is no longer open today</div>
-                <div style="text-align:center; margin: 20px 0; font-size: 16px;">We'll be waiting for your orders tomorrow!</div>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -537,7 +529,7 @@
                 { id: "d7", name: "Cappuccino", icon: "☕", prices: { "200": 4.50, "300": 5.50, "400": 6.50, "600": 7.50 } },
                 { id: "d8", name: "Smoothie", icon: "🥤", prices: { "200": 5.00, "300": 6.00, "400": 7.00, "600": 8.00 } },
                 { id: "d9", name: "Milkshake", icon: "🥛", prices: { "200": 5.50, "300": 6.50, "400": 7.50, "600": 8.50 } },
-                { id: "d10", name: "Lemonade", icon: "��", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
+                { id: "d10", name: "Lemonade", icon: "🍋", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
                 { id: "d11", name: "Iced Tea", icon: "🧊", prices: { "200": 3.00, "300": 4.00, "400": 5.00, "600": 6.00 } },
                 { id: "d12", name: "Water", icon: "💧", prices: { "200": 1.50, "300": 2.50, "400": 3.50, "600": 4.50 } },
                 { id: "d13", name: "Soda", icon: "🥤", prices: { "200": 2.00, "300": 3.00, "400": 4.00, "600": 5.00 } },
@@ -843,9 +835,10 @@
             
             // Check if current time is after business hours
             if (currentHour >= 20) {
-                document.getElementById('afterHoursModal').style.display = 'flex';
-                // Optionally hide the main container
-                document.querySelector('.container').style.filter = 'blur(2px)';
+                const timeDisplay = document.getElementById('timeDisplay');
+                timeDisplay.innerHTML = '<span class="time-unavailable">Sorry, we are closed for today</span>';
+                document.getElementById('timeSlider').style.display = 'none';
+                document.getElementById('nextToStep4').disabled = true;
                 return;
             }
             
