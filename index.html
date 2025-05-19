@@ -457,10 +457,37 @@
             font-size: 24px;
             opacity: 0.5;
         }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .language-btn {
+            background: var(--secondary-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: bold;
+        }
+
+        .language-btn.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="language-selector">
+            <button class="language-btn active" data-lang="en">EN</button>
+            <button class="language-btn" data-lang="ru">RU</button>
+        </div>
         <div class="header">
             <h1>Place Your Order</h1>
         </div>
@@ -1117,6 +1144,190 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', init);
         
+        // Add translations
+        const translations = {
+            en: {
+                welcome: {
+                    title: "Welcome to Yellow Coffee!",
+                    text: "We're excited to serve you today! Please select your preferred location and enter your name to start your order.\nOur delicious coffee and fresh food are waiting for you."
+                },
+                location: {
+                    title: "Select Location",
+                    dmitrovka: "m. Dmitrovka",
+                    tekhnopark: "m. Tekhnopark"
+                },
+                name: {
+                    title: "Enter Your Name",
+                    placeholder: "Your name (max 15 letters)",
+                    error: "Please enter your name"
+                },
+                menu: {
+                    title: "Select Drinks & Food",
+                    drinks: "Drinks",
+                    food: "Food",
+                    selected: "Selected items:"
+                },
+                time: {
+                    title: "Select Pickup Time"
+                },
+                order: {
+                    title: "Order Confirmation",
+                    name: "Name",
+                    location: "Location",
+                    address: "Address",
+                    time: "Pickup Time",
+                    items: "Selected Items",
+                    total: "Total",
+                    confirm: "Confirm Order"
+                },
+                shopClosed: {
+                    evening: "I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow",
+                    morning: "I apologize, the coffee shop is closed until 7:30 AM. Please place your order after 7:30 AM."
+                },
+                thankYou: {
+                    message: "Thank you for your order!",
+                    number: "Your Order Number:",
+                    screenshot: "Please take a screenshot of your order number",
+                    newOrder: "Make Another Order"
+                }
+            },
+            ru: {
+                welcome: {
+                    title: "Добро пожаловать в Yellow Coffee!",
+                    text: "Мы рады обслужить вас сегодня! Пожалуйста, выберите удобное место и введите ваше имя, чтобы начать заказ.\nНаши вкусные кофе и свежая еда ждут вас."
+                },
+                location: {
+                    title: "Выберите Локацию",
+                    dmitrovka: "м. Дмитровка",
+                    tekhnopark: "м. Технопарк"
+                },
+                name: {
+                    title: "Введите Ваше Имя",
+                    placeholder: "Ваше имя (макс. 15 букв)",
+                    error: "Пожалуйста, введите ваше имя"
+                },
+                menu: {
+                    title: "Выберите Напитки и Еду",
+                    drinks: "Напитки",
+                    food: "Еда",
+                    selected: "Выбрано товаров:"
+                },
+                time: {
+                    title: "Выберите Время Получения"
+                },
+                order: {
+                    title: "Подтверждение Заказа",
+                    name: "Имя",
+                    location: "Локация",
+                    address: "Адрес",
+                    time: "Время Получения",
+                    items: "Выбранные Товары",
+                    total: "Итого",
+                    confirm: "Подтвердить Заказ"
+                },
+                shopClosed: {
+                    evening: "Приносим извинения, кофейня уже закрыта сегодня, мы будем ждать ваш заказ завтра",
+                    morning: "Приносим извинения, кофейня закрыта до 7:30 утра. Пожалуйста, сделайте заказ после 7:30 утра."
+                },
+                thankYou: {
+                    message: "Спасибо за ваш заказ!",
+                    number: "Номер Вашего Заказа:",
+                    screenshot: "Пожалуйста, сделайте скриншот номера заказа",
+                    newOrder: "Сделать Новый Заказ"
+                }
+            }
+        };
+
+        let currentLang = 'en';
+
+        // Language switching function
+        function switchLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
+            // Update welcome section
+            document.querySelector('.welcome-title').textContent = t.welcome.title;
+            document.querySelector('.welcome-text').textContent = t.welcome.text;
+
+            // Update location section
+            document.querySelector('.location-section h2').textContent = t.location.title;
+            document.querySelector('[data-location="dmitrovka"] .location-name').textContent = t.location.dmitrovka;
+            document.querySelector('[data-location="tekhnopark"] .location-name').textContent = t.location.tekhnopark;
+
+            // Update name section
+            document.querySelector('#step1 .section h2').textContent = t.name.title;
+            document.getElementById('customerName').placeholder = t.name.placeholder;
+
+            // Update menu section
+            document.querySelector('#step2 .section h2').textContent = t.menu.title;
+            document.querySelector('[data-menu="drinks"]').textContent = t.menu.drinks;
+            document.querySelector('[data-menu="food"]').textContent = t.menu.food;
+            document.querySelector('#selectionSummary p').textContent = t.menu.selected;
+
+            // Update time section
+            document.querySelector('#step3 .section h2').textContent = t.time.title;
+
+            // Update order section
+            document.querySelector('#step4 .section h2').textContent = t.order.title;
+            document.getElementById('confirmOrder').textContent = t.order.confirm;
+
+            // Update thank you section
+            document.querySelector('.thank-you-message').textContent = t.thankYou.message;
+            document.querySelector('.order-number p').textContent = t.thankYou.number;
+            document.querySelector('.screenshot-notice').textContent = t.thankYou.screenshot;
+            document.getElementById('newOrderButton').textContent = t.thankYou.newOrder;
+
+            // Update language buttons
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+        }
+
+        // Add language button handlers
+        document.querySelectorAll('.language-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchLanguage(this.dataset.lang);
+            });
+        });
+
+        // Update shop closed notification text
+        function showShopClosedNotification() {
+            const notification = document.getElementById('shopClosedNotification');
+            const currentHour = new Date().getHours();
+            const currentMinutes = new Date().getMinutes();
+            const currentTime = currentHour + (currentMinutes / 60);
+
+            if (currentTime >= 20) {
+                notification.textContent = translations[currentLang].shopClosed.evening;
+            } else if (currentTime < 7.5) {
+                notification.textContent = translations[currentLang].shopClosed.morning;
+            }
+            
+            notification.style.display = 'block';
+            document.getElementById('confirmStep3').disabled = true;
+            
+            setTimeout(() => {
+                hideShopClosedNotification();
+            }, 5000);
+        }
+
+        // Update order message format
+        function formatOrderMessage(orderNumber, orderData) {
+            const t = translations[currentLang];
+            const locationName = orderData.location === 'dmitrovka' ? t.location.dmitrovka : t.location.tekhnopark;
+            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
+            
+            return `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
+                   `<b>👤 ${t.order.name}:</b> ${orderData.name}\n` +
+                   `<b>📍 ${t.order.location}:</b> ${locationName}\n` +
+                   `<b>🏠 ${t.order.address}:</b> ${locationAddress}\n` +
+                   `<b>⏰ ${t.order.time}:</b> ${orderData.time}\n\n` +
+                   `<b>📋 ${t.order.items}:</b>\n` +
+                   orderData.items.map(item => 
+                       `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
+                   ).join('\n') +
+                   `\n\n<b>💰 ${t.order.total}:</b> $${orderData.total.toFixed(2)}`;
+        }
     </script>
 </body>
 </html>
