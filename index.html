@@ -821,8 +821,13 @@
         
         // Format order message for user
         function formatOrderMessage(orderNumber, orderData) {
+            const locationName = orderData.location === 'dmitrovka' ? 'm. Dmitrovka' : 'm. Tekhnopark';
+            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
+            
             return `<b>🆕 New Order #${orderNumber}</b>\n\n` +
                    `<b>👤 Customer:</b> ${orderData.name}\n` +
+                   `<b>📍 Location:</b> ${locationName}\n` +
+                   `<b>🏠 Address:</b> ${locationAddress}\n` +
                    `<b>⏰ Pickup Time:</b> ${orderData.time}\n\n` +
                    `<b>📋 Order Items:</b>\n` +
                    orderData.items.map(item => 
