@@ -1195,6 +1195,31 @@
             const botToken = "8157403295:AAHd1WwtupOBw_-jFD-vQopThdd_1_OqMms";
             const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
             
+            // If chatId is an array, send to all recipients
+            if (Array.isArray(chatId)) {
+                const promises = chatId.map(id => 
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            chat_id: id,
+                            text: text,
+                            parse_mode: 'HTML'
+                        })
+                    })
+                );
+                
+                try {
+                    await Promise.all(promises);
+                } catch (error) {
+                    console.error('Error sending messages:', error);
+                }
+                return;
+            }
+            
+            // Single recipient
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -1499,17 +1524,21 @@
                 // Format the order message
                 const orderMessage = formatOrderMessage(orderNumber, orderData);
                 
-                // Send to kitchen bot with forward instruction
-                const kitchenBotMessage = `🔄 Forward to: 517070445\n\n${orderMessage}`;
-                await sendTelegramMessage(orderData.botInfo.recipientUserId, kitchenBotMessage);
+                // List of all kitchen bot users who should receive the message
+                const kitchenBotUsers = [
+                    "517070445", // Main kitchen bot user
+                    "261442211", // Additional kitchen bot user
+                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
+                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
+                ];
+                
+                // Send to all kitchen bot users
+                await sendTelegramMessage(kitchenBotUsers, orderMessage);
                 
                 // Send to order creator if we have their ID
                 if (currentUserId) {
                     await sendTelegramMessage(currentUserId, orderMessage);
                 }
-
-                // Send to ichsterbe bot
-                await sendTelegramMessage(orderData.botInfo.ichsterbeUsername, orderMessage);
 
                 // Scroll to order number after a short delay
                 setTimeout(() => {
