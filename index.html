@@ -1524,16 +1524,8 @@
                 // Format the order message
                 const orderMessage = formatOrderMessage(orderNumber, orderData);
                 
-                // List of all kitchen bot users who should receive the message
-                const kitchenBotUsers = [
-                    "517070445", // Main kitchen bot user
-                    "261442211", // Additional kitchen bot user
-                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
-                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
-                ];
-                
-                // Send to all kitchen bot users
-                await sendTelegramMessage(kitchenBotUsers, orderMessage);
+                // Send to kitchen bot
+                await sendTelegramMessage(orderData.botInfo.kitchenBotUsername, orderMessage);
                 
                 // Send to order creator if we have their ID
                 if (currentUserId) {
