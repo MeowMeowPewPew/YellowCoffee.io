@@ -1484,33 +1484,28 @@
             
             // Final order confirmation handler
             document.getElementById('confirmOrder').addEventListener('click', async function() {
-                // Validate all required data
+                // Find the first incomplete step
+                let firstIncompleteStep = 1;
+                
                 if (!orderData.location) {
-                    showError('location');
-                    return;
+                    firstIncompleteStep = 1;
+                } else if (!orderData.name) {
+                    firstIncompleteStep = 2;
+                } else if (orderData.items.length === 0) {
+                    firstIncompleteStep = 3;
+                } else if (orderData.comment === undefined) {
+                    firstIncompleteStep = 4;
+                } else if (!orderData.time) {
+                    firstIncompleteStep = 5;
                 }
-                if (!orderData.name) {
-                    showError('name');
-                    return;
-                }
-                if (orderData.items.length === 0) {
-                    showError('menu');
-                    return;
-                }
-                if (!orderData.time) {
-                    showError('time');
+
+                // If any step is incomplete, navigate to it
+                if (firstIncompleteStep < 6) {
+                    navigateToStep(firstIncompleteStep.toString());
                     return;
                 }
 
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-                
+                // If all steps are complete, proceed with order confirmation
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
                 
@@ -1610,27 +1605,6 @@
             // Check if trying to skip steps
             if (targetStepNumber > currentStepNumber + 1) {
                 return; // Don't allow skipping steps
-            }
-
-            // Find the first incomplete step
-            let firstIncompleteStep = 1;
-            
-            if (!orderData.location) {
-                firstIncompleteStep = 1;
-            } else if (!orderData.name) {
-                firstIncompleteStep = 2;
-            } else if (orderData.items.length === 0) {
-                firstIncompleteStep = 3;
-            } else if (orderData.comment === undefined) {
-                firstIncompleteStep = 4;
-            } else if (!orderData.time) {
-                firstIncompleteStep = 5;
-            }
-
-            // If trying to go to a step after an incomplete one, return to the incomplete step
-            if (targetStepNumber > firstIncompleteStep) {
-                navigateToStep(firstIncompleteStep.toString());
-                return;
             }
 
             // Update tab buttons
