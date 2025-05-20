@@ -1,88 +1,2019 @@
-const { Telegraf } = require('telegraf');
-const fs = require('fs');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food & Drink Order Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary-color: #FFD700;
+            --secondary-color: #FFA500;
+            --accent-color: #FF8C00;
+            --text-color: var(--tg-theme-text-color, #222);
+            --bg-color: var(--tg-theme-bg-color, #fff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
 
-// Initialize bot with your token
-const bot = new Telegraf('8157403295:AAHd1WwtupOBw_-jFD-vQopThdd_1_OqMms');
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+        }
 
-// Store for authorized users and their status
-let userStatus = new Map();
+        .container {
+            max-width: 100%;
+            padding: 16px;
+            animation: fadeIn 0.5s ease;
+        }
 
-// Load user status from file if it exists
-try {
-    const data = fs.readFileSync('user_status.json', 'utf8');
-    userStatus = new Map(JSON.parse(data));
-} catch (error) {
-    console.log('No existing user status file found');
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-// Save user status to file
-function saveUserStatus() {
-    fs.writeFileSync('user_status.json', JSON.stringify([...userStatus]));
-}
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
 
-// Command to start the bot
-bot.command('start', (ctx) => {
-    const userId = ctx.from.id.toString();
-    userStatus.set(userId, true);
-    saveUserStatus();
-    ctx.reply('Welcome! You have been added to the kitchen notification system.');
-});
+        .header h1 {
+            font-size: 2em;
+            margin: 0;
+            padding: 10px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
 
-// Command to stop receiving notifications
-bot.command('stop', (ctx) => {
-    const userId = ctx.from.id.toString();
-    userStatus.set(userId, false);
-    saveUserStatus();
-    ctx.reply('You will no longer receive kitchen notifications.');
-});
+        .section {
+            background-color: var(--secondary-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
 
-// Command to list all users and their status (admin only)
-bot.command('listusers', (ctx) => {
-    const userId = ctx.from.id.toString();
-    if (userId === '517070445') { // Replace with your admin user ID
-        let userList = '';
-        userStatus.forEach((status, id) => {
-            userList += `${id}: ${status ? 'Active' : 'Inactive'}\n`;
-        });
-        ctx.reply(`User status:\n${userList}`);
-    } else {
-        ctx.reply('You are not authorized to use this command.');
-    }
-});
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
 
-// Command to get help
-bot.command('help', (ctx) => {
-    const helpText = `
-Available commands:
-/start - Start receiving kitchen notifications
-/stop - Stop receiving kitchen notifications
-/help - Show this help message
-    `;
-    ctx.reply(helpText);
-});
+        .button, .nav-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: #FFFFFF;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
 
-// Handle incoming messages
-bot.on('message', (ctx) => {
-    const senderId = ctx.from.id.toString();
-    const messageText = ctx.message.text;
-    
-    if (messageText && !messageText.startsWith('/')) {
-        // Only forward to users who are active
-        userStatus.forEach((status, userId) => {
-            if (status && userId !== senderId) {
-                bot.telegram.sendMessage(userId, `New message from ${ctx.from.first_name}:\n${messageText}`);
+        .button:hover, .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .button:active, .nav-button:active {
+            transform: translateY(1px);
+        }
+
+        .input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .menu-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .menu-scroll-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 215, 0, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .menu-container:hover .menu-scroll-indicator {
+            opacity: 1;
+        }
+
+        .menu-scroll-left {
+            left: 10px;
+        }
+
+        .menu-scroll-right {
+            right: 10px;
+        }
+
+        .menu-scroll-indicator:hover {
+            background: rgba(255, 165, 0, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .menu-scroll-indicator:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .menu-item {
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            background: var(--bg-color);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .menu-item.selected {
+            border-color: var(--secondary-color);
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+        }
+
+        .menu-item-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .menu-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover .menu-icon {
+            transform: scale(1.1);
+        }
+
+        .menu-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            min-height: 32px;
+        }
+
+        .menu-price {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .quantity-btn {
+            background: var(--secondary-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+            user-select: none;
+            font-size: 18px;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.95);
+        }
+
+        .quantity-display {
+            font-weight: bold;
+            min-width: 24px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .selection-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .time-selector {
+            display: flex;
+            flex-direction: column;
+            margin-top: 15px;
+            padding: 20px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .time-slider {
+            width: 100%;
+            margin: 15px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
+
+        .time-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .time-display {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: var(--secondary-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            text-align: center;
+            max-width: 80%;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-button {
+            width: 100%;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: calc(var(--border-radius) - 5px);
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 480px) {
+            .tab-buttons {
+                gap: 4px;
+                padding: 4px;
+            }
+
+            .tab-button {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        .order-summary {
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .order-number {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin: 25px 0;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .thank-you-message {
+            text-align: center;
+            font-size: 24px;
+            margin: 25px 0;
+            color: var(--text-color);
+            animation: fadeIn 1s ease;
+        }
+
+        .screenshot-notice {
+            text-align: center;
+            font-size: 16px;
+            margin: 20px 0;
+            color: var(--secondary-color);
+            font-style: italic;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 8px;
+            font-size: 14px;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .nav-button.completed {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            position: relative;
+        }
+
+        .nav-button.completed::after {
+            content: "✓ Done";
+            position: absolute;
+            right: 10px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .navigation {
+            position: sticky;
+            bottom: 0;
+            background: var(--bg-color);
+            padding: 16px;
+            margin-top: 20px;
+            box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: #FFFFFF;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease;
+        }
+
+        .welcome-title {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .welcome-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .location-section {
+            margin-bottom: 30px;
+        }
+
+        .location-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .location-option {
+            background: var(--secondary-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .location-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .location-option.selected {
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+            border-color: var(--secondary-color);
+        }
+
+        .location-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .location-address {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .location-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            opacity: 0.5;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .language-btn {
+            background: var(--secondary-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 80px;
+        }
+
+        .language-btn.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .language-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .owl-message {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            color: var(--text-color);
+            animation: fadeIn 1s ease;
+        }
+
+        .owl-button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .owl-button {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .owl-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .comment-section {
+            margin-top: 20px;
+        }
+
+        .comment-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 14px;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        .word-count {
+            text-align: right;
+            font-size: 14px;
+            color: var(--text-color);
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        .selection-summary {
+            margin-top: 16px;
+            padding: 15px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .selection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .selection-item:last-child {
+            border-bottom: none;
+        }
+
+        .selection-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-item-price {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="language-selector">
+                <button class="language-btn" data-lang="en">EN</button>
+                <button class="language-btn active" data-lang="ru">RU</button>
+            </div>
+        </div>
+        <div class="header">
+            <h1 id="headerTitle">Place Your Order</h1>
+        </div>
+        
+        <!-- Step 1: Location -->
+        <div class="step active" id="step1">
+            <div class="welcome-section">
+                <div class="welcome-icon">☕</div>
+                <div class="welcome-title">Welcome to Yellow Coffee!</div>
+                <div class="welcome-text">
+                    We're excited to serve you today! Please select your preferred location to start your order.<br>
+                    Our delicious coffee and fresh food are waiting for you.
+                </div>
+            </div>
+            <div class="section location-section">
+                <h2>Select Location</h2>
+                <div class="location-options">
+                    <div class="location-option" data-location="dmitrovka">
+                        <div class="location-name">m. Dmitrovka</div>
+                        <div class="location-address">Dmitrovka Street, 7</div>
+                        <div class="location-icon">📍</div>
+                    </div>
+                    <div class="location-option" data-location="tekhnopark">
+                        <div class="location-name">m. Tekhnopark</div>
+                        <div class="location-address">Tekhnopark Street, 15</div>
+                        <div class="location-icon">📍</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Name -->
+        <div class="step" id="step2">
+            <div class="section">
+                <h2>Enter Your Name</h2>
+                <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15" aria-label="Enter your name">
+                <div class="error-message" id="nameError"></div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="confirmName">Confirm</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Menu Selection -->
+        <div class="step" id="step3">
+            <div class="section">
+                <h2>Select Drinks & Food</h2>
+                <div class="tab-buttons">
+                    <div class="tab-button active" data-menu="classicCoffee">${translations[currentLang].menu.classicCoffee}</div>
+                    <div class="tab-button" data-menu="signatureDrinks">${translations[currentLang].menu.signatureDrinks}</div>
+                    <div class="tab-button" data-menu="premiumCollection">${translations[currentLang].menu.premiumCollection}</div>
+                    <div class="tab-button" data-menu="nonCoffee">${translations[currentLang].menu.nonCoffee}</div>
+                    <div class="tab-button" data-menu="food">${translations[currentLang].menu.food}</div>
+                </div>
+                
+                <div class="menu-grid" id="classicCoffeeMenu">
+                    <!-- Classic Coffee items will be populated here -->
+                </div>
+                
+                <div class="menu-grid" id="signatureDrinksMenu" style="display: none;">
+                    <!-- Signature Drinks items will be populated here -->
+                </div>
+                
+                <div class="menu-grid" id="premiumCollectionMenu" style="display: none;">
+                    <!-- Premium Collection items will be populated here -->
+                </div>
+                
+                <div class="menu-grid" id="nonCoffeeMenu" style="display: none;">
+                    <!-- Non-Coffee items will be populated here -->
+                </div>
+                
+                <div class="menu-grid" id="foodMenu" style="display: none;">
+                    <!-- Food items will be populated here -->
+                </div>
+                
+                <div id="selectionSummary" class="order-summary" style="margin-top: 16px;">
+                    <p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="confirmStep2">Confirm</button>
+            </div>
+        </div>
+        
+        <!-- New Step 4: Comment -->
+        <div class="step" id="step4">
+            <div class="section">
+                <h2>Add Comments (Optional)</h2>
+                <div class="comment-section">
+                    <textarea class="comment-input" id="orderComment" placeholder="Enter any special requests or comments about your order (max 90 characters)" maxlength="90" aria-label="Order comments"></textarea>
+                    <div class="word-count"><span id="charCount">0</span>/90 characters</div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="confirmStep3">Confirm</button>
+            </div>
+        </div>
+        
+        <!-- Rename existing step4 to step5 -->
+        <div class="step" id="step5">
+            <div class="section">
+                <h2>Select Pickup Time</h2>
+                <div class="notification" id="shopClosedNotification" style="display: none;">
+                    I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow
+                </div>
+                <div class="time-selector">
+                    <input type="range" class="time-slider" id="timeSlider" min="7.5" max="20" step="0.016666667" value="12" aria-label="Select pickup time">
+                    <div class="time-display" id="timeDisplay">12:00</div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="confirmStep4">Confirm</button>
+            </div>
+        </div>
+        
+        <!-- Rename existing step5 to step6 -->
+        <div class="step" id="step6">
+            <div class="section">
+                <h2>Order Confirmation</h2>
+                <div class="order-summary">
+                    <div class="order-item">
+                        <span><strong>Name:</strong></span>
+                        <span id="summaryName"></span>
+                    </div>
+                    <div class="order-item">
+                        <span><strong>Pickup Time:</strong></span>
+                        <span id="summaryTime"></span>
+                    </div>
+                    <h3>Selected Items:</h3>
+                    <div id="summaryItems"></div>
+                    <div class="order-item" style="margin-top: 10px;">
+                        <span><strong>Total:</strong></span>
+                        <span id="summaryTotal"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button" id="confirmOrder">Confirm Order</button>
+            </div>
+        </div>
+        
+        <!-- Order Confirmed Screen -->
+        <div class="step" id="orderConfirmed" style="display: none;">
+            <div class="section">
+                <div class="thank-you-message">Thank you for your order!</div>
+                <div class="order-number">
+                    <p>Your Order Number:</p>
+                    <span id="orderNumber"></span>
+                </div>
+                <div class="screenshot-notice">Please take a screenshot of your order number</div>
+                <div class="owl-message"></div>
+                <div class="owl-button-container">
+                    <a href="https://t.me/notwise_bot" class="owl-button" target="_blank"></a>
+                </div>
+                <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
+                <button class="button" id="newOrderButton">Make Another Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Get current user ID from initData
+        let currentUserId = null;
+        try {
+            const initData = tg.initData;
+            const initDataObj = JSON.parse(initData);
+            if (initDataObj && initDataObj.user && initDataObj.user.id) {
+                currentUserId = initDataObj.user.id.toString();
+            }
+        } catch (e) {
+            console.error('Error parsing initData:', e);
+        }
+        
+        // Variables to store order data
+        let orderData = {
+            name: "",
+            location: "",
+            items: [],
+            comment: "",
+            time: "12:00",
+            total: 0,
+            botInfo: {
+                forwardToKitchen: true,
+                kitchenBotUsername: "@ZakazYellow_bot",
+                targetUserId: "261442211",
+                recipientUserId: "261442211",
+                meowmeowpewUsername: "@meowmeowpew",
+                ichsterbeUsername: "@ichsterbe" // Add new bot username
+            }
+        };
+        
+        // Menu data - can be replaced with actual items
+        const menuData = {
+            classicCoffee: [
+                { id: "cc1", name: { en: "Espresso", ru: "Эспрессо" }, price: 99, icon: "☕" },
+                { id: "cc2", name: { en: "Americano 200ml", ru: "Американо 200мл" }, price: 139, icon: "☕" },
+                { id: "cc3", name: { en: "Americano 300ml", ru: "Американо 300мл" }, price: 179, icon: "☕" },
+                { id: "cc4", name: { en: "Americano 400ml", ru: "Американо 400мл" }, price: 249, icon: "☕" },
+                { id: "cc5", name: { en: "Americano 600ml", ru: "Американо 600мл" }, price: 299, icon: "☕" },
+                { id: "cc6", name: { en: "Cappuccino 200ml", ru: "Капучино 200мл" }, price: 149, icon: "☕" },
+                { id: "cc7", name: { en: "Cappuccino 300ml", ru: "Капучино 300мл" }, price: 199, icon: "☕" },
+                { id: "cc8", name: { en: "Cappuccino 400ml", ru: "Капучино 400мл" }, price: 249, icon: "☕" },
+                { id: "cc9", name: { en: "Cappuccino 600ml", ru: "Капучино 600мл" }, price: 299, icon: "☕" },
+                { id: "cc10", name: { en: "Latte 300ml", ru: "Латте 300мл" }, price: 199, icon: "☕" },
+                { id: "cc11", name: { en: "Latte 400ml", ru: "Латте 400мл" }, price: 249, icon: "☕" },
+                { id: "cc12", name: { en: "Latte 600ml", ru: "Латте 600мл" }, price: 299, icon: "☕" },
+                { id: "cc13", name: { en: "Flat White 200ml", ru: "Флэт Уайт 200мл" }, price: 199, icon: "☕" },
+                { id: "cc14", name: { en: "Flat White 300ml", ru: "Флэт Уайт 300мл" }, price: 249, icon: "☕" },
+                { id: "cc15", name: { en: "Raf Coffee 300ml", ru: "Раф Кофе 300мл" }, price: 249, icon: "☕" },
+                { id: "cc16", name: { en: "Raf Coffee 400ml", ru: "Раф Кофе 400мл" }, price: 299, icon: "☕" },
+                { id: "cc17", name: { en: "Raf Coffee 600ml", ru: "Раф Кофе 600мл" }, price: 329, icon: "☕" }
+            ],
+            signatureDrinks: [
+                { id: "sd2", name: { en: "Citrus Rainbow 300ml", ru: "Цитрусовый Радуга 300мл" }, price: 279, icon: "🌈" },
+                { id: "sd3", name: { en: "Citrus Rainbow 400ml", ru: "Цитрусовый Радуга 400мл" }, price: 349, icon: "🌈" },
+                { id: "sd4", name: { en: "Citrus Rainbow 600ml", ru: "Цитрусовый Радуга 600мл" }, price: 399, icon: "🌈" },
+                { id: "sd5", name: { en: "Hollywood Morning 300ml", ru: "Голливудское Утро 300мл" }, price: 279, icon: "🌅" },
+                { id: "sd6", name: { en: "Hollywood Morning 400ml", ru: "Голливудское Утро 400мл" }, price: 349, icon: "🌅" },
+                { id: "sd7", name: { en: "Hollywood Morning 600ml", ru: "Голливудское Утро 600мл" }, price: 399, icon: "🌅" },
+                { id: "sd8", name: { en: "Spicy Peach 300ml", ru: "Острый Персик 300мл" }, price: 279, icon: "🍑" },
+                { id: "sd9", name: { en: "Spicy Peach 400ml", ru: "Острый Персик 400мл" }, price: 349, icon: "🍑" },
+                { id: "sd10", name: { en: "Spicy Peach 600ml", ru: "Острый Персик 600мл" }, price: 399, icon: "🍑" },
+                { id: "sd11", name: { en: "Lemon Tart 300ml", ru: "Лимонный Тарт 300мл" }, price: 279, icon: "🍋" },
+                { id: "sd12", name: { en: "Lemon Tart 400ml", ru: "Лимонный Тарт 400мл" }, price: 349, icon: "🍋" },
+                { id: "sd13", name: { en: "Lemon Tart 600ml", ru: "Лимонный Тарт 600мл" }, price: 399, icon: "🍋" }
+            ],
+            premiumCollection: [
+                { id: "pc2", name: { en: "Black Forest 300ml", ru: "Черный Лес 300мл" }, price: 299, icon: "🌲" },
+                { id: "pc3", name: { en: "Black Forest 400ml", ru: "Черный Лес 400мл" }, price: 399, icon: "🌲" },
+                { id: "pc4", name: { en: "Black Forest 600ml", ru: "Черный Лес 600мл" }, price: 499, icon: "🌲" },
+                { id: "pc5", name: { en: "Pistachio Cheesecake 300ml", ru: "Фисташковый Чизкейк 300мл" }, price: 299, icon: "🍰" },
+                { id: "pc6", name: { en: "Pistachio Cheesecake 400ml", ru: "Фисташковый Чизкейк 400мл" }, price: 399, icon: "🍰" },
+                { id: "pc7", name: { en: "Pistachio Cheesecake 600ml", ru: "Фисташковый Чизкейк 600мл" }, price: 499, icon: "🍰" },
+                { id: "pc8", name: { en: "Snickers 300ml", ru: "Сникерс 300мл" }, price: 299, icon: "🍫" },
+                { id: "pc9", name: { en: "Snickers 400ml", ru: "Сникерс 400мл" }, price: 399, icon: "🍫" },
+                { id: "pc10", name: { en: "Snickers 600ml", ru: "Сникерс 600мл" }, price: 499, icon: "🍫" },
+                { id: "pc11", name: { en: "Refreshing Mandarin 300ml", ru: "Освежающий Мандарин 300мл" }, price: 299, icon: "🍊" },
+                { id: "pc12", name: { en: "Refreshing Mandarin 400ml", ru: "Освежающий Мандарин 400мл" }, price: 399, icon: "🍊" },
+                { id: "pc13", name: { en: "Cherry Kiss 300ml", ru: "Вишневый Поцелуй 300мл" }, price: 299, icon: "🍒" },
+                { id: "pc14", name: { en: "Cherry Kiss 400ml", ru: "Вишневый Поцелуй 400мл" }, price: 399, icon: "🍒" },
+                { id: "pc15", name: { en: "Cherry Kiss 600ml", ru: "Вишневый Поцелуй 600мл" }, price: 499, icon: "🍒" },
+                { id: "pc16", name: { en: "Orange Brownie 300ml", ru: "Апельсиновый Брауни 300мл" }, price: 299, icon: "🍊" },
+                { id: "pc17", name: { en: "Orange Brownie 400ml", ru: "Апельсиновый Брауни 400мл" }, price: 399, icon: "🍊" },
+                { id: "pc18", name: { en: "Orange Brownie 600ml", ru: "Апельсиновый Брауни 600мл" }, price: 499, icon: "🍊" }
+            ],
+            nonCoffee: [
+                { id: "nc1", name: { en: "Matcha 300ml", ru: "Матча 300мл" }, price: 249, icon: "🍵" },
+                { id: "nc2", name: { en: "Matcha 400ml", ru: "Матча 400мл" }, price: 299, icon: "🍵" },
+                { id: "nc3", name: { en: "Matcha 600ml", ru: "Матча 600мл" }, price: 329, icon: "🍵" },
+                { id: "nc4", name: { en: "Cocoa 300ml", ru: "Какао 300мл" }, price: 249, icon: "🍫" },
+                { id: "nc5", name: { en: "Cocoa 400ml", ru: "Какао 400мл" }, price: 299, icon: "🍫" },
+                { id: "nc6", name: { en: "Cocoa 600ml", ru: "Какао 600мл" }, price: 329, icon: "🍫" },
+                { id: "nc7", name: { en: "Sea Buckthorn Berry Tea 300ml", ru: "Чай с Облепихой 300мл" }, price: 249, icon: "🫖" },
+                { id: "nc8", name: { en: "Sea Buckthorn Berry Tea 400ml", ru: "Чай с Облепихой 400мл" }, price: 299, icon: "🫖" },
+                { id: "nc9", name: { en: "Sea Buckthorn Berry Tea 600ml", ru: "Чай с Облепихой 600мл" }, price: 329, icon: "🫖" },
+                { id: "nc10", name: { en: "Black Currant Berry Tea 300ml", ru: "Чай с Черной Смородиной 300мл" }, price: 249, icon: "🫖" },
+                { id: "nc11", name: { en: "Black Currant Berry Tea 400ml", ru: "Чай с Черной Смородиной 400мл" }, price: 299, icon: "🫖" },
+                { id: "nc12", name: { en: "Black Currant Berry Tea 600ml", ru: "Чай с Черной Смородиной 600мл" }, price: 329, icon: "🫖" }
+            ],
+            food: [
+                { id: "f1", name: { en: "Ham & Cheese Sandwich Roll", ru: "Ролл с Ветчиной и Сыром" }, price: 229, icon: "🥪" },
+                { id: "f2", name: { en: "Chicken Sandwich Roll", ru: "Ролл с Курицей" }, price: 239, icon: "🥪" },
+                { id: "f3", name: { en: "Salmon Sandwich Roll", ru: "Ролл с Лососем" }, price: 319, icon: "🥪" },
+                { id: "f4", name: { en: "Ham & Cheese Sandwich", ru: "Сэндвич с Ветчиной и Сыром" }, price: 169, icon: "🥪" },
+                { id: "f5", name: { en: "Chicken Curry Sandwich", ru: "Сэндвич с Курицей Карри" }, price: 179, icon: "🥪" },
+                { id: "f6", name: { en: "Chicken Caesar Sandwich", ru: "Сэндвич Цезарь с Курицей" }, price: 179, icon: "🥪" },
+                { id: "f7", name: { en: "Beef Sandwich", ru: "Сэндвич с Говядиной" }, price: 179, icon: "🥪" },
+                { id: "f8", name: { en: "Teriyaki Turkey Sandwich", ru: "Сэндвич с Индейкой Терияки" }, price: 179, icon: "🥪" },
+                { id: "f9", name: { en: "Salmon Sandwich", ru: "Сэндвич с Лососем" }, price: 279, icon: "🥪" },
+                { id: "f10", name: { en: "Ham & Cheese Bagel", ru: "Бейгл с Ветчиной и Сыром" }, price: 179, icon: "🥯" },
+                { id: "f11", name: { en: "Chicken Bagel", ru: "Бейгл с Курицей" }, price: 199, icon: "🥯" },
+                { id: "f12", name: { en: "Salmon Bagel", ru: "Бейгл с Лососем" }, price: 269, icon: "🥯" }
+            ]
+        };
+        
+        // Populate menus
+        function populateMenus() {
+            // Populate each menu category
+            Object.keys(menuData).forEach(category => {
+                const menuContainer = document.getElementById(`${category}Menu`);
+                if (menuContainer) {
+                    menuContainer.innerHTML = '';
+                    menuData[category].forEach(item => {
+                        menuContainer.innerHTML += `
+                            <div class="menu-item" data-id="${item.id}" data-name="${item.name[currentLang]}" data-price="${item.price}">
+                                <div class="menu-icon" aria-hidden="true">${item.icon}</div>
+                                <div class="menu-name">${item.name[currentLang]}</div>
+                                <div class="menu-price">${item.price} ₽</div>
+                                <div class="quantity-controls">
+                                    <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
+                                    <div class="quantity-display">0</div>
+                                    <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+            
+            // Add event listeners to menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const decreaseBtn = item.querySelector('.decrease');
+                const increaseBtn = item.querySelector('.increase');
+                const quantityDisplay = item.querySelector('.quantity-display');
+                
+                decreaseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateItemQuantity(item, -1);
+                });
+                
+                increaseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateItemQuantity(item, 1);
+                });
+            });
+        }
+        
+        // Toggle menu item selection
+        function toggleMenuItem() {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const price = parseFloat(this.dataset.price);
+            
+            // Check if item is already selected
+            const existingItem = orderData.items.find(item => item.id === id);
+            
+            if (existingItem) {
+                // Item exists, increase quantity
+                existingItem.quantity += 1;
+                
+                // Update or add selection count badge
+                let countBadge = this.querySelector('.selection-count');
+                if (countBadge) {
+                    countBadge.textContent = existingItem.quantity;
+                } else {
+                    const badge = document.createElement('div');
+                    badge.className = 'selection-count';
+                    badge.textContent = existingItem.quantity;
+                    this.appendChild(badge);
+                }
+            } else {
+                // Add new item
+                orderData.items.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    quantity: 1
+                });
+                
+                // Add selection class and count badge
+                this.classList.add('selected');
+                const badge = document.createElement('div');
+                badge.className = 'selection-count';
+                badge.textContent = '1';
+                this.appendChild(badge);
+            }
+            
+            // Update total and selection count
+            updateOrderSummary();
+        }
+        
+        // Update order summary
+        function updateOrderSummary() {
+            let total = 0;
+            let count = 0;
+            
+            const summaryContainer = document.getElementById('selectionSummary');
+            summaryContainer.innerHTML = '';
+            
+            if (orderData.items.length === 0) {
+                summaryContainer.innerHTML = `<p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>`;
+                return;
+            }
+            
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'selection-summary';
+            
+            orderData.items.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                count += item.quantity;
+                
+                summaryDiv.innerHTML += `
+                    <div class="selection-item">
+                        <div class="selection-item-controls">
+                            <div class="selection-item-quantity">
+                                <div class="quantity-btn decrease" data-id="${item.id}" aria-label="Decrease quantity">-</div>
+                                <div class="quantity-display">${item.quantity}</div>
+                                <div class="quantity-btn increase" data-id="${item.id}" aria-label="Increase quantity">+</div>
+                            </div>
+                            <div class="selection-item-name">${item.name}</div>
+                        </div>
+                        <div class="selection-item-price">${itemTotal} ₽</div>
+                    </div>
+                `;
+            });
+            
+            summaryDiv.innerHTML += `
+                <div class="selection-item" style="margin-top: 10px; border-top: 2px solid var(--primary-color);">
+                    <div>${translations[currentLang].menu.selected} <span id="selectedCount">${count}</span></div>
+                    <div class="selection-item-price">${total} ₽</div>
+                </div>
+            `;
+            
+            summaryContainer.appendChild(summaryDiv);
+            
+            // Add event listeners to summary quantity controls
+            summaryDiv.querySelectorAll('.quantity-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = btn.dataset.id;
+                    const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+                    if (menuItem) {
+                        updateItemQuantity(menuItem, btn.classList.contains('increase') ? 1 : -1);
+                    }
+                });
+            });
+            
+            orderData.total = total;
+        }
+        
+        // Generate order summary for confirmation
+        function generateOrderSummary() {
+            document.getElementById('summaryName').textContent = orderData.name;
+            document.getElementById('summaryTime').textContent = orderData.time;
+            
+            const summaryItems = document.getElementById('summaryItems');
+            summaryItems.innerHTML = '';
+            
+            // Add location to summary
+            const locationName = orderData.location === 'dmitrovka' ? translations[currentLang].location.dmitrovka : translations[currentLang].location.tekhnopark;
+            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
+            
+            summaryItems.innerHTML += `
+                <div class="order-item">
+                    <span><strong>${translations[currentLang].order.location}:</strong></span>
+                    <span>${locationName}</span>
+                </div>
+                <div class="order-item">
+                    <span><strong>${translations[currentLang].order.address}:</strong></span>
+                    <span>${locationAddress}</span>
+                </div>
+            `;
+            
+            if (orderData.items.length === 0) {
+                summaryItems.innerHTML += '<p>No items selected</p>';
+            } else {
+                orderData.items.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    summaryItems.innerHTML += `
+                        <div class="order-item">
+                            <span>${item.quantity}x ${item.name}</span>
+                            <span>${itemTotal} ₽</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            if (orderData.comment) {
+                summaryItems.innerHTML += `
+                    <div class="order-item">
+                        <span><strong>${translations[currentLang].order.comments || 'Comments'}:</strong></span>
+                        <span>${orderData.comment}</span>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('summaryTotal').textContent = `${orderData.total} ₽`;
+        }
+        
+        // Generate a random order number
+        function generateOrderNumber() {
+            const date = new Date();
+            const dateStr = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+            const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `${dateStr}-${randomNum}`;
+        }
+        
+        // Send message using Telegram Bot API
+        async function sendTelegramMessage(chatId, text) {
+            const botToken = "8157403295:AAHd1WwtupOBw_-jFD-vQopThdd_1_OqMms";
+            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            
+            // If chatId is an array, send to all recipients
+            if (Array.isArray(chatId)) {
+                const promises = chatId.map(id => 
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            chat_id: id,
+                            text: text,
+                            parse_mode: 'HTML'
+                        })
+                    })
+                );
+                
+                try {
+                    await Promise.all(promises);
+                } catch (error) {
+                    console.error('Error sending messages:', error);
+                }
+                return;
+            }
+            
+            // Single recipient
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: text,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Error sending message:', data);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // Format order message for user
+        function formatOrderMessage(orderNumber, orderData) {
+            const t = translations[currentLang];
+            const locationName = orderData.location === 'dmitrovka' ? t.location.dmitrovka : t.location.tekhnopark;
+            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
+            
+            let message = `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
+                   `<b>👤 ${t.order.name}:</b> ${orderData.name}\n` +
+                   `<b>📍 ${t.order.location}:</b> ${locationName}\n` +
+                   `<b>🏠 ${t.order.address}:</b> ${locationAddress}\n` +
+                   `<b>⏰ ${t.order.time}:</b> ${orderData.time}\n\n` +
+                   `<b>📋 ${t.order.items}:</b>\n` +
+                   orderData.items.map(item => 
+                       `• ${item.quantity}x ${item.name} - ${item.price * item.quantity} ₽`
+                   ).join('\n') +
+                   `\n\n<b>💰 ${t.order.total}:</b> ${orderData.total} ₽`;
+
+            if (orderData.comment) {
+                message += `\n\n<b>💭 ${t.order.comments || 'Comments'}:</b>\n${orderData.comment}`;
+            }
+
+            return message;
+        }
+        
+        // Reset order data
+        function resetOrderData() {
+            orderData = {
+                name: "",
+                location: "",
+                items: [],
+                comment: "",
+                time: "12:00",
+                total: 0,
+                botInfo: {
+                    forwardToKitchen: true,
+                    kitchenBotUsername: "@ZakazYellow_bot",
+                    targetUserId: "261442211",
+                    recipientUserId: "261442211",
+                    meowmeowpewUsername: "@meowmeowpew",
+                    ichsterbeUsername: "@ichsterbe" // Add new bot username
+                }
+            };
+            
+            // Reset UI elements
+            document.getElementById('customerName').value = '';
+            document.getElementById('timeSlider').value = 12;
+            document.getElementById('timeDisplay').textContent = '12:00';
+            
+            // Reset selected items counter
+            const selectedCountElement = document.getElementById('selectedCount');
+            if (selectedCountElement) {
+                selectedCountElement.textContent = '0';
+            }
+            
+            // Clear selected items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('selected');
+                const badge = item.querySelector('.selection-count');
+                if (badge) {
+                    badge.remove();
+                }
+            });
+            
+            // Reset menu display
+            document.querySelectorAll('.menu-grid').forEach(menu => {
+                menu.style.display = 'none';
+            });
+            document.querySelector('.tab-button[data-menu="classicCoffee"]').classList.add('active');
+            
+            // Reset comment input
+            const commentInput = document.getElementById('orderComment');
+            if (commentInput) {
+                commentInput.value = '';
+                updateCharCount();
+            }
+        }
+        
+        // Initialize function
+        function init() {
+            populateMenus();
+            
+            // Set initial language to Russian
+            currentLang = 'ru';
+            switchLanguage('ru');
+            
+            // Set initial time to current time + 10 minutes
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 10);
+            let currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            
+            // Calculate minimum time (current time + 10 minutes)
+            const minTime = currentHour + (currentMinute / 60);
+            
+            // Update time slider and display
+            const timeSlider = document.getElementById('timeSlider');
+            const timeDisplay = document.getElementById('timeDisplay');
+            
+            // Set minimum value to max of 7:30 or current time + 10 minutes
+            timeSlider.min = Math.max(7.5, minTime);
+            timeSlider.max = 20; // Shop closes at 20:00
+            
+            // Set initial value to current time + 10 minutes
+            const sliderValue = Math.max(7.5, minTime);
+            timeSlider.value = sliderValue;
+            timeDisplay.textContent = formatTime(sliderValue);
+            orderData.time = formatTime(sliderValue);
+            
+            // Time slider event listener
+            timeSlider.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                const timeString = formatTime(value);
+                timeDisplay.textContent = timeString;
+                orderData.time = timeString;
+            });
+            
+            // Step navigation
+            document.querySelectorAll('.tab-button[data-step]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const step = this.dataset.step;
+                    navigateToStep(step);
+                });
+            });
+            
+            // Menu tabs
+            document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const menu = this.dataset.menu;
+                    document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Hide all menus
+                    document.querySelectorAll('.menu-grid').forEach(menu => {
+                        menu.style.display = 'none';
+                    });
+                    
+                    // Show selected menu
+                    document.getElementById(`${menu}Menu`).style.display = 'grid';
+                });
+            });
+
+            // Add location selection handlers
+            document.querySelectorAll('.location-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    document.querySelectorAll('.location-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    // Store selected location
+                    orderData.location = this.dataset.location;
+
+                    // Smooth transition to name input
+                    setTimeout(() => {
+                        navigateToStep('2');
+                        const nameInput = document.getElementById('customerName');
+                        nameInput.focus();
+                    }, 300);
+                });
+            });
+
+            // Add name confirmation handler
+            document.getElementById('confirmName').addEventListener('click', function() {
+                const nameInput = document.getElementById('customerName').value.trim();
+                const nameError = document.getElementById('nameError');
+                
+                if (nameInput.length === 0) {
+                    nameError.textContent = translations[currentLang].name.error;
+                    return;
+                }
+                
+                nameError.textContent = '';
+                orderData.name = nameInput;
+                this.classList.add('completed');
+                navigateToStep('3');
+            });
+
+            // Menu confirmation handler
+            document.getElementById('confirmStep2').addEventListener('click', function() {
+                if (orderData.items.length === 0) {
+                    // Show error message
+                    const summaryContainer = document.getElementById('selectionSummary');
+                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error || 'Please select at least one item'}</p>`;
+                    return;
+                }
+                this.classList.add('completed');
+                navigateToStep('4');
+            });
+            
+            // Comment confirmation handler
+            document.getElementById('confirmStep3').addEventListener('click', function() {
+                orderData.comment = document.getElementById('orderComment').value.trim();
+                this.classList.add('completed');
+                navigateToStep('5');
+            });
+            
+            // Time confirmation handler
+            document.getElementById('confirmStep4').addEventListener('click', function() {
+                const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
+                const selectedTime = parseFloat(timeSlider.value);
+                const timeSelector = document.querySelector('.time-selector');
+                
+                if (currentTime >= 20 || currentTime < 7.5) {
+                    showShopClosedNotification();
+                    return;
+                }
+
+                if (selectedTime < currentTime) {
+                    // Show error message
+                    let errorMessage = timeSelector.querySelector('.time-error');
+                    if (!errorMessage) {
+                        errorMessage = document.createElement('div');
+                        errorMessage.className = 'time-error';
+                        errorMessage.style.color = '#e74c3c';
+                        errorMessage.style.marginTop = '10px';
+                        errorMessage.style.textAlign = 'center';
+                        timeSelector.appendChild(errorMessage);
+                    }
+                    errorMessage.textContent = translations[currentLang].time.error;
+                    return;
+                }
+
+                // Clear any error message
+                const errorMessage = timeSelector.querySelector('.time-error');
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+
+                generateOrderSummary();
+                this.classList.add('completed');
+                navigateToStep('6');
+            });
+            
+            // Final order confirmation handler
+            document.getElementById('confirmOrder').addEventListener('click', async function() {
+                // Validate all required data
+                if (!orderData.location) {
+                    showError('location');
+                    return;
+                }
+                if (!orderData.name) {
+                    showError('name');
+                    return;
+                }
+                if (orderData.items.length === 0) {
+                    showError('menu');
+                    return;
+                }
+                if (!orderData.time) {
+                    showError('time');
+                    return;
+                }
+
+                const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
+                
+                if (currentTime >= 20 || currentTime < 7.5) {
+                    showShopClosedNotification();
+                    return;
+                }
+                
+                const orderNumber = generateOrderNumber();
+                document.getElementById('orderNumber').textContent = orderNumber;
+                
+                // Hide all steps and show confirmation screen
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                });
+                const orderConfirmed = document.getElementById('orderConfirmed');
+                orderConfirmed.style.display = 'block';
+                
+                // Format the order message
+                const orderMessage = formatOrderMessage(orderNumber, orderData);
+                
+                // List of all kitchen bot users who should receive the message
+                const kitchenBotUsers = [
+                    "517070445", // Main kitchen bot user
+                    "261442211", // Additional kitchen bot user
+                    "1057756574", // New kitchen bot user
+                    "-1002152072922"
+                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
+                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
+                ];
+                
+                // Send to all kitchen bot users
+                await sendTelegramMessage(kitchenBotUsers, orderMessage);
+                
+                // Send to order creator if we have their ID
+                if (currentUserId) {
+                    await sendTelegramMessage(currentUserId, orderMessage);
+                }
+
+                // Scroll to order number after a short delay
+                setTimeout(() => {
+                    const orderNumberElement = document.getElementById('orderNumber');
+                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            });
+            
+            // Add error display function
+            function showError(step) {
+                const errorMessages = {
+                    location: translations[currentLang].location.error || 'Please select a location',
+                    name: translations[currentLang].name.error || 'Please enter your name',
+                    menu: translations[currentLang].menu.error || 'Please select at least one item',
+                    time: translations[currentLang].time.error || 'Please select a valid time'
+                };
+
+                const errorMessage = errorMessages[step];
+                const summaryContainer = document.getElementById('summaryItems');
+                if (summaryContainer) {
+                    summaryContainer.innerHTML = `<p style="color: #e74c3c; text-align: center; padding: 10px;">${errorMessage}</p>`;
+                }
+            }
+            
+            // New Order Button
+            document.getElementById('newOrderButton').addEventListener('click', function() {
+                resetOrderData();
+                navigateToStep('1');
+            });
+
+            // Add step navigation buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const currentStep = document.querySelector('.step.active');
+                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
+                    const nextStepNumber = currentStepNumber + 1;
+                    
+                    // Validate current step before proceeding
+                    if (currentStepNumber === 1 && !orderData.location) {
+                        return;
+                    }
+                    if (currentStepNumber === 2 && !orderData.name) {
+                        const nameInput = document.getElementById('customerName').value.trim();
+                        if (nameInput.length === 0) {
+                            document.getElementById('nameError').textContent = translations[currentLang].name.error;
+                            return;
+                        }
+                    }
+                    if (currentStepNumber === 3 && orderData.items.length === 0) {
+                        const summaryContainer = document.getElementById('selectionSummary');
+                        summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
+                        return;
+                    }
+                    
+                    navigateToStep(nextStepNumber.toString());
+                });
+            });
+        }
+        
+        // Navigate to specific step
+        function navigateToStep(step) {
+            // Validate previous steps
+            const currentStep = document.querySelector('.step.active');
+            const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
+            const targetStepNumber = parseInt(step);
+
+            // Check if trying to skip steps
+            if (targetStepNumber > currentStepNumber + 1) {
+                return; // Don't allow skipping steps
+            }
+
+            // Validate required data for each step
+            if (targetStepNumber === 2 && !orderData.location) {
+                return; // Can't proceed to name without location
+            }
+            if (targetStepNumber === 3 && !orderData.name) {
+                return; // Can't proceed to menu without name
+            }
+            if (targetStepNumber === 4 && orderData.items.length === 0) {
+                return; // Can't proceed to comment without items
+            }
+            if (targetStepNumber === 5 && !orderData.comment) {
+                // Comment is optional, but we still need to set it
+                orderData.comment = '';
+            }
+            if (targetStepNumber === 6 && !orderData.time) {
+                return; // Can't proceed to summary without time
+            }
+
+            // Update tab buttons
+            document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.tab-button[data-step="${step}"]`)?.classList.add('active');
+            
+            // Update visible step
+            document.querySelectorAll('.step').forEach(s => {
+                s.classList.remove('active');
+            });
+            const nextStep = document.getElementById(`step${step}`);
+            nextStep.classList.add('active');
+            
+            // Smooth scroll to the top of the next step
+            nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Add notification functions
+        function showShopClosedNotification() {
+            const notification = document.getElementById('shopClosedNotification');
+            const currentHour = new Date().getHours();
+            const currentMinutes = new Date().getMinutes();
+            const currentTime = currentHour + (currentMinutes / 60);
+
+            if (currentTime >= 20) {
+                notification.textContent = translations[currentLang].shopClosed.evening;
+            } else if (currentTime < 7.5) {
+                notification.textContent = translations[currentLang].shopClosed.morning;
+            }
+            
+            notification.style.display = 'block';
+            
+            // Disable the confirm button
+            document.getElementById('confirmStep4').disabled = true;
+            
+            // Hide notification after 5 seconds
+            setTimeout(() => {
+                hideShopClosedNotification();
+            }, 5000);
+        }
+        
+        function hideShopClosedNotification() {
+            const notification = document.getElementById('shopClosedNotification');
+            notification.style.display = 'none';
+            
+            // Re-enable the confirm button
+            document.getElementById('confirmStep4').disabled = false;
+        }
+        
+        // Helper function to format time
+        function formatTime(value) {
+            const hours = Math.floor(value);
+            const minutes = Math.round((value % 1) * 60);
+            return `${hours}:${minutes.toString().padStart(2, '0')}`;
+        }
+        
+        // Add smooth scrolling to the page
+        document.documentElement.style.scrollBehavior = 'smooth';
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Add translations
+        const translations = {
+            en: {
+                header: {
+                    title: "Place Your Order"
+                },
+                welcome: {
+                    title: "Welcome to Yellow Coffee!",
+                    text: "We're excited to serve you today! Please select your preferred location and enter your name to start your order.\nOur delicious coffee and fresh food are waiting for you."
+                },
+                location: {
+                    title: "Select Location",
+                    dmitrovka: "m. Dmitrovka",
+                    tekhnopark: "m. Tekhnopark"
+                },
+                name: {
+                    title: "Enter Your Name",
+                    placeholder: "Your name (max 15 letters)",
+                    error: "Please enter your name",
+                    confirm: "Confirm"
+                },
+                menu: {
+                    title: "Select Drinks & Food",
+                    classicCoffee: "Classic Coffee",
+                    signatureDrinks: "Signature Drinks",
+                    premiumCollection: "Premium Collection",
+                    nonCoffee: "Non-Coffee Beverages",
+                    food: "Food",
+                    selected: "Selected items:",
+                    error: "Please select at least one item to continue"
+                },
+                time: {
+                    title: "Select Pickup Time",
+                    error: "Please select a time later than the current time"
+                },
+                order: {
+                    title: "Order Confirmation",
+                    name: "Name",
+                    location: "Location",
+                    address: "Address",
+                    time: "Pickup Time",
+                    items: "Selected Items",
+                    total: "Total",
+                    confirm: "Confirm Order",
+                    comments: "Comments",
+                    forwarding: "Your order details have been sent to our kitchen bot."
+                },
+                buttons: {
+                    confirm: "Confirm"
+                },
+                shopClosed: {
+                    evening: "I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow",
+                    morning: "I apologize, the coffee shop is closed until 7:30 AM. Please place your order after 7:30 AM."
+                },
+                thankYou: {
+                    message: "Thank you for your order!",
+                    number: "Your Order Number:",
+                    screenshot: "Please take a screenshot of your order number",
+                    newOrder: "Make Another Order",
+                    owl: {
+                        message: "🦉 Would you like to pet and feed your owl while your coffee is being prepared?",
+                        button: "🦉 Play with Owl"
+                    }
+                },
+                comment: {
+                    title: "Add Comments (Optional)",
+                    placeholder: "Enter any special requests or comments about your order (max 90 characters)",
+                    charCount: "characters"
+                }
+            },
+            ru: {
+                header: {
+                    title: "Сделать Заказ"
+                },
+                welcome: {
+                    title: "Добро пожаловать в Yellow Coffee!",
+                    text: "Мы рады обслужить вас сегодня! Пожалуйста, выберите удобное место и введите ваше имя, чтобы начать заказ.\nНаши вкусные кофе и свежая еда ждут вас."
+                },
+                location: {
+                    title: "Выберите Локацию",
+                    dmitrovka: "м. Дмитровка",
+                    tekhnopark: "м. Технопарк"
+                },
+                name: {
+                    title: "Введите Ваше Имя",
+                    placeholder: "Ваше имя (макс. 15 букв)",
+                    error: "Пожалуйста, введите ваше имя",
+                    confirm: "Подтвердить"
+                },
+                menu: {
+                    title: "Выберите Напитки и Еду",
+                    classicCoffee: "Классический Кофе",
+                    signatureDrinks: "Авторские Напитки",
+                    premiumCollection: "Премиум Коллекция",
+                    nonCoffee: "Некофейные Напитки",
+                    food: "Еда",
+                    selected: "Выбрано товаров:",
+                    error: "Пожалуйста, выберите хотя бы один товар для продолжения"
+                },
+                time: {
+                    title: "Выберите Время Получения",
+                    error: "Пожалуйста, выберите время позже текущего"
+                },
+                order: {
+                    title: "Подтверждение Заказа",
+                    name: "Имя",
+                    location: "Локация",
+                    address: "Адрес",
+                    time: "Время Получения",
+                    items: "Выбранные Товары",
+                    total: "Итого",
+                    confirm: "Подтвердить Заказ",
+                    comments: "Комментарии",
+                    forwarding: "Детали вашего заказа отправлены нашему кухонному боту."
+                },
+                buttons: {
+                    confirm: "Подтвердить"
+                },
+                shopClosed: {
+                    evening: "Приносим извинения, кофейня уже закрыта сегодня, мы будем ждать ваш заказ завтра",
+                    morning: "Приносим извинения, кофейня закрыта до 7:30 утра. Пожалуйста, сделайте заказ после 7:30 утра."
+                },
+                thankYou: {
+                    message: "Спасибо за ваш заказ!",
+                    number: "Номер Вашего Заказа:",
+                    screenshot: "Пожалуйста, сделайте скриншот номера заказа",
+                    newOrder: "Сделать Новый Заказ",
+                    owl: {
+                        message: "🦉 Может хотите погладить и покормить свою сову, пока ваш кофе готовится?",
+                        button: "🦉 Перейти к Сове"
+                    }
+                },
+                comment: {
+                    title: "Добавить Комментарии (Необязательно)",
+                    placeholder: "Введите особые пожелания или комментарии к заказу (макс. 90 символов)",
+                    charCount: "символов"
+                }
+            }
+        };
+
+        let currentLang = 'ru';
+
+        // Language switching function
+        function switchLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
+            // Update header
+            document.getElementById('headerTitle').textContent = t.header.title;
+
+            // Update welcome section
+            document.querySelector('.welcome-title').textContent = t.welcome.title;
+            document.querySelector('.welcome-text').textContent = t.welcome.text;
+
+            // Update location section
+            document.querySelector('.location-section h2').textContent = t.location.title;
+            document.querySelector('[data-location="dmitrovka"] .location-name').textContent = t.location.dmitrovka;
+            document.querySelector('[data-location="tekhnopark"] .location-name').textContent = t.location.tekhnopark;
+
+            // Update name section
+            document.querySelector('#step2 .section h2').textContent = t.name.title;
+            document.getElementById('customerName').placeholder = t.name.placeholder;
+            document.getElementById('confirmName').textContent = t.name.confirm;
+
+            // Update menu section
+            document.querySelector('#step3 .section h2').textContent = t.menu.title;
+            document.querySelector('[data-menu="classicCoffee"]').textContent = t.menu.classicCoffee;
+            document.querySelector('[data-menu="signatureDrinks"]').textContent = t.menu.signatureDrinks;
+            document.querySelector('[data-menu="premiumCollection"]').textContent = t.menu.premiumCollection;
+            document.querySelector('[data-menu="nonCoffee"]').textContent = t.menu.nonCoffee;
+            document.querySelector('[data-menu="food"]').textContent = t.menu.food;
+            document.querySelector('#selectionSummary p').textContent = t.menu.selected;
+
+            // Update menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const id = item.dataset.id;
+                const menuItem = [...menuData.classicCoffee, ...menuData.signatureDrinks, ...menuData.premiumCollection, ...menuData.nonCoffee, ...menuData.food].find(mi => mi.id === id);
+                if (menuItem) {
+                    item.querySelector('.menu-name').textContent = menuItem.name[lang];
+                    item.dataset.name = menuItem.name[lang];
+                }
+            });
+
+            // Update comment section
+            document.querySelector('#step4 .section h2').textContent = t.comment.title;
+            const commentInput = document.getElementById('orderComment');
+            if (commentInput) {
+                commentInput.placeholder = t.comment.placeholder;
+            }
+            document.querySelector('.word-count').innerHTML = `<span id="charCount">0</span>/90 ${t.comment.charCount}`;
+
+            // Update time section
+            document.querySelector('#step5 .section h2').textContent = t.time.title;
+
+            // Update order section
+            document.querySelector('#step6 .section h2').textContent = t.order.title;
+            document.getElementById('confirmOrder').textContent = t.order.confirm;
+            document.querySelector('.forwarding-notice').textContent = t.order.forwarding;
+
+            // Update thank you section
+            document.querySelector('.thank-you-message').textContent = t.thankYou.message;
+            document.querySelector('.order-number p').textContent = t.thankYou.number;
+            document.querySelector('.screenshot-notice').textContent = t.thankYou.screenshot;
+            document.getElementById('newOrderButton').textContent = t.thankYou.newOrder;
+
+            // Update owl section
+            const owlMessage = document.querySelector('.owl-message');
+            const owlButton = document.querySelector('.owl-button');
+            if (owlMessage && owlButton) {
+                owlMessage.textContent = t.thankYou.owl.message;
+                owlButton.textContent = t.thankYou.owl.button;
+                owlButton.href = "https://t.me/notwise_bot";
+            }
+
+            // Update confirm buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                if (button.id !== 'confirmOrder') {
+                    button.textContent = t.buttons.confirm;
+                }
+            });
+
+            // Update language buttons
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+
+            // Update order summary if it exists
+            if (orderData.items.length > 0) {
+                updateOrderSummary();
+            }
+        }
+
+        // Initialize owl button text on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial owl button text
+            const owlMessage = document.querySelector('.owl-message');
+            const owlButton = document.querySelector('.owl-button');
+            if (owlMessage && owlButton) {
+                owlMessage.textContent = translations[currentLang].thankYou.owl.message;
+                owlButton.textContent = translations[currentLang].thankYou.owl.button;
+                owlButton.href = "https://t.me/notwise_bot";
             }
         });
-    }
-});
 
-// Start the bot
-bot.launch().then(() => {
-    console.log('Kitchen bot is running...');
-}).catch((error) => {
-    console.error('Error starting bot:', error);
-});
+        // Add language button handlers
+        document.querySelectorAll('.language-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchLanguage(this.dataset.lang);
+            });
+        });
 
-// Enable graceful stop
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM')); 
+        // Replace word count functionality with character count
+        function updateCharCount() {
+            const commentInput = document.getElementById('orderComment');
+            const charCountDisplay = document.getElementById('charCount');
+            const charCount = commentInput.value.length;
+            charCountDisplay.textContent = charCount;
+            
+            // Disable/enable confirm button based on character count
+            const confirmButton = document.getElementById('confirmStep3');
+            if (confirmButton) {
+                confirmButton.disabled = charCount > 90;
+            }
+        }
+
+        // Add updateItemQuantity function
+        function updateItemQuantity(item, change) {
+            const id = item.dataset.id;
+            const name = item.dataset.name;
+            const price = parseFloat(item.dataset.price);
+            const quantityDisplay = item.querySelector('.quantity-display');
+            const currentQuantity = parseInt(quantityDisplay.textContent);
+            const newQuantity = Math.max(0, currentQuantity + change);
+            
+            // Update display
+            quantityDisplay.textContent = newQuantity;
+            
+            // Update order data
+            const existingItem = orderData.items.find(item => item.id === id);
+            
+            if (newQuantity === 0) {
+                // Remove item if quantity is 0
+                if (existingItem) {
+                    orderData.items = orderData.items.filter(item => item.id !== id);
+                    item.classList.remove('selected');
+                }
+            } else {
+                if (existingItem) {
+                    existingItem.quantity = newQuantity;
+                } else {
+                    orderData.items.push({
+                        id: id,
+                        name: name,
+                        price: price,
+                        quantity: newQuantity
+                    });
+                    item.classList.add('selected');
+                }
+            }
+            
+            // Update summary
+            updateOrderSummary();
+        }
+
+        // Update menu tab switching
+        document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
+            button.addEventListener('click', function() {
+                const menu = this.dataset.menu;
+                document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Hide all menus
+                document.querySelectorAll('.menu-grid').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+                
+                // Show selected menu
+                document.getElementById(`${menu}Menu`).style.display = 'grid';
+            });
+        });
+    </script>
+</body>
+</html>
