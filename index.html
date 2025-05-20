@@ -1196,19 +1196,19 @@
             let currentHour = now.getHours();
             const currentMinute = now.getMinutes();
             
-            // Format time with minutes
-            const roundedTime = `${currentHour}:${currentMinute.toString().padStart(2, '0')}`;
+            // Calculate minimum time (current time + 10 minutes)
+            const minTime = currentHour + (currentMinute / 60);
             
             // Update time slider and display
             const timeSlider = document.getElementById('timeSlider');
             const timeDisplay = document.getElementById('timeDisplay');
             
-            // Set minimum value to 7:30 (7.5 hours)
-            timeSlider.min = 7.5;
+            // Set minimum value to max of 7:30 or current time + 10 minutes
+            timeSlider.min = Math.max(7.5, minTime);
             timeSlider.max = 20; // Shop closes at 20:00
             
-            // Convert time to slider value (hours + minutes as decimal)
-            const sliderValue = Math.max(7.5, currentHour + (currentMinute / 60));
+            // Set initial value to current time + 10 minutes
+            const sliderValue = Math.max(7.5, minTime);
             timeSlider.value = sliderValue;
             timeDisplay.textContent = formatTime(sliderValue);
             orderData.time = formatTime(sliderValue);
@@ -1283,11 +1283,18 @@
                 
                 nameError.textContent = '';
                 orderData.name = nameInput;
+                this.classList.add('completed');
                 navigateToStep('3');
             });
 
             // Menu confirmation handler
             document.getElementById('confirmStep2').addEventListener('click', function() {
+                if (orderData.items.length === 0) {
+                    // Show error message
+                    const summaryContainer = document.getElementById('selectionSummary');
+                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error || 'Please select at least one item'}</p>`;
+                    return;
+                }
                 this.classList.add('completed');
                 navigateToStep('4');
             });
@@ -1304,11 +1311,35 @@
                 const currentHour = new Date().getHours();
                 const currentMinutes = new Date().getMinutes();
                 const currentTime = currentHour + (currentMinutes / 60);
+                const selectedTime = parseFloat(timeSlider.value);
                 
                 if (currentTime >= 20 || currentTime < 7.5) {
                     showShopClosedNotification();
                     return;
                 }
+
+                if (selectedTime < currentTime) {
+                    // Show error message
+                    const timeSelector = document.querySelector('.time-selector');
+                    let errorMessage = timeSelector.querySelector('.time-error');
+                    if (!errorMessage) {
+                        errorMessage = document.createElement('div');
+                        errorMessage.className = 'time-error';
+                        errorMessage.style.color = '#e74c3c';
+                        errorMessage.style.marginTop = '10px';
+                        errorMessage.style.textAlign = 'center';
+                        timeSelector.appendChild(errorMessage);
+                    }
+                    errorMessage.textContent = translations[currentLang].time.error;
+                    return;
+                }
+
+                // Clear any error message
+                const errorMessage = timeSelector.querySelector('.time-error');
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+
                 generateOrderSummary();
                 this.classList.add('completed');
                 navigateToStep('6');
@@ -1449,10 +1480,12 @@
                     title: "Select Drinks & Food",
                     drinks: "Drinks",
                     food: "Food",
-                    selected: "Selected items:"
+                    selected: "Selected items:",
+                    error: "Please select at least one item to continue"
                 },
                 time: {
-                    title: "Select Pickup Time"
+                    title: "Select Pickup Time",
+                    error: "Please select a time later than the current time"
                 },
                 order: {
                     title: "Order Confirmation",
@@ -1512,10 +1545,12 @@
                     title: "Выберите Напитки и Еду",
                     drinks: "Напитки",
                     food: "Еда",
-                    selected: "Выбрано товаров:"
+                    selected: "Выбрано товаров:",
+                    error: "Пожалуйста, выберите хотя бы один товар для продолжения"
                 },
                 time: {
-                    title: "Выберите Время Получения"
+                    title: "Выберите Время Получения",
+                    error: "Пожалуйста, выберите время позже текущего"
                 },
                 order: {
                     title: "Подтверждение Заказа",
