@@ -1433,7 +1433,7 @@
                     return;
                 }
                 this.classList.add('completed');
-                navigateToStep('4'); // Navigate to comment step
+                navigateToStep('4');
             });
             
             // Comment confirmation handler
@@ -1484,28 +1484,24 @@
             
             // Final order confirmation handler
             document.getElementById('confirmOrder').addEventListener('click', async function() {
-                // Find the first incomplete step
-                let firstIncompleteStep = 1;
-                
+                // Validate all required data
                 if (!orderData.location) {
-                    firstIncompleteStep = 1;
-                } else if (!orderData.name) {
-                    firstIncompleteStep = 2;
-                } else if (orderData.items.length === 0) {
-                    firstIncompleteStep = 3;
-                } else if (orderData.comment === undefined) {
-                    firstIncompleteStep = 4;
-                } else if (!orderData.time) {
-                    firstIncompleteStep = 5;
+                    showError('location');
+                    return;
                 }
-
-                // If any step is incomplete, navigate to it
-                if (firstIncompleteStep < 6) {
-                    navigateToStep(firstIncompleteStep.toString());
+                if (!orderData.name) {
+                    showError('name');
+                    return;
+                }
+                if (orderData.items.length === 0) {
+                    showError('menu');
+                    return;
+                }
+                if (!orderData.time) {
+                    showError('time');
                     return;
                 }
 
-                // Check if shop is closed
                 const currentHour = new Date().getHours();
                 const currentMinutes = new Date().getMinutes();
                 const currentTime = currentHour + (currentMinutes / 60);
@@ -1514,8 +1510,7 @@
                     showShopClosedNotification();
                     return;
                 }
-
-                // If all steps are complete, proceed with order confirmation
+                
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
                 
@@ -1539,26 +1534,19 @@
                     orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
                 ];
                 
-                try {
-                    // Send to all kitchen bot users
-                    await sendTelegramMessage(kitchenBotUsers, orderMessage);
-                    
-                    // Send to order creator if we have their ID
-                    if (currentUserId) {
-                        await sendTelegramMessage(currentUserId, orderMessage);
-                    }
-
-                    // Scroll to order number after a short delay
-                    setTimeout(() => {
-                        const orderNumberElement = document.getElementById('orderNumber');
-                        orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 100);
-                } catch (error) {
-                    console.error('Error sending order:', error);
-                    // Show error message to user
-                    const errorMessage = translations[currentLang].order.error || 'Error sending order. Please try again.';
-                    showError('order');
+                // Send to all kitchen bot users
+                await sendTelegramMessage(kitchenBotUsers, orderMessage);
+                
+                // Send to order creator if we have their ID
+                if (currentUserId) {
+                    await sendTelegramMessage(currentUserId, orderMessage);
                 }
+
+                // Scroll to order number after a short delay
+                setTimeout(() => {
+                    const orderNumberElement = document.getElementById('orderNumber');
+                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
             });
             
             // Add error display function
@@ -1624,6 +1612,24 @@
                 return; // Don't allow skipping steps
             }
 
+            // Validate required data for each step
+            if (targetStepNumber === 2 && !orderData.location) {
+                return; // Can't proceed to name without location
+            }
+            if (targetStepNumber === 3 && !orderData.name) {
+                return; // Can't proceed to menu without name
+            }
+            if (targetStepNumber === 4 && orderData.items.length === 0) {
+                return; // Can't proceed to comment without items
+            }
+            if (targetStepNumber === 5 && !orderData.comment) {
+                // Comment is optional, but we still need to set it
+                orderData.comment = '';
+            }
+            if (targetStepNumber === 6 && !orderData.time) {
+                return; // Can't proceed to summary without time
+            }
+
             // Update tab buttons
             document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
                 btn.classList.remove('active');
@@ -1637,21 +1643,8 @@
             const nextStep = document.getElementById(`step${step}`);
             nextStep.classList.add('active');
             
-            // Smooth scroll to the next step
+            // Smooth scroll to the top of the next step
             nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            // Show error message if trying to proceed with incomplete data
-            if (targetStepNumber === 2 && !orderData.location) {
-                showError('location');
-            } else if (targetStepNumber === 3 && !orderData.name) {
-                showError('name');
-            } else if (targetStepNumber === 4 && orderData.items.length === 0) {
-                showError('menu');
-            } else if (targetStepNumber === 5 && orderData.comment === undefined) {
-                orderData.comment = ''; // Set empty comment if undefined
-            } else if (targetStepNumber === 6 && !orderData.time) {
-                showError('time');
-            }
         }
         
         // Add notification functions
