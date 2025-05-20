@@ -1387,8 +1387,9 @@
                 // Format the order message
                 const orderMessage = formatOrderMessage(orderNumber, orderData);
                 
-                // Send to bot
-                await sendTelegramMessage(orderData.botInfo.recipientUserId, orderMessage);
+                // Send to kitchen bot with forward instruction
+                const kitchenBotMessage = `🔄 Forward to: 517070445\n\n${orderMessage}`;
+                await sendTelegramMessage(orderData.botInfo.recipientUserId, kitchenBotMessage);
                 
                 // Send to order creator if we have their ID
                 if (currentUserId) {
