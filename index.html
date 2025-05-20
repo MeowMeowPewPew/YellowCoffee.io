@@ -113,11 +113,10 @@
         }
 
         .menu-grid {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
             margin-top: 15px;
-            max-width: 100%;
         }
 
         .menu-container {
@@ -169,14 +168,11 @@
             border: 2px solid var(--primary-color);
             border-radius: var(--border-radius);
             padding: 15px;
-            text-align: left;
+            text-align: center;
             cursor: pointer;
             position: relative;
             transition: var(--transition);
             background: var(--bg-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
         .menu-item:hover {
@@ -198,8 +194,8 @@
 
         .menu-icon {
             font-size: 32px;
+            margin-bottom: 10px;
             transition: var(--transition);
-            flex-shrink: 0;
         }
 
         .menu-item:hover .menu-icon {
@@ -207,24 +203,23 @@
         }
 
         .menu-name {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            min-height: 32px;
         }
 
         .menu-price {
             font-weight: bold;
             color: var(--secondary-color);
-            font-size: 18px;
-            margin-left: auto;
-            padding-right: 15px;
         }
 
         .quantity-controls {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
-            margin-left: 15px;
+            margin-top: 12px;
         }
 
         .quantity-btn {
@@ -241,7 +236,6 @@
             transition: var(--transition);
             user-select: none;
             font-size: 18px;
-            flex-shrink: 0;
         }
 
         .quantity-btn:hover {
@@ -352,16 +346,19 @@
 
         .tab-buttons {
             display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
             margin-bottom: 20px;
             background: var(--secondary-bg);
             border-radius: var(--border-radius);
-            padding: 5px;
+            padding: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .tab-button {
             flex: 1;
-            padding: 12px;
+            min-width: 120px;
+            padding: 8px 12px;
             text-align: center;
             background: transparent;
             border: none;
@@ -369,12 +366,27 @@
             transition: var(--transition);
             border-radius: calc(var(--border-radius) - 5px);
             font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
         }
 
         .tab-button.active {
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             color: white;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 480px) {
+            .tab-buttons {
+                gap: 4px;
+                padding: 4px;
+            }
+
+            .tab-button {
+                min-width: 90px;
+                padding: 6px 8px;
+                font-size: 12px;
+            }
         }
 
         .order-summary {
@@ -989,10 +1001,8 @@
                     menuData[category].forEach(item => {
                         menuContainer.innerHTML += `
                             <div class="menu-item" data-id="${item.id}" data-name="${item.name[currentLang]}" data-price="${item.price}">
-                                <div class="menu-item-left">
-                                    <div class="menu-icon" aria-hidden="true">${item.icon}</div>
-                                    <div class="menu-name">${item.name[currentLang]}</div>
-                                </div>
+                                <div class="menu-icon" aria-hidden="true">${item.icon}</div>
+                                <div class="menu-name">${item.name[currentLang]}</div>
                                 <div class="menu-price">${item.price} ₽</div>
                                 <div class="quantity-controls">
                                     <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
