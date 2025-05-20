@@ -1347,6 +1347,24 @@
             
             // Final order confirmation handler
             document.getElementById('confirmOrder').addEventListener('click', async function() {
+                // Validate all required data
+                if (!orderData.location) {
+                    showError('location');
+                    return;
+                }
+                if (!orderData.name) {
+                    showError('name');
+                    return;
+                }
+                if (orderData.items.length === 0) {
+                    showError('menu');
+                    return;
+                }
+                if (!orderData.time) {
+                    showError('time');
+                    return;
+                }
+
                 const currentHour = new Date().getHours();
                 const currentMinutes = new Date().getMinutes();
                 const currentTime = currentHour + (currentMinutes / 60);
@@ -1383,6 +1401,22 @@
                     orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 100);
             });
+            
+            // Add error display function
+            function showError(step) {
+                const errorMessages = {
+                    location: translations[currentLang].location.error || 'Please select a location',
+                    name: translations[currentLang].name.error || 'Please enter your name',
+                    menu: translations[currentLang].menu.error || 'Please select at least one item',
+                    time: translations[currentLang].time.error || 'Please select a valid time'
+                };
+
+                const errorMessage = errorMessages[step];
+                const summaryContainer = document.getElementById('summaryItems');
+                if (summaryContainer) {
+                    summaryContainer.innerHTML = `<p style="color: #e74c3c; text-align: center; padding: 10px;">${errorMessage}</p>`;
+                }
+            }
             
             // New Order Button
             document.getElementById('newOrderButton').addEventListener('click', function() {
