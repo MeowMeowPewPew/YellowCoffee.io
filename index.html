@@ -1524,12 +1524,22 @@
                 // Format the order message
                 const orderMessage = formatOrderMessage(orderNumber, orderData);
                 
-                // Send to kitchen bot
-                await sendTelegramMessage(orderData.botInfo.kitchenBotUsername, orderMessage);
-                
-                // Send to order creator if we have their ID
-                if (currentUserId) {
-                    await sendTelegramMessage(currentUserId, orderMessage);
+                try {
+                    // Send to kitchen bot
+                    await sendTelegramMessage(orderData.botInfo.kitchenBotUsername, orderMessage);
+                    console.log('Order sent to kitchen bot successfully');
+                    
+                    // Send to order creator if we have their ID
+                    if (currentUserId) {
+                        await sendTelegramMessage(currentUserId, orderMessage);
+                        console.log('Order confirmation sent to user');
+                    }
+                } catch (error) {
+                    console.error('Error sending order:', error);
+                    // Show error message to user
+                    const errorMessage = translations[currentLang].order.error || 'Error sending order. Please try again.';
+                    alert(errorMessage);
+                    return;
                 }
 
                 // Scroll to order number after a short delay
