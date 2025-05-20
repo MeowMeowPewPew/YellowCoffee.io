@@ -117,6 +117,66 @@
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
             margin-top: 15px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            padding-bottom: 10px;
+        }
+
+        .menu-grid::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .menu-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .menu-scroll-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 215, 0, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .menu-container:hover .menu-scroll-indicator {
+            opacity: 1;
+        }
+
+        .menu-scroll-left {
+            left: 10px;
+        }
+
+        .menu-scroll-right {
+            right: 10px;
+        }
+
+        .menu-scroll-indicator:hover {
+            background: rgba(255, 165, 0, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .menu-scroll-indicator:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .menu-item {
+            scroll-snap-align: start;
+            min-width: 120px;
         }
 
         .menu-item {
@@ -689,35 +749,55 @@
             <div class="section">
                 <h2>Select Drinks & Food</h2>
                 <div class="tab-buttons">
-                    <div class="tab-button active" data-menu="classicCoffee">Classic Coffee</div>
-                    <div class="tab-button" data-menu="signatureDrinks">Signature Drinks</div>
-                    <div class="tab-button" data-menu="premiumCollection">Premium Collection</div>
-                    <div class="tab-button" data-menu="nonCoffee">Non-Coffee Beverages</div>
-                    <div class="tab-button" data-menu="food">Food</div>
+                    <div class="tab-button active" data-menu="classicCoffee">${translations[currentLang].menu.classicCoffee}</div>
+                    <div class="tab-button" data-menu="signatureDrinks">${translations[currentLang].menu.signatureDrinks}</div>
+                    <div class="tab-button" data-menu="premiumCollection">${translations[currentLang].menu.premiumCollection}</div>
+                    <div class="tab-button" data-menu="nonCoffee">${translations[currentLang].menu.nonCoffee}</div>
+                    <div class="tab-button" data-menu="food">${translations[currentLang].menu.food}</div>
                 </div>
                 
-                <div class="menu-grid" id="classicCoffeeMenu">
-                    <!-- Classic Coffee items will be populated here -->
+                <div class="menu-container">
+                    <div class="menu-scroll-indicator menu-scroll-left">←</div>
+                    <div class="menu-grid" id="classicCoffeeMenu">
+                        <!-- Classic Coffee items will be populated here -->
+                    </div>
+                    <div class="menu-scroll-indicator menu-scroll-right">→</div>
                 </div>
                 
-                <div class="menu-grid" id="signatureDrinksMenu" style="display: none;">
-                    <!-- Signature Drinks items will be populated here -->
+                <div class="menu-container" style="display: none;">
+                    <div class="menu-scroll-indicator menu-scroll-left">←</div>
+                    <div class="menu-grid" id="signatureDrinksMenu">
+                        <!-- Signature Drinks items will be populated here -->
+                    </div>
+                    <div class="menu-scroll-indicator menu-scroll-right">→</div>
                 </div>
                 
-                <div class="menu-grid" id="premiumCollectionMenu" style="display: none;">
-                    <!-- Premium Collection items will be populated here -->
+                <div class="menu-container" style="display: none;">
+                    <div class="menu-scroll-indicator menu-scroll-left">←</div>
+                    <div class="menu-grid" id="premiumCollectionMenu">
+                        <!-- Premium Collection items will be populated here -->
+                    </div>
+                    <div class="menu-scroll-indicator menu-scroll-right">→</div>
                 </div>
                 
-                <div class="menu-grid" id="nonCoffeeMenu" style="display: none;">
-                    <!-- Non-Coffee items will be populated here -->
+                <div class="menu-container" style="display: none;">
+                    <div class="menu-scroll-indicator menu-scroll-left">←</div>
+                    <div class="menu-grid" id="nonCoffeeMenu">
+                        <!-- Non-Coffee items will be populated here -->
+                    </div>
+                    <div class="menu-scroll-indicator menu-scroll-right">→</div>
                 </div>
                 
-                <div class="menu-grid" id="foodMenu" style="display: none;">
-                    <!-- Food items will be populated here -->
+                <div class="menu-container" style="display: none;">
+                    <div class="menu-scroll-indicator menu-scroll-left">←</div>
+                    <div class="menu-grid" id="foodMenu">
+                        <!-- Food items will be populated here -->
+                    </div>
+                    <div class="menu-scroll-indicator menu-scroll-right">→</div>
                 </div>
                 
                 <div id="selectionSummary" class="order-summary" style="margin-top: 16px;">
-                    <p>Selected items: <span id="selectedCount">0</span></p>
+                    <p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>
                 </div>
             </div>
             <div class="navigation">
@@ -932,7 +1012,7 @@
                         menuContainer.innerHTML += `
                             <div class="menu-item" data-id="${item.id}" data-name="${item.name[currentLang]}" data-price="${item.price}">
                                 <div class="menu-icon" aria-hidden="true">${item.icon}</div>
-                                <div class="menu-name">${item.name[currentLang]}</div>
+                                <div class="menu-name">${item.name[lang]}</div>
                                 <div class="menu-price">${item.price} ₽</div>
                                 <div class="quantity-controls">
                                     <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
@@ -961,6 +1041,9 @@
                     updateItemQuantity(item, 1);
                 });
             });
+            
+            // Initialize scroll functionality
+            initMenuScroll();
         }
         
         // Toggle menu item selection
@@ -1893,6 +1976,93 @@
             // Update summary
             updateOrderSummary();
         }
+
+        // Add scroll functionality
+        function initMenuScroll() {
+            document.querySelectorAll('.menu-container').forEach(container => {
+                const menuGrid = container.querySelector('.menu-grid');
+                const leftButton = container.querySelector('.menu-scroll-left');
+                const rightButton = container.querySelector('.menu-scroll-right');
+
+                // Scroll buttons
+                leftButton.addEventListener('click', () => {
+                    menuGrid.scrollBy({
+                        left: -200,
+                        behavior: 'smooth'
+                    });
+                });
+
+                rightButton.addEventListener('click', () => {
+                    menuGrid.scrollBy({
+                        left: 200,
+                        behavior: 'smooth'
+                    });
+                });
+
+                // Touch events for swipe
+                let touchStartX = 0;
+                let touchEndX = 0;
+
+                menuGrid.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+
+                menuGrid.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                });
+
+                function handleSwipe() {
+                    const swipeThreshold = 50;
+                    const diff = touchStartX - touchEndX;
+
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            // Swipe left
+                            menuGrid.scrollBy({
+                                left: 200,
+                                behavior: 'smooth'
+                            });
+                        } else {
+                            // Swipe right
+                            menuGrid.scrollBy({
+                                left: -200,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                }
+
+                // Show/hide scroll buttons based on scroll position
+                menuGrid.addEventListener('scroll', () => {
+                    const isAtStart = menuGrid.scrollLeft === 0;
+                    const isAtEnd = menuGrid.scrollLeft + menuGrid.clientWidth >= menuGrid.scrollWidth;
+
+                    leftButton.style.opacity = isAtStart ? '0' : '1';
+                    rightButton.style.opacity = isAtEnd ? '0' : '1';
+                });
+            });
+        }
+
+        // Update menu tab switching
+        document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
+            button.addEventListener('click', function() {
+                const menu = this.dataset.menu;
+                document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Hide all menu containers
+                document.querySelectorAll('.menu-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                
+                // Show selected menu container
+                const selectedContainer = document.querySelector(`#${menu}Menu`).parentElement;
+                selectedContainer.style.display = 'block';
+            });
+        });
     </script>
 </body>
 </html>
