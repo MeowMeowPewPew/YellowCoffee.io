@@ -1,1 +1,12 @@
-
+{
+  "name": "kitchen-bot",
+  "version": "1.0.0",
+  "description": "Kitchen notification bot for Yellow Coffee",
+  "main": "kitchen_bot.js",
+  "scripts": {
+    "start": "node kitchen_bot.js"
+  },
+  "dependencies": {
+    "telegraf": "^4.15.3"
+  }
+}
