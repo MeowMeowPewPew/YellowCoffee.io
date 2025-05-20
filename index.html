@@ -1312,6 +1312,7 @@
                 const currentMinutes = new Date().getMinutes();
                 const currentTime = currentHour + (currentMinutes / 60);
                 const selectedTime = parseFloat(timeSlider.value);
+                const timeSelector = document.querySelector('.time-selector');
                 
                 if (currentTime >= 20 || currentTime < 7.5) {
                     showShopClosedNotification();
@@ -1320,7 +1321,6 @@
 
                 if (selectedTime < currentTime) {
                     // Show error message
-                    const timeSelector = document.querySelector('.time-selector');
                     let errorMessage = timeSelector.querySelector('.time-error');
                     if (!errorMessage) {
                         errorMessage = document.createElement('div');
