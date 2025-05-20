@@ -94,6 +94,7 @@ Available commands:
 /start - Start receiving kitchen notifications
 /stop - Stop receiving kitchen notifications
 /test - Test if notifications are working
+/status - Check if you are registered for notifications
 /help - Show this help message
     `;
     ctx.reply(helpText);
@@ -101,23 +102,41 @@ Available commands:
 
 // Handle incoming messages
 bot.on('message', async (ctx) => {
-    // Forward the message to all authorized users except the sender
     const senderId = ctx.from.id.toString();
     const messageText = ctx.message.text;
     
-    if (messageText && !messageText.startsWith('/')) {
-        console.log('Received message:', messageText);
-        console.log('Authorized users:', [...authorizedUsers]);
+    // Log incoming message
+    console.log('Received message from:', senderId);
+    console.log('Message content:', messageText);
+    
+    // Check if this is an order message (contains order number)
+    if (messageText && messageText.includes('🆕')) {
+        console.log('Detected order message, forwarding to all authorized users');
         
         // Forward to all authorized users
+        for (const userId of authorizedUsers) {
+            try {
+                await bot.telegram.sendMessage(userId, messageText, { parse_mode: 'HTML' });
+                console.log(`Order message forwarded to user ${userId}`);
+            } catch (error) {
+                console.error(`Failed to forward order to user ${userId}:`, error.message);
+                // If user blocked the bot or chat is not available, remove them from authorized users
+                if (error.message.includes('chat not found') || error.message.includes('blocked')) {
+                    authorizedUsers.delete(userId);
+                    saveAuthorizedUsers();
+                    console.log(`Removed user ${userId} from authorized users due to error`);
+                }
+            }
+        }
+    } else if (messageText && !messageText.startsWith('/')) {
+        // Regular message forwarding
         for (const userId of authorizedUsers) {
             if (userId !== senderId) {
                 try {
                     await bot.telegram.sendMessage(userId, `New message from ${ctx.from.first_name}:\n${messageText}`);
-                    console.log(`Message sent to user ${userId}`);
+                    console.log(`Message forwarded to user ${userId}`);
                 } catch (error) {
-                    console.error(`Failed to send message to user ${userId}:`, error.message);
-                    // If user blocked the bot or chat is not available, remove them from authorized users
+                    console.error(`Failed to forward message to user ${userId}:`, error.message);
                     if (error.message.includes('chat not found') || error.message.includes('blocked')) {
                         authorizedUsers.delete(userId);
                         saveAuthorizedUsers();
@@ -143,6 +162,16 @@ bot.command('test', async (ctx) => {
         }
     } else {
         await ctx.reply('Please use /start first to register for notifications.');
+    }
+});
+
+// Add a command to check if user is receiving orders
+bot.command('status', async (ctx) => {
+    const userId = ctx.from.id.toString();
+    if (authorizedUsers.has(userId)) {
+        await ctx.reply('✅ You are registered to receive order notifications.');
+    } else {
+        await ctx.reply('❌ You are not registered to receive order notifications. Use /start to register.');
     }
 });
 
