@@ -1505,6 +1505,16 @@
                     return;
                 }
 
+                // Check if shop is closed
+                const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
+                
+                if (currentTime >= 20 || currentTime < 7.5) {
+                    showShopClosedNotification();
+                    return;
+                }
+
                 // If all steps are complete, proceed with order confirmation
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
@@ -1529,19 +1539,26 @@
                     orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
                 ];
                 
-                // Send to all kitchen bot users
-                await sendTelegramMessage(kitchenBotUsers, orderMessage);
-                
-                // Send to order creator if we have their ID
-                if (currentUserId) {
-                    await sendTelegramMessage(currentUserId, orderMessage);
-                }
+                try {
+                    // Send to all kitchen bot users
+                    await sendTelegramMessage(kitchenBotUsers, orderMessage);
+                    
+                    // Send to order creator if we have their ID
+                    if (currentUserId) {
+                        await sendTelegramMessage(currentUserId, orderMessage);
+                    }
 
-                // Scroll to order number after a short delay
-                setTimeout(() => {
-                    const orderNumberElement = document.getElementById('orderNumber');
-                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
+                    // Scroll to order number after a short delay
+                    setTimeout(() => {
+                        const orderNumberElement = document.getElementById('orderNumber');
+                        orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                } catch (error) {
+                    console.error('Error sending order:', error);
+                    // Show error message to user
+                    const errorMessage = translations[currentLang].order.error || 'Error sending order. Please try again.';
+                    showError('order');
+                }
             });
             
             // Add error display function
