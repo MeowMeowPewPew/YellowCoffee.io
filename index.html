@@ -1434,6 +1434,14 @@
                 }
                 this.classList.add('completed');
                 navigateToStep('4');
+                
+                // Add smooth scroll to comment section
+                setTimeout(() => {
+                    const commentSection = document.querySelector('#step4 .section');
+                    if (commentSection) {
+                        commentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
             });
             
             // Comment confirmation handler
