@@ -112,21 +112,38 @@ bot.on('message', async (ctx) => {
     // Check if this is an order message (contains order number)
     if (messageText && messageText.includes('🆕')) {
         console.log('Detected order message, forwarding to all authorized users');
+        console.log('Number of authorized users:', authorizedUsers.size);
         
         // Forward to all authorized users
+        const forwardPromises = [];
         for (const userId of authorizedUsers) {
             try {
-                await bot.telegram.sendMessage(userId, messageText, { parse_mode: 'HTML' });
-                console.log(`Order message forwarded to user ${userId}`);
+                console.log(`Attempting to forward order to user ${userId}`);
+                const forwardPromise = bot.telegram.sendMessage(userId, messageText, { parse_mode: 'HTML' })
+                    .then(() => {
+                        console.log(`Order message forwarded to user ${userId}`);
+                    })
+                    .catch(error => {
+                        console.error(`Failed to forward order to user ${userId}:`, error.message);
+                        // If user blocked the bot or chat is not available, remove them from authorized users
+                        if (error.message.includes('chat not found') || error.message.includes('blocked')) {
+                            authorizedUsers.delete(userId);
+                            saveAuthorizedUsers();
+                            console.log(`Removed user ${userId} from authorized users due to error`);
+                        }
+                    });
+                forwardPromises.push(forwardPromise);
             } catch (error) {
-                console.error(`Failed to forward order to user ${userId}:`, error.message);
-                // If user blocked the bot or chat is not available, remove them from authorized users
-                if (error.message.includes('chat not found') || error.message.includes('blocked')) {
-                    authorizedUsers.delete(userId);
-                    saveAuthorizedUsers();
-                    console.log(`Removed user ${userId} from authorized users due to error`);
-                }
+                console.error(`Error setting up forward to user ${userId}:`, error);
             }
+        }
+        
+        // Wait for all forwards to complete
+        try {
+            await Promise.all(forwardPromises);
+            console.log('Finished forwarding order to all users');
+        } catch (error) {
+            console.error('Error during message forwarding:', error);
         }
     } else if (messageText && !messageText.startsWith('/')) {
         // Regular message forwarding
