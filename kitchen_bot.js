@@ -21,14 +21,29 @@ function saveAuthorizedUsers() {
 }
 
 // Command to start the bot
-bot.command('start', (ctx) => {
+bot.command('start', async (ctx) => {
     const userId = ctx.from.id.toString();
+    console.log('Start command received from user:', userId);
+    
     if (!authorizedUsers.has(userId)) {
         authorizedUsers.add(userId);
         saveAuthorizedUsers();
-        ctx.reply('Welcome! You have been added to the kitchen notification system.');
+        console.log('Added new user:', userId);
+        await ctx.reply('Welcome! You have been added to the kitchen notification system.');
+        
+        // Send a test message to verify the user can receive messages
+        try {
+            await bot.telegram.sendMessage(userId, 'This is a test message to verify you can receive notifications.');
+            console.log('Test message sent successfully to new user');
+        } catch (error) {
+            console.error('Failed to send test message:', error.message);
+            // If we can't send the test message, remove the user
+            authorizedUsers.delete(userId);
+            saveAuthorizedUsers();
+            await ctx.reply('Sorry, there was an error setting up notifications. Please try again later.');
+        }
     } else {
-        ctx.reply('You are already registered to receive kitchen notifications.');
+        await ctx.reply('You are already registered to receive kitchen notifications.');
     }
 });
 
@@ -78,23 +93,56 @@ bot.command('help', (ctx) => {
 Available commands:
 /start - Start receiving kitchen notifications
 /stop - Stop receiving kitchen notifications
+/test - Test if notifications are working
 /help - Show this help message
     `;
     ctx.reply(helpText);
 });
 
 // Handle incoming messages
-bot.on('message', (ctx) => {
+bot.on('message', async (ctx) => {
     // Forward the message to all authorized users except the sender
     const senderId = ctx.from.id.toString();
     const messageText = ctx.message.text;
     
     if (messageText && !messageText.startsWith('/')) {
-        authorizedUsers.forEach(userId => {
+        console.log('Received message:', messageText);
+        console.log('Authorized users:', [...authorizedUsers]);
+        
+        // Forward to all authorized users
+        for (const userId of authorizedUsers) {
             if (userId !== senderId) {
-                bot.telegram.sendMessage(userId, `New message from ${ctx.from.first_name}:\n${messageText}`);
+                try {
+                    await bot.telegram.sendMessage(userId, `New message from ${ctx.from.first_name}:\n${messageText}`);
+                    console.log(`Message sent to user ${userId}`);
+                } catch (error) {
+                    console.error(`Failed to send message to user ${userId}:`, error.message);
+                    // If user blocked the bot or chat is not available, remove them from authorized users
+                    if (error.message.includes('chat not found') || error.message.includes('blocked')) {
+                        authorizedUsers.delete(userId);
+                        saveAuthorizedUsers();
+                        console.log(`Removed user ${userId} from authorized users due to error`);
+                    }
+                }
             }
-        });
+        }
+    }
+});
+
+// Add a test command to verify message sending
+bot.command('test', async (ctx) => {
+    const userId = ctx.from.id.toString();
+    if (authorizedUsers.has(userId)) {
+        try {
+            await ctx.reply('Sending test message...');
+            await bot.telegram.sendMessage(userId, 'This is a test message. If you receive this, notifications are working correctly.');
+            console.log('Test message sent successfully');
+        } catch (error) {
+            console.error('Test message failed:', error.message);
+            await ctx.reply('Failed to send test message. Please try /start again.');
+        }
+    } else {
+        await ctx.reply('Please use /start first to register for notifications.');
     }
 });
 
