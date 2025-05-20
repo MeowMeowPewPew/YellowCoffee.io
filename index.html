@@ -689,18 +689,31 @@
             <div class="section">
                 <h2>Select Drinks & Food</h2>
                 <div class="tab-buttons">
-                    <div class="tab-button active" data-menu="drinks">Drinks</div>
+                    <div class="tab-button active" data-menu="classicCoffee">Classic Coffee</div>
+                    <div class="tab-button" data-menu="signatureDrinks">Signature Drinks</div>
+                    <div class="tab-button" data-menu="premiumCollection">Premium Collection</div>
+                    <div class="tab-button" data-menu="nonCoffee">Non-Coffee Beverages</div>
                     <div class="tab-button" data-menu="food">Food</div>
                 </div>
                 
-                <!-- Drinks Menu -->
-                <div class="menu-grid" id="drinksMenu">
-                    <!-- Drinks will be populated here -->
+                <div class="menu-grid" id="classicCoffeeMenu">
+                    <!-- Classic Coffee items will be populated here -->
                 </div>
                 
-                <!-- Food Menu -->
+                <div class="menu-grid" id="signatureDrinksMenu" style="display: none;">
+                    <!-- Signature Drinks items will be populated here -->
+                </div>
+                
+                <div class="menu-grid" id="premiumCollectionMenu" style="display: none;">
+                    <!-- Premium Collection items will be populated here -->
+                </div>
+                
+                <div class="menu-grid" id="nonCoffeeMenu" style="display: none;">
+                    <!-- Non-Coffee items will be populated here -->
+                </div>
+                
                 <div class="menu-grid" id="foodMenu" style="display: none;">
-                    <!-- Food will be populated here -->
+                    <!-- Food items will be populated here -->
                 </div>
                 
                 <div id="selectionSummary" class="order-summary" style="margin-top: 16px;">
@@ -824,79 +837,112 @@
         
         // Menu data - can be replaced with actual items
         const menuData = {
-            drinks: [
-                { id: "d1", name: { en: "Coffee", ru: "Кофе" }, price: 350, icon: "☕" },
-                { id: "d2", name: { en: "Tea", ru: "Чай" }, price: 250, icon: "🍵" },
-                { id: "d3", name: { en: "Orange Juice", ru: "Апельсиновый Сок" }, price: 400, icon: "🍊" },
-                { id: "d4", name: { en: "Latte", ru: "Латте" }, price: 450, icon: "☕" },
-                { id: "d5", name: { en: "Hot Chocolate", ru: "Горячий Шоколад" }, price: 400, icon: "🍫" },
-                { id: "d6", name: { en: "Espresso", ru: "Эспрессо" }, price: 300, icon: "☕" },
-                { id: "d7", name: { en: "Cappuccino", ru: "Капучино" }, price: 450, icon: "☕" },
-                { id: "d8", name: { en: "Smoothie", ru: "Смузи" }, price: 500, icon: "🥤" },
-                { id: "d9", name: { en: "Milkshake", ru: "Милкшейк" }, price: 550, icon: "🥛" },
-                { id: "d10", name: { en: "Lemonade", ru: "Лимонад" }, price: 300, icon: "🍋" },
-                { id: "d11", name: { en: "Iced Tea", ru: "Холодный Чай" }, price: 300, icon: "🧊" },
-                { id: "d12", name: { en: "Water", ru: "Вода" }, price: 150, icon: "💧" },
-                { id: "d13", name: { en: "Soda", ru: "Газировка" }, price: 200, icon: "🥤" },
-                { id: "d14", name: { en: "Green Tea", ru: "Зеленый Чай" }, price: 300, icon: "🍵" },
-                { id: "d15", name: { en: "Mocha", ru: "Мокка" }, price: 500, icon: "☕" }
+            classicCoffee: [
+                { id: "cc1", name: { en: "Espresso", ru: "Эспрессо" }, price: 99, icon: "☕" },
+                { id: "cc2", name: { en: "Americano 200ml", ru: "Американо 200мл" }, price: 139, icon: "☕" },
+                { id: "cc3", name: { en: "Americano 300ml", ru: "Американо 300мл" }, price: 179, icon: "☕" },
+                { id: "cc4", name: { en: "Americano 400ml", ru: "Американо 400мл" }, price: 249, icon: "☕" },
+                { id: "cc5", name: { en: "Americano 600ml", ru: "Американо 600мл" }, price: 299, icon: "☕" },
+                { id: "cc6", name: { en: "Cappuccino 200ml", ru: "Капучино 200мл" }, price: 149, icon: "☕" },
+                { id: "cc7", name: { en: "Cappuccino 300ml", ru: "Капучино 300мл" }, price: 199, icon: "☕" },
+                { id: "cc8", name: { en: "Cappuccino 400ml", ru: "Капучино 400мл" }, price: 249, icon: "☕" },
+                { id: "cc9", name: { en: "Cappuccino 600ml", ru: "Капучино 600мл" }, price: 299, icon: "☕" },
+                { id: "cc10", name: { en: "Latte 300ml", ru: "Латте 300мл" }, price: 199, icon: "☕" },
+                { id: "cc11", name: { en: "Latte 400ml", ru: "Латте 400мл" }, price: 249, icon: "☕" },
+                { id: "cc12", name: { en: "Latte 600ml", ru: "Латте 600мл" }, price: 299, icon: "☕" },
+                { id: "cc13", name: { en: "Flat White 200ml", ru: "Флэт Уайт 200мл" }, price: 199, icon: "☕" },
+                { id: "cc14", name: { en: "Flat White 300ml", ru: "Флэт Уайт 300мл" }, price: 249, icon: "☕" },
+                { id: "cc15", name: { en: "Raf Coffee 300ml", ru: "Раф Кофе 300мл" }, price: 249, icon: "☕" },
+                { id: "cc16", name: { en: "Raf Coffee 400ml", ru: "Раф Кофе 400мл" }, price: 299, icon: "☕" },
+                { id: "cc17", name: { en: "Raf Coffee 600ml", ru: "Раф Кофе 600мл" }, price: 329, icon: "☕" }
+            ],
+            signatureDrinks: [
+                { id: "sd1", name: { en: "Espresso", ru: "Эспрессо" }, price: 99, icon: "☕" },
+                { id: "sd2", name: { en: "Citrus Rainbow 300ml", ru: "Цитрусовый Радуга 300мл" }, price: 279, icon: "🌈" },
+                { id: "sd3", name: { en: "Citrus Rainbow 400ml", ru: "Цитрусовый Радуга 400мл" }, price: 349, icon: "🌈" },
+                { id: "sd4", name: { en: "Citrus Rainbow 600ml", ru: "Цитрусовый Радуга 600мл" }, price: 399, icon: "🌈" },
+                { id: "sd5", name: { en: "Hollywood Morning 300ml", ru: "Голливудское Утро 300мл" }, price: 279, icon: "🌅" },
+                { id: "sd6", name: { en: "Hollywood Morning 400ml", ru: "Голливудское Утро 400мл" }, price: 349, icon: "🌅" },
+                { id: "sd7", name: { en: "Hollywood Morning 600ml", ru: "Голливудское Утро 600мл" }, price: 399, icon: "🌅" },
+                { id: "sd8", name: { en: "Spicy Peach 300ml", ru: "Острый Персик 300мл" }, price: 279, icon: "🍑" },
+                { id: "sd9", name: { en: "Spicy Peach 400ml", ru: "Острый Персик 400мл" }, price: 349, icon: "🍑" },
+                { id: "sd10", name: { en: "Spicy Peach 600ml", ru: "Острый Персик 600мл" }, price: 399, icon: "🍑" },
+                { id: "sd11", name: { en: "Lemon Tart 300ml", ru: "Лимонный Тарт 300мл" }, price: 279, icon: "🍋" },
+                { id: "sd12", name: { en: "Lemon Tart 400ml", ru: "Лимонный Тарт 400мл" }, price: 349, icon: "🍋" },
+                { id: "sd13", name: { en: "Lemon Tart 600ml", ru: "Лимонный Тарт 600мл" }, price: 399, icon: "🍋" }
+            ],
+            premiumCollection: [
+                { id: "pc1", name: { en: "Espresso", ru: "Эспрессо" }, price: 99, icon: "☕" },
+                { id: "pc2", name: { en: "Black Forest 300ml", ru: "Черный Лес 300мл" }, price: 299, icon: "🌲" },
+                { id: "pc3", name: { en: "Black Forest 400ml", ru: "Черный Лес 400мл" }, price: 399, icon: "🌲" },
+                { id: "pc4", name: { en: "Black Forest 600ml", ru: "Черный Лес 600мл" }, price: 499, icon: "🌲" },
+                { id: "pc5", name: { en: "Pistachio Cheesecake 300ml", ru: "Фисташковый Чизкейк 300мл" }, price: 299, icon: "🍰" },
+                { id: "pc6", name: { en: "Pistachio Cheesecake 400ml", ru: "Фисташковый Чизкейк 400мл" }, price: 399, icon: "🍰" },
+                { id: "pc7", name: { en: "Pistachio Cheesecake 600ml", ru: "Фисташковый Чизкейк 600мл" }, price: 499, icon: "🍰" },
+                { id: "pc8", name: { en: "Snickers 300ml", ru: "Сникерс 300мл" }, price: 299, icon: "🍫" },
+                { id: "pc9", name: { en: "Snickers 400ml", ru: "Сникерс 400мл" }, price: 399, icon: "🍫" },
+                { id: "pc10", name: { en: "Snickers 600ml", ru: "Сникерс 600мл" }, price: 499, icon: "🍫" },
+                { id: "pc11", name: { en: "Refreshing Mandarin 300ml", ru: "Освежающий Мандарин 300мл" }, price: 299, icon: "🍊" },
+                { id: "pc12", name: { en: "Refreshing Mandarin 400ml", ru: "Освежающий Мандарин 400мл" }, price: 399, icon: "🍊" },
+                { id: "pc13", name: { en: "Cherry Kiss 300ml", ru: "Вишневый Поцелуй 300мл" }, price: 299, icon: "🍒" },
+                { id: "pc14", name: { en: "Cherry Kiss 400ml", ru: "Вишневый Поцелуй 400мл" }, price: 399, icon: "🍒" },
+                { id: "pc15", name: { en: "Cherry Kiss 600ml", ru: "Вишневый Поцелуй 600мл" }, price: 499, icon: "🍒" },
+                { id: "pc16", name: { en: "Orange Brownie 300ml", ru: "Апельсиновый Брауни 300мл" }, price: 299, icon: "🍊" },
+                { id: "pc17", name: { en: "Orange Brownie 400ml", ru: "Апельсиновый Брауни 400мл" }, price: 399, icon: "🍊" },
+                { id: "pc18", name: { en: "Orange Brownie 600ml", ru: "Апельсиновый Брауни 600мл" }, price: 499, icon: "🍊" }
+            ],
+            nonCoffee: [
+                { id: "nc1", name: { en: "Matcha 300ml", ru: "Матча 300мл" }, price: 249, icon: "🍵" },
+                { id: "nc2", name: { en: "Matcha 400ml", ru: "Матча 400мл" }, price: 299, icon: "🍵" },
+                { id: "nc3", name: { en: "Matcha 600ml", ru: "Матча 600мл" }, price: 329, icon: "🍵" },
+                { id: "nc4", name: { en: "Cocoa 300ml", ru: "Какао 300мл" }, price: 249, icon: "🍫" },
+                { id: "nc5", name: { en: "Cocoa 400ml", ru: "Какао 400мл" }, price: 299, icon: "🍫" },
+                { id: "nc6", name: { en: "Cocoa 600ml", ru: "Какао 600мл" }, price: 329, icon: "🍫" },
+                { id: "nc7", name: { en: "Sea Buckthorn Berry Tea 300ml", ru: "Чай с Облепихой 300мл" }, price: 249, icon: "🫖" },
+                { id: "nc8", name: { en: "Sea Buckthorn Berry Tea 400ml", ru: "Чай с Облепихой 400мл" }, price: 299, icon: "🫖" },
+                { id: "nc9", name: { en: "Sea Buckthorn Berry Tea 600ml", ru: "Чай с Облепихой 600мл" }, price: 329, icon: "🫖" },
+                { id: "nc10", name: { en: "Black Currant Berry Tea 300ml", ru: "Чай с Черной Смородиной 300мл" }, price: 249, icon: "🫖" },
+                { id: "nc11", name: { en: "Black Currant Berry Tea 400ml", ru: "Чай с Черной Смородиной 400мл" }, price: 299, icon: "🫖" },
+                { id: "nc12", name: { en: "Black Currant Berry Tea 600ml", ru: "Чай с Черной Смородиной 600мл" }, price: 329, icon: "🫖" }
             ],
             food: [
-                { id: "f1", name: { en: "Sandwich", ru: "Сэндвич" }, price: 650, icon: "🥪" },
-                { id: "f2", name: { en: "Salad", ru: "Салат" }, price: 700, icon: "🥗" },
-                { id: "f3", name: { en: "Pasta", ru: "Паста" }, price: 900, icon: "🍝" },
-                { id: "f4", name: { en: "Pizza", ru: "Пицца" }, price: 1000, icon: "🍕" },
-                { id: "f5", name: { en: "Burger", ru: "Бургер" }, price: 850, icon: "🍔" },
-                { id: "f6", name: { en: "Croissant", ru: "Круассан" }, price: 300, icon: "🥐" },
-                { id: "f7", name: { en: "Bagel", ru: "Бейгл" }, price: 400, icon: "🥯" },
-                { id: "f8", name: { en: "Muffin", ru: "Маффин" }, price: 350, icon: "🧁" },
-                { id: "f9", name: { en: "Cake", ru: "Торт" }, price: 500, icon: "🍰" },
-                { id: "f10", name: { en: "Pancakes", ru: "Блины" }, price: 600, icon: "🥞" },
-                { id: "f11", name: { en: "Wrap", ru: "Ролл" }, price: 700, icon: "🌯" },
-                { id: "f12", name: { en: "Soup", ru: "Суп" }, price: 500, icon: "🍲" },
-                { id: "f13", name: { en: "Sushi", ru: "Суши" }, price: 1200, icon: "🍣" },
-                { id: "f14", name: { en: "Fries", ru: "Картошка Фри" }, price: 350, icon: "🍟" },
-                { id: "f15", name: { en: "Donut", ru: "Пончик" }, price: 250, icon: "🍩" }
+                { id: "f1", name: { en: "Ham & Cheese Sandwich Roll", ru: "Ролл с Ветчиной и Сыром" }, price: 229, icon: "🥪" },
+                { id: "f2", name: { en: "Chicken Sandwich Roll", ru: "Ролл с Курицей" }, price: 239, icon: "🥪" },
+                { id: "f3", name: { en: "Salmon Sandwich Roll", ru: "Ролл с Лососем" }, price: 319, icon: "🥪" },
+                { id: "f4", name: { en: "Ham & Cheese Sandwich", ru: "Сэндвич с Ветчиной и Сыром" }, price: 169, icon: "🥪" },
+                { id: "f5", name: { en: "Chicken Curry Sandwich", ru: "Сэндвич с Курицей Карри" }, price: 179, icon: "🥪" },
+                { id: "f6", name: { en: "Chicken Caesar Sandwich", ru: "Сэндвич Цезарь с Курицей" }, price: 179, icon: "🥪" },
+                { id: "f7", name: { en: "Beef Sandwich", ru: "Сэндвич с Говядиной" }, price: 179, icon: "🥪" },
+                { id: "f8", name: { en: "Teriyaki Turkey Sandwich", ru: "Сэндвич с Индейкой Терияки" }, price: 179, icon: "🥪" },
+                { id: "f9", name: { en: "Salmon Sandwich", ru: "Сэндвич с Лососем" }, price: 279, icon: "🥪" },
+                { id: "f10", name: { en: "Ham & Cheese Bagel", ru: "Бейгл с Ветчиной и Сыром" }, price: 179, icon: "🥯" },
+                { id: "f11", name: { en: "Chicken Bagel", ru: "Бейгл с Курицей" }, price: 199, icon: "🥯" },
+                { id: "f12", name: { en: "Salmon Bagel", ru: "Бейгл с Лососем" }, price: 269, icon: "🥯" }
             ]
         };
         
         // Populate menus
         function populateMenus() {
-            const drinksMenu = document.getElementById('drinksMenu');
-            const foodMenu = document.getElementById('foodMenu');
-            
-            // Populate drinks
-            drinksMenu.innerHTML = '';
-            menuData.drinks.forEach(drink => {
-                drinksMenu.innerHTML += `
-                    <div class="menu-item" data-id="${drink.id}" data-name="${drink.name[currentLang]}" data-price="${drink.price}">
-                        <div class="menu-icon" aria-hidden="true">${drink.icon}</div>
-                        <div class="menu-name">${drink.name[currentLang]}</div>
-                        <div class="menu-price">${drink.price} ₽</div>
-                        <div class="quantity-controls">
-                            <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
-                            <div class="quantity-display">0</div>
-                            <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            // Populate foods
-            foodMenu.innerHTML = '';
-            menuData.food.forEach(food => {
-                foodMenu.innerHTML += `
-                    <div class="menu-item" data-id="${food.id}" data-name="${food.name[currentLang]}" data-price="${food.price}">
-                        <div class="menu-icon" aria-hidden="true">${food.icon}</div>
-                        <div class="menu-name">${food.name[currentLang]}</div>
-                        <div class="menu-price">${food.price} ₽</div>
-                        <div class="quantity-controls">
-                            <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
-                            <div class="quantity-display">0</div>
-                            <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
-                        </div>
-                    </div>
-                `;
+            // Populate each menu category
+            Object.keys(menuData).forEach(category => {
+                const menuContainer = document.getElementById(`${category}Menu`);
+                if (menuContainer) {
+                    menuContainer.innerHTML = '';
+                    menuData[category].forEach(item => {
+                        menuContainer.innerHTML += `
+                            <div class="menu-item" data-id="${item.id}" data-name="${item.name[currentLang]}" data-price="${item.price}">
+                                <div class="menu-icon" aria-hidden="true">${item.icon}</div>
+                                <div class="menu-name">${item.name[currentLang]}</div>
+                                <div class="menu-price">${item.price} ₽</div>
+                                <div class="quantity-controls">
+                                    <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
+                                    <div class="quantity-display">0</div>
+                                    <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
             });
             
             // Add event listeners to menu items
@@ -1167,12 +1213,10 @@
             });
             
             // Reset menu display
-            document.getElementById('drinksMenu').style.display = 'grid';
-            document.getElementById('foodMenu').style.display = 'none';
-            document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
-                btn.classList.remove('active');
+            document.querySelectorAll('.menu-grid').forEach(menu => {
+                menu.style.display = 'none';
             });
-            document.querySelector('.tab-button[data-menu="drinks"]').classList.add('active');
+            document.querySelector('.tab-button[data-menu="classicCoffee"]').classList.add('active');
             
             // Reset comment input
             const commentInput = document.getElementById('orderComment');
@@ -1238,13 +1282,13 @@
                     });
                     this.classList.add('active');
                     
-                    if (menu === 'drinks') {
-                        document.getElementById('drinksMenu').style.display = 'grid';
-                        document.getElementById('foodMenu').style.display = 'none';
-                    } else {
-                        document.getElementById('drinksMenu').style.display = 'none';
-                        document.getElementById('foodMenu').style.display = 'grid';
-                    }
+                    // Hide all menus
+                    document.querySelectorAll('.menu-grid').forEach(menu => {
+                        menu.style.display = 'none';
+                    });
+                    
+                    // Show selected menu
+                    document.getElementById(`${menu}Menu`).style.display = 'grid';
                 });
             });
 
@@ -1569,7 +1613,10 @@
                 },
                 menu: {
                     title: "Select Drinks & Food",
-                    drinks: "Drinks",
+                    classicCoffee: "Classic Coffee",
+                    signatureDrinks: "Signature Drinks",
+                    premiumCollection: "Premium Collection",
+                    nonCoffee: "Non-Coffee Beverages",
                     food: "Food",
                     selected: "Selected items:",
                     error: "Please select at least one item to continue"
@@ -1634,7 +1681,10 @@
                 },
                 menu: {
                     title: "Выберите Напитки и Еду",
-                    drinks: "Напитки",
+                    classicCoffee: "Классический Кофе",
+                    signatureDrinks: "Авторские Напитки",
+                    premiumCollection: "Премиум Коллекция",
+                    nonCoffee: "Безалкогольные Напитки",
                     food: "Еда",
                     selected: "Выбрано товаров:",
                     error: "Пожалуйста, выберите хотя бы один товар для продолжения"
@@ -1706,14 +1756,17 @@
 
             // Update menu section
             document.querySelector('#step3 .section h2').textContent = t.menu.title;
-            document.querySelector('[data-menu="drinks"]').textContent = t.menu.drinks;
+            document.querySelector('[data-menu="classicCoffee"]').textContent = t.menu.classicCoffee;
+            document.querySelector('[data-menu="signatureDrinks"]').textContent = t.menu.signatureDrinks;
+            document.querySelector('[data-menu="premiumCollection"]').textContent = t.menu.premiumCollection;
+            document.querySelector('[data-menu="nonCoffee"]').textContent = t.menu.nonCoffee;
             document.querySelector('[data-menu="food"]').textContent = t.menu.food;
             document.querySelector('#selectionSummary p').textContent = t.menu.selected;
 
             // Update menu items
             document.querySelectorAll('.menu-item').forEach(item => {
                 const id = item.dataset.id;
-                const menuItem = [...menuData.drinks, ...menuData.food].find(mi => mi.id === id);
+                const menuItem = [...menuData.classicCoffee, ...menuData.signatureDrinks, ...menuData.premiumCollection, ...menuData.nonCoffee, ...menuData.food].find(mi => mi.id === id);
                 if (menuItem) {
                     item.querySelector('.menu-name').textContent = menuItem.name[lang];
                     item.dataset.name = menuItem.name[lang];
