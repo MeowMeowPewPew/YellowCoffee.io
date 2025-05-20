@@ -1389,10 +1389,66 @@
                 resetOrderData();
                 navigateToStep('1');
             });
+
+            // Add step navigation buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const currentStep = document.querySelector('.step.active');
+                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
+                    const nextStepNumber = currentStepNumber + 1;
+                    
+                    // Validate current step before proceeding
+                    if (currentStepNumber === 1 && !orderData.location) {
+                        return;
+                    }
+                    if (currentStepNumber === 2 && !orderData.name) {
+                        const nameInput = document.getElementById('customerName').value.trim();
+                        if (nameInput.length === 0) {
+                            document.getElementById('nameError').textContent = translations[currentLang].name.error;
+                            return;
+                        }
+                    }
+                    if (currentStepNumber === 3 && orderData.items.length === 0) {
+                        const summaryContainer = document.getElementById('selectionSummary');
+                        summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
+                        return;
+                    }
+                    
+                    navigateToStep(nextStepNumber.toString());
+                });
+            });
         }
         
         // Navigate to specific step
         function navigateToStep(step) {
+            // Validate previous steps
+            const currentStep = document.querySelector('.step.active');
+            const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
+            const targetStepNumber = parseInt(step);
+
+            // Check if trying to skip steps
+            if (targetStepNumber > currentStepNumber + 1) {
+                return; // Don't allow skipping steps
+            }
+
+            // Validate required data for each step
+            if (targetStepNumber === 2 && !orderData.location) {
+                return; // Can't proceed to name without location
+            }
+            if (targetStepNumber === 3 && !orderData.name) {
+                return; // Can't proceed to menu without name
+            }
+            if (targetStepNumber === 4 && orderData.items.length === 0) {
+                return; // Can't proceed to comment without items
+            }
+            if (targetStepNumber === 5 && !orderData.comment) {
+                // Comment is optional, but we still need to set it
+                orderData.comment = '';
+            }
+            if (targetStepNumber === 6 && !orderData.time) {
+                return; // Can't proceed to summary without time
+            }
+
             // Update tab buttons
             document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
                 btn.classList.remove('active');
