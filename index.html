@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Food & Drink Order Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -1627,7 +1627,7 @@
                 }
             });
 
-            // Update navigation state when switching steps
+            // Initialize navigation buttons
             document.querySelectorAll('.nav-button.next').forEach(button => {
                 button.addEventListener('click', function() {
                     const currentStep = this.closest('.step');
@@ -1640,31 +1640,31 @@
                 });
             });
 
-            // Update button text based on language
-            function updateButtonTexts() {
-                document.querySelectorAll('.nav-button.back').forEach(button => {
-                    button.textContent = translations[currentLang].buttons.back;
-                });
-                document.querySelectorAll('.nav-button.next').forEach(button => {
-                    if (button.closest('#step6')) {
-                        button.textContent = translations[currentLang].buttons.confirm;
-                    } else {
-                        button.textContent = translations[currentLang].buttons.next;
+            document.querySelectorAll('.nav-button.back').forEach(button => {
+                button.addEventListener('click', function() {
+                    const currentStep = this.closest('.step');
+                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
+                    if (currentStepNumber > 1) {
+                        navigateToStep((currentStepNumber - 1).toString());
                     }
-                });
-            }
-
-            // Call updateButtonTexts when language changes
-            const languageButtons = document.querySelectorAll('.language-btn');
-            languageButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    switchLanguage(this.dataset.lang);
-                    updateButtonTexts();
                 });
             });
 
-            // Initial button text update
-            updateButtonTexts();
+            // Initialize navigation grid items
+            document.querySelectorAll('.nav-grid-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const step = this.dataset.step;
+                    const currentStep = document.querySelector('.step.active');
+                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
+                    const targetStepNumber = parseInt(step);
+
+                    // Only allow navigation to completed steps or the next available step
+                    if (!this.classList.contains('disabled') || 
+                        (targetStepNumber === currentStepNumber + 1 && checkStepCompletion(currentStepNumber))) {
+                        navigateToStep(step);
+                    }
+                });
+            });
         }
         
         // Navigate to specific step
