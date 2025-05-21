@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food & Drink Order Mini App</title>
+    <title>Yellow Coffee Order Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* Add all CSS styles here */
         :root {
             --primary-color: #FFD700;
             --secondary-color: #FFA500;
@@ -119,51 +120,6 @@
             margin-top: 15px;
         }
 
-        .menu-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .menu-scroll-indicator {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 30px;
-            background: rgba(255, 215, 0, 0.8);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .menu-container:hover .menu-scroll-indicator {
-            opacity: 1;
-        }
-
-        .menu-scroll-left {
-            left: 10px;
-        }
-
-        .menu-scroll-right {
-            right: 10px;
-        }
-
-        .menu-scroll-indicator:hover {
-            background: rgba(255, 165, 0, 0.9);
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .menu-scroll-indicator:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
         .menu-item {
             border: 2px solid var(--primary-color);
             border-radius: var(--border-radius);
@@ -185,21 +141,10 @@
             background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
         }
 
-        .menu-item-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 1;
-        }
-
         .menu-icon {
             font-size: 32px;
             margin-bottom: 10px;
             transition: var(--transition);
-        }
-
-        .menu-item:hover .menu-icon {
-            transform: scale(1.1);
         }
 
         .menu-name {
@@ -212,47 +157,6 @@
         .menu-price {
             font-weight: bold;
             color: var(--secondary-color);
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .quantity-btn {
-            background: var(--secondary-bg);
-            border: 2px solid var(--primary-color);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: bold;
-            transition: var(--transition);
-            user-select: none;
-            font-size: 18px;
-        }
-
-        .quantity-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .quantity-btn:active {
-            transform: scale(0.95);
-        }
-
-        .quantity-display {
-            font-weight: bold;
-            min-width: 24px;
-            text-align: center;
-            font-size: 16px;
         }
 
         .selection-count {
@@ -308,10 +212,6 @@
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             transition: var(--transition);
-        }
-
-        .time-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
         }
 
         .time-display {
@@ -375,18 +275,6 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
 
-        @media (max-width: 480px) {
-            .tab-buttons {
-                gap: 4px;
-                padding: 4px;
-            }
-
-            .tab-button {
-                padding: 10px;
-                font-size: 13px;
-            }
-        }
-
         .order-summary {
             margin-top: 15px;
             padding: 15px;
@@ -444,127 +332,66 @@
             75% { transform: translateX(5px); }
         }
 
-        .nav-button.completed {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            position: relative;
-        }
-
-        .nav-button.completed::after {
-            content: "✓ Done";
-            position: absolute;
-            right: 10px;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .navigation {
+        .stage-navigation {
             position: sticky;
-            bottom: 0;
+            top: 0;
             background: var(--bg-color);
-            padding: 16px;
-            margin-top: 20px;
-            box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+            padding: 10px 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 100;
         }
 
-        .nav-button {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: #FFFFFF;
-            border: none;
+        .stage-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stage-button {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid var(--primary-color);
             border-radius: var(--border-radius);
-            padding: 14px 24px;
-            font-size: 16px;
-            font-weight: bold;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
             cursor: pointer;
-            width: 100%;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
             transition: var(--transition);
-            position: relative;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stage-button.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .stage-button.completed {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .stage-button.completed::after {
+            content: "✓";
+            margin-left: 4px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--secondary-bg);
+            border-radius: 2px;
+            margin-top: 8px;
             overflow: hidden;
         }
 
-        .welcome-section {
-            text-align: center;
-            padding: 20px;
-            margin-bottom: 30px;
-            animation: fadeIn 1s ease;
-        }
-
-        .welcome-title {
-            font-size: 24px;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .welcome-text {
-            font-size: 16px;
-            line-height: 1.6;
-            color: var(--text-color);
-            margin-bottom: 20px;
-        }
-
-        .welcome-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .location-section {
-            margin-bottom: 30px;
-        }
-
-        .location-options {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .location-option {
-            background: var(--secondary-bg);
-            border: 2px solid var(--primary-color);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .location-option:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .location-option.selected {
-            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
-            border-color: var(--secondary-color);
-        }
-
-        .location-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-
-        .location-address {
-            font-size: 14px;
-            color: var(--text-color);
-        }
-
-        .location-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 24px;
-            opacity: 0.5;
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
         }
 
         .language-selector {
@@ -596,36 +423,6 @@
         .language-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .owl-message {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 18px;
-            color: var(--text-color);
-            animation: fadeIn 1s ease;
-        }
-
-        .owl-button-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .owl-button {
-            display: inline-block;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
-            font-weight: bold;
-            transition: var(--transition);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .owl-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
         }
 
         .comment-section {
@@ -700,70 +497,58 @@
             font-weight: bold;
         }
 
-        /* Add new styles for stage navigation */
-        .stage-navigation {
-            position: sticky;
-            top: 0;
-            background: var(--bg-color);
-            padding: 10px 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
-
-        .stage-buttons {
+        .quantity-controls {
             display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 10px;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
         }
 
-        .stage-button {
-            flex: 1;
-            padding: 8px;
-            border: 2px solid var(--primary-color);
-            border-radius: var(--border-radius);
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-size: 14px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .stage-button.active {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-
-        .stage-button.completed {
-            border-color: #4CAF50;
-            color: #4CAF50;
-        }
-
-        .stage-button.completed::after {
-            content: "✓";
-            margin-left: 4px;
-        }
-
-        .progress-bar {
-            height: 4px;
+        .quantity-btn {
             background: var(--secondary-bg);
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+            user-select: none;
+            font-size: 18px;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            transition: width 0.3s ease;
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.95);
+        }
+
+        .quantity-display {
+            font-weight: bold;
+            min-width: 24px;
+            text-align: center;
+            font-size: 16px;
         }
 
         @media (max-width: 480px) {
+            .tab-buttons {
+                gap: 4px;
+                padding: 4px;
+            }
+
+            .tab-button {
+                padding: 10px;
+                font-size: 13px;
+            }
+
             .stage-button {
                 font-size: 12px;
                 padding: 6px;
@@ -846,11 +631,11 @@
             <div class="section">
                 <h2>Select Drinks & Food</h2>
                 <div class="tab-buttons">
-                    <div class="tab-button active" data-menu="classicCoffee">${translations[currentLang].menu.classicCoffee}</div>
-                    <div class="tab-button" data-menu="signatureDrinks">${translations[currentLang].menu.signatureDrinks}</div>
-                    <div class="tab-button" data-menu="premiumCollection">${translations[currentLang].menu.premiumCollection}</div>
-                    <div class="tab-button" data-menu="nonCoffee">${translations[currentLang].menu.nonCoffee}</div>
-                    <div class="tab-button" data-menu="food">${translations[currentLang].menu.food}</div>
+                    <button class="tab-button active" data-menu="classicCoffee">Classic Coffee</button>
+                    <button class="tab-button" data-menu="signatureDrinks">Signature Drinks</button>
+                    <button class="tab-button" data-menu="premiumCollection">Premium Collection</button>
+                    <button class="tab-button" data-menu="nonCoffee">Non-Coffee</button>
+                    <button class="tab-button" data-menu="food">Food</button>
                 </div>
                 
                 <div class="menu-grid" id="classicCoffeeMenu">
@@ -874,7 +659,7 @@
                 </div>
                 
                 <div id="selectionSummary" class="order-summary" style="margin-top: 16px;">
-                    <p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>
+                    <p>Selected items: <span id="selectedCount">0</span></p>
                 </div>
             </div>
             <div class="navigation">
@@ -963,1145 +748,625 @@
     </div>
 
     <script>
-        // Initialize Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        
-        // Get current user ID from initData
-        let currentUserId = null;
-        try {
-            const initData = tg.initData;
-            const initDataObj = JSON.parse(initData);
-            if (initDataObj && initDataObj.user && initDataObj.user.id) {
-                currentUserId = initDataObj.user.id.toString();
-            }
-        } catch (e) {
-            console.error('Error parsing initData:', e);
-        }
-        
-        // Variables to store order data
+        // Initialize variables
+        let currentLanguage = 'ru';
         let orderData = {
-            name: "",
-            location: "",
+            location: '',
+            name: '',
             items: [],
-            comment: "",
-            time: "12:00",
-            total: 0,
-            botInfo: {
-                forwardToKitchen: true,
-                kitchenBotUsername: "@ZakazYellow_bot",
-                targetUserId: "261442211",
-                recipientUserId: "261442211",
-                meowmeowpewUsername: "@meowmeowpew",
-                ichsterbeUsername: "@ichsterbe" // Add new bot username
-            }
+            comment: '',
+            time: '',
+            total: 0
         };
-        
-        // Menu data - can be replaced with actual items
-        const menuData = {
+
+        // Menu items data
+        const menuItems = {
             classicCoffee: [
-                { id: "cc1", name: { en: "Espresso", ru: "Эспрессо" }, price: 99, icon: "☕" },
-                { id: "cc2", name: { en: "Americano 200ml", ru: "Американо 200мл" }, price: 139, icon: "☕" },
-                { id: "cc3", name: { en: "Americano 300ml", ru: "Американо 300мл" }, price: 179, icon: "☕" },
-                { id: "cc4", name: { en: "Americano 400ml", ru: "Американо 400мл" }, price: 249, icon: "☕" },
-                { id: "cc5", name: { en: "Americano 600ml", ru: "Американо 600мл" }, price: 299, icon: "☕" },
-                { id: "cc6", name: { en: "Cappuccino 200ml", ru: "Капучино 200мл" }, price: 149, icon: "☕" },
-                { id: "cc7", name: { en: "Cappuccino 300ml", ru: "Капучино 300мл" }, price: 199, icon: "☕" },
-                { id: "cc8", name: { en: "Cappuccino 400ml", ru: "Капучино 400мл" }, price: 249, icon: "☕" },
-                { id: "cc9", name: { en: "Cappuccino 600ml", ru: "Капучино 600мл" }, price: 299, icon: "☕" },
-                { id: "cc10", name: { en: "Latte 300ml", ru: "Латте 300мл" }, price: 199, icon: "☕" },
-                { id: "cc11", name: { en: "Latte 400ml", ru: "Латте 400мл" }, price: 249, icon: "☕" },
-                { id: "cc12", name: { en: "Latte 600ml", ru: "Латте 600мл" }, price: 299, icon: "☕" },
-                { id: "cc13", name: { en: "Flat White 200ml", ru: "Флэт Уайт 200мл" }, price: 199, icon: "☕" },
-                { id: "cc14", name: { en: "Flat White 300ml", ru: "Флэт Уайт 300мл" }, price: 249, icon: "☕" },
-                { id: "cc15", name: { en: "Raf Coffee 300ml", ru: "Раф Кофе 300мл" }, price: 249, icon: "☕" },
-                { id: "cc16", name: { en: "Raf Coffee 400ml", ru: "Раф Кофе 400мл" }, price: 299, icon: "☕" },
-                { id: "cc17", name: { en: "Raf Coffee 600ml", ru: "Раф Кофе 600мл" }, price: 329, icon: "☕" }
+                { id: 'americano', name: 'Americano', price: 250, image: 'americano.jpg' },
+                { id: 'cappuccino', name: 'Cappuccino', price: 300, image: 'cappuccino.jpg' },
+                { id: 'latte', name: 'Latte', price: 320, image: 'latte.jpg' },
+                { id: 'espresso', name: 'Espresso', price: 200, image: 'espresso.jpg' }
             ],
             signatureDrinks: [
-                { id: "sd2", name: { en: "Citrus Rainbow 300ml", ru: "Цитрусовый Радуга 300мл" }, price: 279, icon: "🌈" },
-                { id: "sd3", name: { en: "Citrus Rainbow 400ml", ru: "Цитрусовый Радуга 400мл" }, price: 349, icon: "🌈" },
-                { id: "sd4", name: { en: "Citrus Rainbow 600ml", ru: "Цитрусовый Радуга 600мл" }, price: 399, icon: "🌈" },
-                { id: "sd5", name: { en: "Hollywood Morning 300ml", ru: "Голливудское Утро 300мл" }, price: 279, icon: "🌅" },
-                { id: "sd6", name: { en: "Hollywood Morning 400ml", ru: "Голливудское Утро 400мл" }, price: 349, icon: "🌅" },
-                { id: "sd7", name: { en: "Hollywood Morning 600ml", ru: "Голливудское Утро 600мл" }, price: 399, icon: "🌅" },
-                { id: "sd8", name: { en: "Spicy Peach 300ml", ru: "Острый Персик 300мл" }, price: 279, icon: "🍑" },
-                { id: "sd9", name: { en: "Spicy Peach 400ml", ru: "Острый Персик 400мл" }, price: 349, icon: "🍑" },
-                { id: "sd10", name: { en: "Spicy Peach 600ml", ru: "Острый Персик 600мл" }, price: 399, icon: "🍑" },
-                { id: "sd11", name: { en: "Lemon Tart 300ml", ru: "Лимонный Тарт 300мл" }, price: 279, icon: "🍋" },
-                { id: "sd12", name: { en: "Lemon Tart 400ml", ru: "Лимонный Тарт 400мл" }, price: 349, icon: "🍋" },
-                { id: "sd13", name: { en: "Lemon Tart 600ml", ru: "Лимонный Тарт 600мл" }, price: 399, icon: "🍋" }
+                { id: 'caramel_latte', name: 'Caramel Latte', price: 350, image: 'caramel_latte.jpg' },
+                { id: 'vanilla_latte', name: 'Vanilla Latte', price: 350, image: 'vanilla_latte.jpg' },
+                { id: 'hazelnut_latte', name: 'Hazelnut Latte', price: 350, image: 'hazelnut_latte.jpg' }
             ],
             premiumCollection: [
-                { id: "pc2", name: { en: "Black Forest 300ml", ru: "Черный Лес 300мл" }, price: 299, icon: "🌲" },
-                { id: "pc3", name: { en: "Black Forest 400ml", ru: "Черный Лес 400мл" }, price: 399, icon: "🌲" },
-                { id: "pc4", name: { en: "Black Forest 600ml", ru: "Черный Лес 600мл" }, price: 499, icon: "🌲" },
-                { id: "pc5", name: { en: "Pistachio Cheesecake 300ml", ru: "Фисташковый Чизкейк 300мл" }, price: 299, icon: "🍰" },
-                { id: "pc6", name: { en: "Pistachio Cheesecake 400ml", ru: "Фисташковый Чизкейк 400мл" }, price: 399, icon: "🍰" },
-                { id: "pc7", name: { en: "Pistachio Cheesecake 600ml", ru: "Фисташковый Чизкейк 600мл" }, price: 499, icon: "🍰" },
-                { id: "pc8", name: { en: "Snickers 300ml", ru: "Сникерс 300мл" }, price: 299, icon: "🍫" },
-                { id: "pc9", name: { en: "Snickers 400ml", ru: "Сникерс 400мл" }, price: 399, icon: "🍫" },
-                { id: "pc10", name: { en: "Snickers 600ml", ru: "Сникерс 600мл" }, price: 499, icon: "🍫" },
-                { id: "pc11", name: { en: "Refreshing Mandarin 300ml", ru: "Освежающий Мандарин 300мл" }, price: 299, icon: "🍊" },
-                { id: "pc12", name: { en: "Refreshing Mandarin 400ml", ru: "Освежающий Мандарин 400мл" }, price: 399, icon: "🍊" },
-                { id: "pc13", name: { en: "Cherry Kiss 300ml", ru: "Вишневый Поцелуй 300мл" }, price: 299, icon: "🍒" },
-                { id: "pc14", name: { en: "Cherry Kiss 400ml", ru: "Вишневый Поцелуй 400мл" }, price: 399, icon: "🍒" },
-                { id: "pc15", name: { en: "Cherry Kiss 600ml", ru: "Вишневый Поцелуй 600мл" }, price: 499, icon: "🍒" },
-                { id: "pc16", name: { en: "Orange Brownie 300ml", ru: "Апельсиновый Брауни 300мл" }, price: 299, icon: "🍊" },
-                { id: "pc17", name: { en: "Orange Brownie 400ml", ru: "Апельсиновый Брауни 400мл" }, price: 399, icon: "🍊" },
-                { id: "pc18", name: { en: "Orange Brownie 600ml", ru: "Апельсиновый Брауни 600мл" }, price: 499, icon: "🍊" }
+                { id: 'flat_white', name: 'Flat White', price: 380, image: 'flat_white.jpg' },
+                { id: 'cold_brew', name: 'Cold Brew', price: 400, image: 'cold_brew.jpg' },
+                { id: 'pour_over', name: 'Pour Over', price: 450, image: 'pour_over.jpg' }
             ],
             nonCoffee: [
-                { id: "nc1", name: { en: "Matcha 300ml", ru: "Матча 300мл" }, price: 249, icon: "🍵" },
-                { id: "nc2", name: { en: "Matcha 400ml", ru: "Матча 400мл" }, price: 299, icon: "🍵" },
-                { id: "nc3", name: { en: "Matcha 600ml", ru: "Матча 600мл" }, price: 329, icon: "🍵" },
-                { id: "nc4", name: { en: "Cocoa 300ml", ru: "Какао 300мл" }, price: 249, icon: "🍫" },
-                { id: "nc5", name: { en: "Cocoa 400ml", ru: "Какао 400мл" }, price: 299, icon: "🍫" },
-                { id: "nc6", name: { en: "Cocoa 600ml", ru: "Какао 600мл" }, price: 329, icon: "🍫" },
-                { id: "nc7", name: { en: "Sea Buckthorn Berry Tea 300ml", ru: "Чай с Облепихой 300мл" }, price: 249, icon: "🫖" },
-                { id: "nc8", name: { en: "Sea Buckthorn Berry Tea 400ml", ru: "Чай с Облепихой 400мл" }, price: 299, icon: "🫖" },
-                { id: "nc9", name: { en: "Sea Buckthorn Berry Tea 600ml", ru: "Чай с Облепихой 600мл" }, price: 329, icon: "🫖" },
-                { id: "nc10", name: { en: "Black Currant Berry Tea 300ml", ru: "Чай с Черной Смородиной 300мл" }, price: 249, icon: "🫖" },
-                { id: "nc11", name: { en: "Black Currant Berry Tea 400ml", ru: "Чай с Черной Смородиной 400мл" }, price: 299, icon: "🫖" },
-                { id: "nc12", name: { en: "Black Currant Berry Tea 600ml", ru: "Чай с Черной Смородиной 600мл" }, price: 329, icon: "🫖" }
+                { id: 'hot_chocolate', name: 'Hot Chocolate', price: 300, image: 'hot_chocolate.jpg' },
+                { id: 'tea', name: 'Tea', price: 200, image: 'tea.jpg' },
+                { id: 'lemonade', name: 'Lemonade', price: 250, image: 'lemonade.jpg' }
             ],
             food: [
-                { id: "f1", name: { en: "Ham & Cheese Sandwich Roll", ru: "Ролл с Ветчиной и Сыром" }, price: 229, icon: "🥪" },
-                { id: "f2", name: { en: "Chicken Sandwich Roll", ru: "Ролл с Курицей" }, price: 239, icon: "🥪" },
-                { id: "f3", name: { en: "Salmon Sandwich Roll", ru: "Ролл с Лососем" }, price: 319, icon: "🥪" },
-                { id: "f4", name: { en: "Ham & Cheese Sandwich", ru: "Сэндвич с Ветчиной и Сыром" }, price: 169, icon: "🥪" },
-                { id: "f5", name: { en: "Chicken Curry Sandwich", ru: "Сэндвич с Курицей Карри" }, price: 179, icon: "🥪" },
-                { id: "f6", name: { en: "Chicken Caesar Sandwich", ru: "Сэндвич Цезарь с Курицей" }, price: 179, icon: "🥪" },
-                { id: "f7", name: { en: "Beef Sandwich", ru: "Сэндвич с Говядиной" }, price: 179, icon: "🥪" },
-                { id: "f8", name: { en: "Teriyaki Turkey Sandwich", ru: "Сэндвич с Индейкой Терияки" }, price: 179, icon: "🥪" },
-                { id: "f9", name: { en: "Salmon Sandwich", ru: "Сэндвич с Лососем" }, price: 279, icon: "🥪" },
-                { id: "f10", name: { en: "Ham & Cheese Bagel", ru: "Бейгл с Ветчиной и Сыром" }, price: 179, icon: "🥯" },
-                { id: "f11", name: { en: "Chicken Bagel", ru: "Бейгл с Курицей" }, price: 199, icon: "🥯" },
-                { id: "f12", name: { en: "Salmon Bagel", ru: "Бейгл с Лососем" }, price: 269, icon: "🥯" }
+                { id: 'croissant', name: 'Croissant', price: 150, image: 'croissant.jpg' },
+                { id: 'sandwich', name: 'Sandwich', price: 300, image: 'sandwich.jpg' },
+                { id: 'muffin', name: 'Muffin', price: 200, image: 'muffin.jpg' }
             ]
         };
-        
-        // Populate menus
-        function populateMenus() {
-            // Populate each menu category
-            Object.keys(menuData).forEach(category => {
-                const menuContainer = document.getElementById(`${category}Menu`);
-                if (menuContainer) {
-                    menuContainer.innerHTML = '';
-                    menuData[category].forEach(item => {
-                        menuContainer.innerHTML += `
-                            <div class="menu-item" data-id="${item.id}" data-name="${item.name[currentLang]}" data-price="${item.price}">
-                                <div class="menu-icon" aria-hidden="true">${item.icon}</div>
-                                <div class="menu-name">${item.name[currentLang]}</div>
-                                <div class="menu-price">${item.price} ₽</div>
-                                <div class="quantity-controls">
-                                    <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
-                                    <div class="quantity-display">0</div>
-                                    <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            });
-            
-            // Add event listeners to menu items
-            document.querySelectorAll('.menu-item').forEach(item => {
-                const decreaseBtn = item.querySelector('.decrease');
-                const increaseBtn = item.querySelector('.increase');
-                const quantityDisplay = item.querySelector('.quantity-display');
-                
-                decreaseBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    updateItemQuantity(item, -1);
-                });
-                
-                increaseBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    updateItemQuantity(item, 1);
-                });
-            });
-        }
-        
-        // Toggle menu item selection
-        function toggleMenuItem() {
-            const id = this.dataset.id;
-            const name = this.dataset.name;
-            const price = parseFloat(this.dataset.price);
-            
-            // Check if item is already selected
-            const existingItem = orderData.items.find(item => item.id === id);
-            
-            if (existingItem) {
-                // Item exists, increase quantity
-                existingItem.quantity += 1;
-                
-                // Update or add selection count badge
-                let countBadge = this.querySelector('.selection-count');
-                if (countBadge) {
-                    countBadge.textContent = existingItem.quantity;
-                } else {
-                    const badge = document.createElement('div');
-                    badge.className = 'selection-count';
-                    badge.textContent = existingItem.quantity;
-                    this.appendChild(badge);
-                }
-            } else {
-                // Add new item
-                orderData.items.push({
-                    id: id,
-                    name: name,
-                    price: price,
-                    quantity: 1
-                });
-                
-                // Add selection class and count badge
-                this.classList.add('selected');
-                const badge = document.createElement('div');
-                badge.className = 'selection-count';
-                badge.textContent = '1';
-                this.appendChild(badge);
-            }
-            
-            // Update total and selection count
-            updateOrderSummary();
-        }
-        
-        // Update order summary
-        function updateOrderSummary() {
-            let total = 0;
-            let count = 0;
-            
-            const summaryContainer = document.getElementById('selectionSummary');
-            summaryContainer.innerHTML = '';
-            
-            if (orderData.items.length === 0) {
-                summaryContainer.innerHTML = `<p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>`;
-                return;
-            }
-            
-            const summaryDiv = document.createElement('div');
-            summaryDiv.className = 'selection-summary';
-            
-            orderData.items.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                count += item.quantity;
-                
-                summaryDiv.innerHTML += `
-                    <div class="selection-item">
-                        <div class="selection-item-controls">
-                            <div class="selection-item-quantity">
-                                <div class="quantity-btn decrease" data-id="${item.id}" aria-label="Decrease quantity">-</div>
-                                <div class="quantity-display">${item.quantity}</div>
-                                <div class="quantity-btn increase" data-id="${item.id}" aria-label="Increase quantity">+</div>
-                            </div>
-                            <div class="selection-item-name">${item.name}</div>
-                        </div>
-                        <div class="selection-item-price">${itemTotal} ₽</div>
-                    </div>
-                `;
-            });
-            
-            summaryDiv.innerHTML += `
-                <div class="selection-item" style="margin-top: 10px; border-top: 2px solid var(--primary-color);">
-                    <div>${translations[currentLang].menu.selected} <span id="selectedCount">${count}</span></div>
-                    <div class="selection-item-price">${total} ₽</div>
-                </div>
-            `;
-            
-            summaryContainer.appendChild(summaryDiv);
-            
-            // Add event listeners to summary quantity controls
-            summaryDiv.querySelectorAll('.quantity-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = btn.dataset.id;
-                    const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
-                    if (menuItem) {
-                        updateItemQuantity(menuItem, btn.classList.contains('increase') ? 1 : -1);
-                    }
-                });
-            });
-            
-            orderData.total = total;
-        }
-        
-        // Generate order summary for confirmation
-        function generateOrderSummary() {
-            document.getElementById('summaryName').textContent = orderData.name;
-            document.getElementById('summaryTime').textContent = orderData.time;
-            
-            const summaryItems = document.getElementById('summaryItems');
-            summaryItems.innerHTML = '';
-            
-            // Add location to summary
-            const locationName = orderData.location === 'dmitrovka' ? translations[currentLang].location.dmitrovka : translations[currentLang].location.tekhnopark;
-            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
-            
-            summaryItems.innerHTML += `
-                <div class="order-item">
-                    <span><strong>${translations[currentLang].order.location}:</strong></span>
-                    <span>${locationName}</span>
-                </div>
-                <div class="order-item">
-                    <span><strong>${translations[currentLang].order.address}:</strong></span>
-                    <span>${locationAddress}</span>
-                </div>
-            `;
-            
-            if (orderData.items.length === 0) {
-                summaryItems.innerHTML += '<p>No items selected</p>';
-            } else {
-                orderData.items.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    summaryItems.innerHTML += `
-                        <div class="order-item">
-                            <span>${item.quantity}x ${item.name}</span>
-                            <span>${itemTotal} ₽</span>
-                        </div>
-                    `;
-                });
-            }
-            
-            if (orderData.comment) {
-                summaryItems.innerHTML += `
-                    <div class="order-item">
-                        <span><strong>${translations[currentLang].order.comments || 'Comments'}:</strong></span>
-                        <span>${orderData.comment}</span>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('summaryTotal').textContent = `${orderData.total} ₽`;
-        }
-        
-        // Generate a random order number
-        function generateOrderNumber() {
-            const date = new Date();
-            const dateStr = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-            const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-            return `${dateStr}-${randomNum}`;
-        }
-        
-        // Send message using Telegram Bot API
-        async function sendTelegramMessage(chatId, text) {
-            const botToken = "8157403295:AAHd1WwtupOBw_-jFD-vQopThdd_1_OqMms";
-            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            
-            // If chatId is an array, send to all recipients
-            if (Array.isArray(chatId)) {
-                const promises = chatId.map(id => 
-                    fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            chat_id: id,
-                            text: text,
-                            parse_mode: 'HTML'
-                        })
-                    })
-                );
-                
-                try {
-                    await Promise.all(promises);
-                } catch (error) {
-                    console.error('Error sending messages:', error);
-                }
-                return;
-            }
-            
-            // Single recipient
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: text,
-                        parse_mode: 'HTML'
-                    })
-                });
-                
-                const data = await response.json();
-                if (!data.ok) {
-                    console.error('Error sending message:', data);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-        
-        // Format order message for user
-        function formatOrderMessage(orderNumber, orderData) {
-            const t = translations[currentLang];
-            const locationName = orderData.location === 'dmitrovka' ? t.location.dmitrovka : t.location.tekhnopark;
-            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
-            
-            let message = `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
-                   `<b>👤 ${t.order.name}:</b> ${orderData.name}\n` +
-                   `<b>📍 ${t.order.location}:</b> ${locationName}\n` +
-                   `<b>🏠 ${t.order.address}:</b> ${locationAddress}\n` +
-                   `<b>⏰ ${t.order.time}:</b> ${orderData.time}\n\n` +
-                   `<b>📋 ${t.order.items}:</b>\n` +
-                   orderData.items.map(item => 
-                       `• ${item.quantity}x ${item.name} - ${item.price * item.quantity} ₽`
-                   ).join('\n') +
-                   `\n\n<b>💰 ${t.order.total}:</b> ${orderData.total} ₽`;
 
-            if (orderData.comment) {
-                message += `\n\n<b>💭 ${t.order.comments || 'Comments'}:</b>\n${orderData.comment}`;
+        // Translations
+        const translations = {
+            en: {
+                headerTitle: 'Place Your Order',
+                location: 'Select Location',
+                name: 'Enter Your Name',
+                menu: 'Select Drinks & Food',
+                comment: 'Add Comments (Optional)',
+                time: 'Select Pickup Time',
+                summary: 'Order Confirmation',
+                next: 'Next',
+                back: 'Back',
+                confirm: 'Confirm Order',
+                newOrder: 'Make Another Order',
+                thankYou: 'Thank you for your order!',
+                orderNumber: 'Your Order Number:',
+                screenshotNotice: 'Please take a screenshot of your order number',
+                forwardingNotice: 'Your order details have been sent to our kitchen bot.',
+                selectedItems: 'Selected items:',
+                total: 'Total:',
+                nameError: 'Please enter your name',
+                timeError: 'Please select a valid pickup time',
+                menuError: 'Please select at least one item',
+                locationError: 'Please select a location'
+            },
+            ru: {
+                headerTitle: 'Сделать Заказ',
+                location: 'Выберите Локацию',
+                name: 'Введите Ваше Имя',
+                menu: 'Выберите Напитки и Еду',
+                comment: 'Добавить Комментарий (Необязательно)',
+                time: 'Выберите Время Получения',
+                summary: 'Подтверждение Заказа',
+                next: 'Далее',
+                back: 'Назад',
+                confirm: 'Подтвердить Заказ',
+                newOrder: 'Сделать Новый Заказ',
+                thankYou: 'Спасибо за ваш заказ!',
+                orderNumber: 'Номер Вашего Заказа:',
+                screenshotNotice: 'Пожалуйста, сделайте скриншот номера заказа',
+                forwardingNotice: 'Детали вашего заказа отправлены нашему боту.',
+                selectedItems: 'Выбранные позиции:',
+                total: 'Итого:',
+                nameError: 'Пожалуйста, введите ваше имя',
+                timeError: 'Пожалуйста, выберите корректное время получения',
+                menuError: 'Пожалуйста, выберите хотя бы один пункт',
+                locationError: 'Пожалуйста, выберите локацию'
             }
+        };
 
-            return message;
-        }
-        
-        // Reset order data
-        function resetOrderData() {
-            orderData = {
-                name: "",
-                location: "",
-                items: [],
-                comment: "",
-                time: "12:00",
-                total: 0,
-                botInfo: {
-                    forwardToKitchen: true,
-                    kitchenBotUsername: "@ZakazYellow_bot",
-                    targetUserId: "261442211",
-                    recipientUserId: "261442211",
-                    meowmeowpewUsername: "@meowmeowpew",
-                    ichsterbeUsername: "@ichsterbe" // Add new bot username
-                }
-            };
-            
-            // Reset UI elements
-            document.getElementById('customerName').value = '';
-            document.getElementById('timeSlider').value = 12;
-            document.getElementById('timeDisplay').textContent = '12:00';
-            
-            // Reset selected items counter
-            const selectedCountElement = document.getElementById('selectedCount');
-            if (selectedCountElement) {
-                selectedCountElement.textContent = '0';
-            }
-            
-            // Clear selected items
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('selected');
-                const badge = item.querySelector('.selection-count');
-                if (badge) {
-                    badge.remove();
-                }
-            });
-            
-            // Reset menu display
-            document.querySelectorAll('.menu-grid').forEach(menu => {
-                menu.style.display = 'none';
-            });
-            document.querySelector('.tab-button[data-menu="classicCoffee"]').classList.add('active');
-            
-            // Reset comment input
-            const commentInput = document.getElementById('orderComment');
-            if (commentInput) {
-                commentInput.value = '';
-                updateCharCount();
-            }
-        }
-        
-        // Initialize function
+        // Initialize the application
         function init() {
-            populateMenus();
+            // Set initial language
+            setLanguage('ru');
             
-            // Set initial language to Russian
-            currentLang = 'ru';
-            switchLanguage('ru');
-            
-            // Add stage button click handlers
-            document.querySelectorAll('.stage-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetPage = this.dataset.page;
-                    const currentPage = document.querySelector('.page[style="display: block;"]').id;
-                    const currentPageNum = parseInt(currentPage.replace('page', ''));
-                    const targetPageNum = parseInt(targetPage.replace('page', ''));
-
-                    // Validate navigation
-                    if (targetPageNum > currentPageNum + 1) {
-                        // Check if all previous stages are completed
-                        for (let i = 1; i < targetPageNum; i++) {
-                            const pageId = `page${i}`;
-                            if (i === 1 && !orderData.location) {
-                                alert(translations[currentLang].location.error);
-                                return;
-                            }
-                            if (i === 2 && !orderData.name) {
-                                alert(translations[currentLang].name.error);
-                                return;
-                            }
-                            if (i === 3 && orderData.items.length === 0) {
-                                alert(translations[currentLang].menu.error);
-                                return;
-                            }
-                            if (i === 5 && !orderData.time) {
-                                alert(translations[currentLang].time.error);
-                                return;
-                            }
-                        }
-                    }
-
-                    showPage(targetPage);
-                });
-            });
-
-            // Set initial time to current time + 10 minutes
+            // Set initial time (current time + 10 minutes)
             const now = new Date();
-            now.setMinutes(now.getMinutes() + 10);
-            let currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
+            const initialTime = new Date(now.getTime() + 10 * 60000);
+            const hours = initialTime.getHours();
+            const minutes = initialTime.getMinutes();
+            const timeValue = hours + minutes / 60;
             
-            // Calculate minimum time (current time + 10 minutes)
-            const minTime = currentHour + (currentMinute / 60);
+            document.getElementById('timeSlider').value = timeValue;
+            updateTimeDisplay(timeValue);
             
-            // Update time slider and display
-            const timeSlider = document.getElementById('timeSlider');
-            const timeDisplay = document.getElementById('timeDisplay');
+            // Initialize menu items
+            initializeMenuItems();
             
-            // Set minimum value to max of 7:30 or current time + 10 minutes
-            timeSlider.min = Math.max(7.5, minTime);
-            timeSlider.max = 20; // Shop closes at 20:00
+            // Add event listeners
+            addEventListeners();
             
-            // Set initial value to current time + 10 minutes
-            const sliderValue = Math.max(7.5, minTime);
-            timeSlider.value = sliderValue;
-            timeDisplay.textContent = formatTime(sliderValue);
-            orderData.time = formatTime(sliderValue);
-            
-            // Time slider event listener
-            timeSlider.addEventListener('input', function() {
-                const value = parseFloat(this.value);
-                const timeString = formatTime(value);
-                timeDisplay.textContent = timeString;
-                orderData.time = timeString;
-                updateCompletedStages();
-            });
-
-            // Add location selection handlers
-            document.querySelectorAll('.location-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options
-                    document.querySelectorAll('.location-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                    
-                    // Store selected location
-                    orderData.location = this.dataset.location;
-                    updateCompletedStages();
-                });
-            });
-
-            // Add name input handler
-            document.getElementById('customerName').addEventListener('input', function() {
-                orderData.name = this.value.trim();
-                updateCompletedStages();
-            });
-
-            // Add menu item selection handlers
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    toggleMenuItem.call(this);
-                    updateCompletedStages();
-                });
-            });
-
-            // Add comment input handler
-            document.getElementById('orderComment').addEventListener('input', function() {
-                orderData.comment = this.value.trim();
-                updateCompletedStages();
-            });
-
-            // Navigation handlers
-            document.getElementById('toNamePage').addEventListener('click', function() {
-                if (!orderData.location) {
-                    alert(translations[currentLang].location.error || 'Please select a location');
-                    return;
-                }
-                showPage('page2');
-            });
-
-            document.getElementById('backToLocation').addEventListener('click', function() {
-                showPage('page1');
-            });
-
-            document.getElementById('toMenuPage').addEventListener('click', function() {
-                const nameInput = document.getElementById('customerName').value.trim();
-                if (nameInput.length === 0) {
-                    document.getElementById('nameError').textContent = translations[currentLang].name.error;
-                    return;
-                }
-                orderData.name = nameInput;
-                showPage('page3');
-            });
-
-            document.getElementById('backToName').addEventListener('click', function() {
-                showPage('page2');
-            });
-
-            document.getElementById('toCommentPage').addEventListener('click', function() {
-                if (orderData.items.length === 0) {
-                    const summaryContainer = document.getElementById('selectionSummary');
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
-                    return;
-                }
-                showPage('page4');
-            });
-
-            document.getElementById('backToMenu').addEventListener('click', function() {
-                showPage('page3');
-            });
-
-            document.getElementById('toTimePage').addEventListener('click', function() {
-                orderData.comment = document.getElementById('orderComment').value.trim();
-                showPage('page5');
-            });
-
-            document.getElementById('backToComment').addEventListener('click', function() {
-                showPage('page4');
-            });
-
-            document.getElementById('toSummaryPage').addEventListener('click', function() {
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                const selectedTime = parseFloat(timeSlider.value);
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-
-                if (selectedTime < currentTime) {
-                    alert(translations[currentLang].time.error);
-                    return;
-                }
-
-                generateOrderSummary();
-                showPage('page6');
-            });
-
-            document.getElementById('backToTime').addEventListener('click', function() {
-                showPage('page5');
-            });
-
-            // Final order confirmation handler
-            document.getElementById('confirmOrder').addEventListener('click', async function() {
-                // Validate all required data
-                if (!orderData.location) {
-                    showError('location');
-                    return;
-                }
-                if (!orderData.name) {
-                    showError('name');
-                    return;
-                }
-                if (orderData.items.length === 0) {
-                    showError('menu');
-                    return;
-                }
-                if (!orderData.time) {
-                    showError('time');
-                    return;
-                }
-
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-                
-                const orderNumber = generateOrderNumber();
-                document.getElementById('orderNumber').textContent = orderNumber;
-                
-                // Show confirmation screen
-                showPage('orderConfirmed');
-                
-                // Format the order message
-                const orderMessage = formatOrderMessage(orderNumber, orderData);
-                
-                // List of all kitchen bot users who should receive the message
-                const kitchenBotUsers = [
-                    "517070445", // Main kitchen bot user
-                    "261442211", // Additional kitchen bot user
-                    "1057756574", // New kitchen bot user
-                    "-1002152072922", // Group chat
-                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
-                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
-                ];
-                
-                // Send to all kitchen bot users
-                await sendTelegramMessage(kitchenBotUsers, orderMessage);
-                
-                // Send to order creator if we have their ID
-                if (currentUserId) {
-                    await sendTelegramMessage(currentUserId, orderMessage);
-                }
-            });
-            
-            // New Order Button
-            document.getElementById('newOrderButton').addEventListener('click', function() {
-                resetOrderData();
-                showPage('page1');
-            });
-
-            // Show initial page
+            // Show first page
             showPage('page1');
         }
 
-        // Show specific page and hide others
-        function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.style.display = 'none';
+        // Set language
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('[data-lang]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
             });
             
-            // Show requested page
-            document.getElementById(pageId).style.display = 'block';
-            
-            // Update stage buttons
-            document.querySelectorAll('.stage-button').forEach(button => {
-                button.classList.remove('active');
-                if (button.dataset.page === pageId) {
-                    button.classList.add('active');
+            // Update all text content
+            Object.keys(translations[lang]).forEach(key => {
+                const elements = document.querySelectorAll(`[data-translate="${key}"]`);
+                elements.forEach(el => {
+                    el.textContent = translations[lang][key];
+                });
+            });
+        }
+
+        // Initialize menu items
+        function initializeMenuItems() {
+            Object.keys(menuItems).forEach(category => {
+                const menuGrid = document.getElementById(`${category}Menu`);
+                menuItems[category].forEach(item => {
+                    const itemElement = createMenuItemElement(item);
+                    menuGrid.appendChild(itemElement);
+                });
+            });
+        }
+
+        // Create menu item element
+        function createMenuItemElement(item) {
+            const div = document.createElement('div');
+            div.className = 'menu-item';
+            div.dataset.id = item.id;
+            div.innerHTML = `
+                <div class="menu-item-image">
+                    <img src="images/${item.image}" alt="${item.name}">
+                </div>
+                <div class="menu-item-info">
+                    <div class="menu-item-name">${item.name}</div>
+                    <div class="menu-item-price">${item.price} ₽</div>
+                </div>
+                <div class="menu-item-quantity">
+                    <button class="quantity-btn minus">-</button>
+                    <span class="quantity-display">0</span>
+                    <button class="quantity-btn plus">+</button>
+                </div>
+            `;
+            return div;
+        }
+
+        // Add event listeners
+        function addEventListeners() {
+            // Language buttons
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+            });
+
+            // Location selection
+            document.querySelectorAll('.location-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.location-option').forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    orderData.location = option.dataset.location;
+                    updateCompletedStages();
+                });
+            });
+
+            // Name input
+            document.getElementById('customerName').addEventListener('input', (e) => {
+                orderData.name = e.target.value;
+                updateCompletedStages();
+            });
+
+            // Menu tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    document.querySelectorAll('.menu-grid').forEach(grid => grid.style.display = 'none');
+                    document.getElementById(`${btn.dataset.menu}Menu`).style.display = 'grid';
+                });
+            });
+
+            // Menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const minusBtn = item.querySelector('.minus');
+                const plusBtn = item.querySelector('.plus');
+                const quantityDisplay = item.querySelector('.quantity-display');
+                
+                minusBtn.addEventListener('click', () => {
+                    const currentQuantity = parseInt(quantityDisplay.textContent);
+                    if (currentQuantity > 0) {
+                        quantityDisplay.textContent = currentQuantity - 1;
+                        updateMenuItemQuantity(item.dataset.id, currentQuantity - 1);
+                    }
+                });
+                
+                plusBtn.addEventListener('click', () => {
+                    const currentQuantity = parseInt(quantityDisplay.textContent);
+                    quantityDisplay.textContent = currentQuantity + 1;
+                    updateMenuItemQuantity(item.dataset.id, currentQuantity + 1);
+                });
+            });
+
+            // Comment input
+            document.getElementById('orderComment').addEventListener('input', (e) => {
+                orderData.comment = e.target.value;
+                document.getElementById('charCount').textContent = e.target.value.length;
+            });
+
+            // Time slider
+            document.getElementById('timeSlider').addEventListener('input', (e) => {
+                const timeValue = parseFloat(e.target.value);
+                updateTimeDisplay(timeValue);
+                orderData.time = formatTime(timeValue);
+                updateCompletedStages();
+            });
+
+            // Navigation buttons
+            document.getElementById('toNamePage').addEventListener('click', () => {
+                if (validateLocation()) {
+                    showPage('page2');
                 }
             });
 
+            document.getElementById('backToLocation').addEventListener('click', () => {
+                showPage('page1');
+            });
+
+            document.getElementById('toMenuPage').addEventListener('click', () => {
+                if (validateName()) {
+                    showPage('page3');
+                }
+            });
+
+            document.getElementById('backToName').addEventListener('click', () => {
+                showPage('page2');
+            });
+
+            document.getElementById('toCommentPage').addEventListener('click', () => {
+                if (validateMenu()) {
+                    showPage('page4');
+                }
+            });
+
+            document.getElementById('backToMenu').addEventListener('click', () => {
+                showPage('page3');
+            });
+
+            document.getElementById('toTimePage').addEventListener('click', () => {
+                showPage('page5');
+            });
+
+            document.getElementById('backToComment').addEventListener('click', () => {
+                showPage('page4');
+            });
+
+            document.getElementById('toSummaryPage').addEventListener('click', () => {
+                if (validateTime()) {
+                    showPage('page6');
+                    updateOrderSummary();
+                }
+            });
+
+            document.getElementById('backToTime').addEventListener('click', () => {
+                showPage('page5');
+            });
+
+            // Stage navigation buttons
+            document.querySelectorAll('.stage-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetPage = btn.dataset.page;
+                    if (canNavigateToPage(targetPage)) {
+                        showPage(targetPage);
+                    }
+                });
+            });
+
+            // Confirm order button
+            document.getElementById('confirmOrder').addEventListener('click', () => {
+                if (validateOrder()) {
+                    confirmOrder();
+                }
+            });
+
+            // New order button
+            document.getElementById('newOrderButton').addEventListener('click', () => {
+                resetOrder();
+                showPage('page1');
+            });
+        }
+
+        // Show page
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById(pageId).style.display = 'block';
+            
+            // Update active stage button
+            document.querySelectorAll('.stage-button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.page === pageId);
+            });
+            
             // Update progress bar
             const pageNumber = parseInt(pageId.replace('page', ''));
-            const progress = ((pageNumber - 1) / 5) * 100; // 5 is the number of steps before summary
+            const progress = ((pageNumber - 1) / 5) * 100;
             document.getElementById('progressFill').style.width = `${progress}%`;
-
-            // Update completed stages
-            updateCompletedStages();
-            
-            // Scroll to top
-            window.scrollTo(0, 0);
         }
 
         // Update completed stages
         function updateCompletedStages() {
             const stages = {
-                page1: !!orderData.location,
-                page2: !!orderData.name,
+                page1: orderData.location !== '',
+                page2: orderData.name !== '',
                 page3: orderData.items.length > 0,
                 page4: true, // Comment is optional
-                page5: !!orderData.time
+                page5: orderData.time !== ''
             };
-
-            document.querySelectorAll('.stage-button').forEach(button => {
-                const pageId = button.dataset.page;
-                if (stages[pageId]) {
-                    button.classList.add('completed');
-                } else {
-                    button.classList.remove('completed');
+            
+            Object.entries(stages).forEach(([page, completed]) => {
+                const btn = document.querySelector(`.stage-button[data-page="${page}"]`);
+                if (btn) {
+                    btn.classList.toggle('completed', completed);
                 }
             });
         }
 
-        // Add error handling function
-        function showError(type) {
-            let errorMessage = '';
-            switch(type) {
-                case 'location':
-                    errorMessage = translations[currentLang].location.error;
-                    break;
-                case 'name':
-                    errorMessage = translations[currentLang].name.error;
-                    break;
-                case 'menu':
-                    errorMessage = translations[currentLang].menu.error;
-                    break;
-                case 'time':
-                    errorMessage = translations[currentLang].time.error;
-                    break;
-            }
-            alert(errorMessage);
-        }
-
-        // Add notification functions
-        function showShopClosedNotification() {
-            const notification = document.getElementById('shopClosedNotification');
-            const currentHour = new Date().getHours();
-            const currentMinutes = new Date().getMinutes();
-            const currentTime = currentHour + (currentMinutes / 60);
-
-            if (currentTime >= 20) {
-                notification.textContent = translations[currentLang].shopClosed.evening;
-            } else if (currentTime < 7.5) {
-                notification.textContent = translations[currentLang].shopClosed.morning;
+        // Can navigate to page
+        function canNavigateToPage(pageId) {
+            const pageNumber = parseInt(pageId.replace('page', ''));
+            const currentPage = parseInt(document.querySelector('.page[style="display: block;"]').id.replace('page', ''));
+            
+            if (pageNumber <= currentPage) {
+                return true;
             }
             
-            notification.style.display = 'block';
+            const previousPages = {
+                page2: validateLocation,
+                page3: validateName,
+                page4: validateMenu,
+                page5: () => true,
+                page6: validateTime
+            };
             
-            // Disable the confirm button
-            document.getElementById('confirmStep4').disabled = true;
-            
-            // Hide notification after 5 seconds
-            setTimeout(() => {
-                hideShopClosedNotification();
-            }, 5000);
+            return previousPages[pageId]();
         }
-        
-        function hideShopClosedNotification() {
-            const notification = document.getElementById('shopClosedNotification');
-            notification.style.display = 'none';
-            
-            // Re-enable the confirm button
-            document.getElementById('confirmStep4').disabled = false;
+
+        // Validate location
+        function validateLocation() {
+            if (!orderData.location) {
+                showError('locationError');
+                return false;
+            }
+            return true;
         }
-        
-        // Helper function to format time
-        function formatTime(value) {
-            const hours = Math.floor(value);
-            const minutes = Math.round((value % 1) * 60);
-            return `${hours}:${minutes.toString().padStart(2, '0')}`;
+
+        // Validate name
+        function validateName() {
+            if (!orderData.name) {
+                showError('nameError');
+                return false;
+            }
+            return true;
         }
-        
-        // Add smooth scrolling to the page
-        document.documentElement.style.scrollBehavior = 'smooth';
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', init);
-        
-        // Add translations
-        const translations = {
-            en: {
-                header: {
-                    title: "Place Your Order"
-                },
-                welcome: {
-                    title: "Welcome to Yellow Coffee!",
-                    text: "We're excited to serve you today! Please select your preferred location and enter your name to start your order.\nOur delicious coffee and fresh food are waiting for you."
-                },
-                location: {
-                    title: "Select Location",
-                    dmitrovka: "m. Dmitrovka",
-                    tekhnopark: "m. Tekhnopark"
-                },
-                name: {
-                    title: "Enter Your Name",
-                    placeholder: "Your name (max 15 letters)",
-                    error: "Please enter your name",
-                    confirm: "Confirm"
-                },
-                menu: {
-                    title: "Select Drinks & Food",
-                    classicCoffee: "Classic Coffee",
-                    signatureDrinks: "Signature Drinks",
-                    premiumCollection: "Premium Collection",
-                    nonCoffee: "Non-Coffee Beverages",
-                    food: "Food",
-                    selected: "Selected items:",
-                    error: "Please select at least one item to continue"
-                },
-                time: {
-                    title: "Select Pickup Time",
-                    error: "Please select a time later than the current time"
-                },
-                order: {
-                    title: "Order Confirmation",
-                    name: "Name",
-                    location: "Location",
-                    address: "Address",
-                    time: "Pickup Time",
-                    items: "Selected Items",
-                    total: "Total",
-                    confirm: "Confirm Order",
-                    comments: "Comments",
-                    forwarding: "Your order details have been sent to our kitchen bot."
-                },
-                buttons: {
-                    confirm: "Confirm"
-                },
-                shopClosed: {
-                    evening: "I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow",
-                    morning: "I apologize, the coffee shop is closed until 7:30 AM. Please place your order after 7:30 AM."
-                },
-                thankYou: {
-                    message: "Thank you for your order!",
-                    number: "Your Order Number:",
-                    screenshot: "Please take a screenshot of your order number",
-                    newOrder: "Make Another Order",
-                    owl: {
-                        message: "🦉 Would you like to pet and feed your owl while your coffee is being prepared?",
-                        button: "🦉 Play with Owl"
-                    }
-                },
-                comment: {
-                    title: "Add Comments (Optional)",
-                    placeholder: "Enter any special requests or comments about your order (max 90 characters)",
-                    charCount: "characters"
+
+        // Validate menu
+        function validateMenu() {
+            if (orderData.items.length === 0) {
+                showError('menuError');
+                return false;
+            }
+            return true;
+        }
+
+        // Validate time
+        function validateTime() {
+            if (!orderData.time) {
+                showError('timeError');
+                return false;
+            }
+            return true;
+        }
+
+        // Validate order
+        function validateOrder() {
+            return validateLocation() && validateName() && validateMenu() && validateTime();
+        }
+
+        // Show error
+        function showError(errorType) {
+            const errorElement = document.getElementById(errorType.replace('Error', ''));
+            if (errorElement) {
+                errorElement.textContent = translations[currentLanguage][errorType];
+                errorElement.style.display = 'block';
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Update menu item quantity
+        function updateMenuItemQuantity(itemId, quantity) {
+            const item = orderData.items.find(i => i.id === itemId);
+            if (item) {
+                if (quantity === 0) {
+                    orderData.items = orderData.items.filter(i => i.id !== itemId);
+                } else {
+                    item.quantity = quantity;
                 }
-            },
-            ru: {
-                header: {
-                    title: "Сделать Заказ"
-                },
-                welcome: {
-                    title: "Добро пожаловать в Yellow Coffee!",
-                    text: "Мы рады обслужить вас сегодня! Пожалуйста, выберите удобное место и введите ваше имя, чтобы начать заказ.\nНаши вкусные кофе и свежая еда ждут вас."
-                },
-                location: {
-                    title: "Выберите Локацию",
-                    dmitrovka: "м. Дмитровка",
-                    tekhnopark: "м. Технопарк"
-                },
-                name: {
-                    title: "Введите Ваше Имя",
-                    placeholder: "Ваше имя (макс. 15 букв)",
-                    error: "Пожалуйста, введите ваше имя",
-                    confirm: "Подтвердить"
-                },
-                menu: {
-                    title: "Выберите Напитки и Еду",
-                    classicCoffee: "Классический Кофе",
-                    signatureDrinks: "Авторские Напитки",
-                    premiumCollection: "Премиум Коллекция",
-                    nonCoffee: "Некофейные Напитки",
-                    food: "Еда",
-                    selected: "Выбрано товаров:",
-                    error: "Пожалуйста, выберите хотя бы один товар для продолжения"
-                },
-                time: {
-                    title: "Выберите Время Получения",
-                    error: "Пожалуйста, выберите время позже текущего"
-                },
-                order: {
-                    title: "Подтверждение Заказа",
-                    name: "Имя",
-                    location: "Локация",
-                    address: "Адрес",
-                    time: "Время Получения",
-                    items: "Выбранные Товары",
-                    total: "Итого",
-                    confirm: "Подтвердить Заказ",
-                    comments: "Комментарии",
-                    forwarding: "Детали вашего заказа отправлены нашему кухонному боту."
-                },
-                buttons: {
-                    confirm: "Подтвердить"
-                },
-                shopClosed: {
-                    evening: "Приносим извинения, кофейня уже закрыта сегодня, мы будем ждать ваш заказ завтра",
-                    morning: "Приносим извинения, кофейня закрыта до 7:30 утра. Пожалуйста, сделайте заказ после 7:30 утра."
-                },
-                thankYou: {
-                    message: "Спасибо за ваш заказ!",
-                    number: "Номер Вашего Заказа:",
-                    screenshot: "Пожалуйста, сделайте скриншот номера заказа",
-                    newOrder: "Сделать Новый Заказ",
-                    owl: {
-                        message: "🦉 Может хотите погладить и покормить свою сову, пока ваш кофе готовится?",
-                        button: "🦉 Перейти к Сове"
-                    }
-                },
-                comment: {
-                    title: "Добавить Комментарии (Необязательно)",
-                    placeholder: "Введите особые пожелания или комментарии к заказу (макс. 90 символов)",
-                    charCount: "символов"
-                }
-            }
-        };
-
-        let currentLang = 'ru';
-
-        // Language switching function
-        function switchLanguage(lang) {
-            currentLang = lang;
-            const t = translations[lang];
-
-            // Update header
-            document.getElementById('headerTitle').textContent = t.header.title;
-
-            // Update welcome section
-            document.querySelector('.welcome-title').textContent = t.welcome.title;
-            document.querySelector('.welcome-text').textContent = t.welcome.text;
-
-            // Update location section
-            document.querySelector('.location-section h2').textContent = t.location.title;
-            document.querySelector('[data-location="dmitrovka"] .location-name').textContent = t.location.dmitrovka;
-            document.querySelector('[data-location="tekhnopark"] .location-name').textContent = t.location.tekhnopark;
-
-            // Update name section
-            document.querySelector('#step2 .section h2').textContent = t.name.title;
-            document.getElementById('customerName').placeholder = t.name.placeholder;
-            document.getElementById('confirmName').textContent = t.name.confirm;
-
-            // Update menu section
-            document.querySelector('#step3 .section h2').textContent = t.menu.title;
-            document.querySelector('[data-menu="classicCoffee"]').textContent = t.menu.classicCoffee;
-            document.querySelector('[data-menu="signatureDrinks"]').textContent = t.menu.signatureDrinks;
-            document.querySelector('[data-menu="premiumCollection"]').textContent = t.menu.premiumCollection;
-            document.querySelector('[data-menu="nonCoffee"]').textContent = t.menu.nonCoffee;
-            document.querySelector('[data-menu="food"]').textContent = t.menu.food;
-            document.querySelector('#selectionSummary p').textContent = t.menu.selected;
-
-            // Update menu items
-            document.querySelectorAll('.menu-item').forEach(item => {
-                const id = item.dataset.id;
-                const menuItem = [...menuData.classicCoffee, ...menuData.signatureDrinks, ...menuData.premiumCollection, ...menuData.nonCoffee, ...menuData.food].find(mi => mi.id === id);
+            } else if (quantity > 0) {
+                const menuItem = findMenuItem(itemId);
                 if (menuItem) {
-                    item.querySelector('.menu-name').textContent = menuItem.name[lang];
-                    item.dataset.name = menuItem.name[lang];
-                }
-            });
-
-            // Update comment section
-            document.querySelector('#step4 .section h2').textContent = t.comment.title;
-            const commentInput = document.getElementById('orderComment');
-            if (commentInput) {
-                commentInput.placeholder = t.comment.placeholder;
-            }
-            document.querySelector('.word-count').innerHTML = `<span id="charCount">0</span>/90 ${t.comment.charCount}`;
-
-            // Update time section
-            document.querySelector('#step5 .section h2').textContent = t.time.title;
-
-            // Update order section
-            document.querySelector('#step6 .section h2').textContent = t.order.title;
-            document.getElementById('confirmOrder').textContent = t.order.confirm;
-            document.querySelector('.forwarding-notice').textContent = t.order.forwarding;
-
-            // Update thank you section
-            document.querySelector('.thank-you-message').textContent = t.thankYou.message;
-            document.querySelector('.order-number p').textContent = t.thankYou.number;
-            document.querySelector('.screenshot-notice').textContent = t.thankYou.screenshot;
-            document.getElementById('newOrderButton').textContent = t.thankYou.newOrder;
-
-            // Update owl section
-            const owlMessage = document.querySelector('.owl-message');
-            const owlButton = document.querySelector('.owl-button');
-            if (owlMessage && owlButton) {
-                owlMessage.textContent = t.thankYou.owl.message;
-                owlButton.textContent = t.thankYou.owl.button;
-                owlButton.href = "https://t.me/notwise_bot";
-            }
-
-            // Update confirm buttons
-            document.querySelectorAll('.nav-button').forEach(button => {
-                if (button.id !== 'confirmOrder') {
-                    button.textContent = t.buttons.confirm;
-                }
-            });
-
-            // Update language buttons
-            document.querySelectorAll('.language-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.lang === lang);
-            });
-
-            // Update order summary if it exists
-            if (orderData.items.length > 0) {
-                updateOrderSummary();
-            }
-        }
-
-        // Initialize owl button text on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set initial owl button text
-            const owlMessage = document.querySelector('.owl-message');
-            const owlButton = document.querySelector('.owl-button');
-            if (owlMessage && owlButton) {
-                owlMessage.textContent = translations[currentLang].thankYou.owl.message;
-                owlButton.textContent = translations[currentLang].thankYou.owl.button;
-                owlButton.href = "https://t.me/notwise_bot";
-            }
-        });
-
-        // Add language button handlers
-        document.querySelectorAll('.language-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                switchLanguage(this.dataset.lang);
-            });
-        });
-
-        // Replace word count functionality with character count
-        function updateCharCount() {
-            const commentInput = document.getElementById('orderComment');
-            const charCountDisplay = document.getElementById('charCount');
-            const charCount = commentInput.value.length;
-            charCountDisplay.textContent = charCount;
-            
-            // Disable/enable confirm button based on character count
-            const confirmButton = document.getElementById('confirmStep3');
-            if (confirmButton) {
-                confirmButton.disabled = charCount > 90;
-            }
-        }
-
-        // Add updateItemQuantity function
-        function updateItemQuantity(item, change) {
-            const id = item.dataset.id;
-            const name = item.dataset.name;
-            const price = parseFloat(item.dataset.price);
-            const quantityDisplay = item.querySelector('.quantity-display');
-            const currentQuantity = parseInt(quantityDisplay.textContent);
-            const newQuantity = Math.max(0, currentQuantity + change);
-            
-            // Update display
-            quantityDisplay.textContent = newQuantity;
-            
-            // Update order data
-            const existingItem = orderData.items.find(item => item.id === id);
-            
-            if (newQuantity === 0) {
-                // Remove item if quantity is 0
-                if (existingItem) {
-                    orderData.items = orderData.items.filter(item => item.id !== id);
-                    item.classList.remove('selected');
-                }
-            } else {
-                if (existingItem) {
-                    existingItem.quantity = newQuantity;
-                } else {
                     orderData.items.push({
-                        id: id,
-                        name: name,
-                        price: price,
-                        quantity: newQuantity
+                        id: itemId,
+                        name: menuItem.name,
+                        price: menuItem.price,
+                        quantity: quantity
                     });
-                    item.classList.add('selected');
                 }
             }
             
-            // Update summary
-            updateOrderSummary();
+            updateOrderTotal();
+            updateCompletedStages();
         }
 
-        // Update menu tab switching
-        document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
-            button.addEventListener('click', function() {
-                const menu = this.dataset.menu;
-                document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                this.classList.add('active');
-                
-                // Hide all menus
-                document.querySelectorAll('.menu-grid').forEach(menu => {
-                    menu.style.display = 'none';
-                });
-                
-                // Show selected menu
-                document.getElementById(`${menu}Menu`).style.display = 'grid';
+        // Find menu item
+        function findMenuItem(itemId) {
+            for (const category of Object.values(menuItems)) {
+                const item = category.find(i => i.id === itemId);
+                if (item) return item;
+            }
+            return null;
+        }
+
+        // Update order total
+        function updateOrderTotal() {
+            orderData.total = orderData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('selectedCount').textContent = orderData.items.reduce((sum, item) => sum + item.quantity, 0);
+        }
+
+        // Update time display
+        function updateTimeDisplay(timeValue) {
+            const hours = Math.floor(timeValue);
+            const minutes = Math.round((timeValue - hours) * 60);
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            document.getElementById('timeDisplay').textContent = timeString;
+        }
+
+        // Format time
+        function formatTime(timeValue) {
+            const hours = Math.floor(timeValue);
+            const minutes = Math.round((timeValue - hours) * 60);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
+
+        // Update order summary
+        function updateOrderSummary() {
+            document.getElementById('summaryName').textContent = orderData.name;
+            document.getElementById('summaryTime').textContent = orderData.time;
+            
+            const summaryItems = document.getElementById('summaryItems');
+            summaryItems.innerHTML = '';
+            orderData.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'order-item';
+                div.innerHTML = `
+                    <span>${item.name} x${item.quantity}</span>
+                    <span>${item.price * item.quantity} ₽</span>
+                `;
+                summaryItems.appendChild(div);
             });
-        });
+            
+            document.getElementById('summaryTotal').textContent = `${orderData.total} ₽`;
+        }
+
+        // Confirm order
+        function confirmOrder() {
+            const orderNumber = generateOrderNumber();
+            document.getElementById('orderNumber').textContent = orderNumber;
+            
+            // Send order to Telegram
+            sendTelegramMessage(orderNumber);
+            
+            // Show confirmation page
+            showPage('orderConfirmed');
+        }
+
+        // Generate order number
+        function generateOrderNumber() {
+            const date = new Date();
+            const year = date.getFullYear().toString().slice(-2);
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `${year}${month}${day}-${random}`;
+        }
+
+        // Send Telegram message
+        function sendTelegramMessage(orderNumber) {
+            const botToken = 'YOUR_BOT_TOKEN';
+            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            
+            const message = formatOrderMessage(orderNumber);
+            const kitchenBotUsers = [
+                'YOUR_CHAT_ID',
+                'ANOTHER_CHAT_ID',
+                'GROUP_CHAT_ID'
+            ];
+            
+            // Send to all recipients
+            Promise.all(kitchenBotUsers.map(chatId => {
+                return fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+            })).catch(error => {
+                console.error('Error sending Telegram message:', error);
+            });
+        }
+
+        // Format order message
+        function formatOrderMessage(orderNumber) {
+            return `
+<b>🆕 New Order #${orderNumber}</b>
+
+👤 Customer: ${orderData.name}
+📍 Location: ${orderData.location}
+🏠 Address: ${getLocationAddress(orderData.location)}
+⏰ Pickup Time: ${orderData.time}
+
+<b>Selected Items:</b>
+${orderData.items.map(item => `• ${item.name} x${item.quantity} - ${item.price * item.quantity} ₽`).join('\n')}
+
+💰 Total: ${orderData.total} ₽
+
+${orderData.comment ? `📝 Comment: ${orderData.comment}` : ''}
+            `;
+        }
+
+        // Get location address
+        function getLocationAddress(location) {
+            const addresses = {
+                dmitrovka: 'Dmitrovka Street, 7',
+                tekhnopark: 'Tekhnopark Street, 15'
+            };
+            return addresses[location] || '';
+        }
+
+        // Reset order
+        function resetOrder() {
+            orderData = {
+                location: '',
+                name: '',
+                items: [],
+                comment: '',
+                time: '',
+                total: 0
+            };
+            
+            // Reset form elements
+            document.getElementById('customerName').value = '';
+            document.getElementById('orderComment').value = '';
+            document.getElementById('charCount').textContent = '0';
+            
+            // Reset menu items
+            document.querySelectorAll('.menu-item .quantity-display').forEach(display => {
+                display.textContent = '0';
+            });
+            
+            // Reset location selection
+            document.querySelectorAll('.location-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Reset time slider
+            const now = new Date();
+            const initialTime = new Date(now.getTime() + 10 * 60000);
+            const hours = initialTime.getHours();
+            const minutes = initialTime.getMinutes();
+            const timeValue = hours + minutes / 60;
+            
+            document.getElementById('timeSlider').value = timeValue;
+            updateTimeDisplay(timeValue);
+            
+            // Reset completed stages
+            document.querySelectorAll('.stage-button').forEach(btn => {
+                btn.classList.remove('completed');
+            });
+            
+            // Update progress bar
+            document.getElementById('progressFill').style.width = '0%';
+        }
+
+        // Initialize the application
+        init();
     </script>
 </body>
 </html>
