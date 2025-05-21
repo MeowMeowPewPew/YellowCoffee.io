@@ -474,11 +474,11 @@
             grid-template-rows: repeat(2, 1fr);
             gap: 4px;
             margin: 8px auto;
-            padding: 8px;
+            padding: 4px;
             background: var(--secondary-bg);
             border-radius: var(--border-radius);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 300px;
+            max-width: 200px;
         }
 
         .nav-grid-item {
@@ -486,8 +486,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px;
-            border-radius: 8px;
+            padding: 4px;
+            border-radius: 6px;
             background: var(--bg-color);
             cursor: pointer;
             transition: var(--transition);
@@ -497,16 +497,16 @@
 
         .nav-grid-item-number {
             position: absolute;
-            top: 2px;
-            left: 2px;
-            font-size: 12px;
+            top: 1px;
+            left: 1px;
+            font-size: 10px;
             font-weight: bold;
             color: var(--text-color);
             opacity: 0.7;
         }
 
         .nav-grid-item-emoji {
-            font-size: 24px;
+            font-size: 18px;
             line-height: 1;
         }
 
@@ -945,38 +945,6 @@
                     </div>
                 </div>
             </div>
-            <div class="navigation">
-                <div class="nav-grid">
-                    <div class="nav-grid-item active" data-step="1">
-                        <div class="nav-grid-item-number">1</div>
-                        <div class="nav-grid-item-emoji">📍</div>
-                    </div>
-                    <div class="nav-grid-item disabled" data-step="2">
-                        <div class="nav-grid-item-number">2</div>
-                        <div class="nav-grid-item-emoji">👤</div>
-                    </div>
-                    <div class="nav-grid-item disabled" data-step="3">
-                        <div class="nav-grid-item-number">3</div>
-                        <div class="nav-grid-item-emoji">☕</div>
-                    </div>
-                    <div class="nav-grid-item disabled" data-step="4">
-                        <div class="nav-grid-item-number">4</div>
-                        <div class="nav-grid-item-emoji">💭</div>
-                    </div>
-                    <div class="nav-grid-item disabled" data-step="5">
-                        <div class="nav-grid-item-number">5</div>
-                        <div class="nav-grid-item-emoji">⏰</div>
-                    </div>
-                    <div class="nav-grid-item disabled" data-step="6">
-                        <div class="nav-grid-item-number">6</div>
-                        <div class="nav-grid-item-emoji">✅</div>
-                    </div>
-                </div>
-                <div class="nav-buttons">
-                    <button class="nav-button back" disabled>${translations[currentLang].buttons.back}</button>
-                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
-                </div>
-            </div>
         </div>
 
         <!-- Step 2: Name -->
@@ -985,9 +953,6 @@
                 <h2>Enter Your Name</h2>
                 <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15" aria-label="Enter your name">
                 <div class="error-message" id="nameError"></div>
-            </div>
-            <div class="navigation">
-                <button class="nav-button" id="confirmName">Confirm</button>
             </div>
         </div>
         
@@ -1027,9 +992,6 @@
                     <p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>
                 </div>
             </div>
-            <div class="navigation">
-                <button class="nav-button" id="confirmStep2">Confirm</button>
-            </div>
         </div>
         
         <!-- New Step 4: Comment -->
@@ -1040,9 +1002,6 @@
                     <textarea class="comment-input" id="orderComment" placeholder="Enter any special requests or comments about your order (max 90 characters)" maxlength="90" aria-label="Order comments"></textarea>
                     <div class="word-count"><span id="charCount">0</span>/90 characters</div>
                 </div>
-            </div>
-            <div class="navigation">
-                <button class="nav-button" id="confirmStep3">Confirm</button>
             </div>
         </div>
         
@@ -1057,9 +1016,6 @@
                     <input type="range" class="time-slider" id="timeSlider" min="7.5" max="20" step="0.016666667" value="12" aria-label="Select pickup time">
                     <div class="time-display" id="timeDisplay">12:00</div>
                 </div>
-            </div>
-            <div class="navigation">
-                <button class="nav-button" id="confirmStep4">Confirm</button>
             </div>
         </div>
         
@@ -1083,9 +1039,6 @@
                         <span id="summaryTotal"></span>
                     </div>
                 </div>
-            </div>
-            <div class="navigation">
-                <button class="nav-button" id="confirmOrder">Confirm Order</button>
             </div>
         </div>
         
@@ -1894,7 +1847,10 @@
                     // Check if previous step was completed successfully
                     const isCompleted = checkStepCompletion(itemStep);
                     item.classList.add(isCompleted ? 'completed' : 'error');
-                } else {
+                } else if (itemStep === stepNumber + 1 && checkStepCompletion(stepNumber)) {
+                    // Enable next step if current step is completed
+                    item.classList.remove('disabled');
+                } else if (itemStep > stepNumber) {
                     item.classList.add('disabled');
                 }
             });
@@ -2323,30 +2279,15 @@
             // Grid item click handlers
             document.querySelectorAll('.nav-grid-item').forEach(item => {
                 item.addEventListener('click', function() {
-                    if (!this.classList.contains('disabled')) {
-                        const step = this.dataset.step;
+                    const step = this.dataset.step;
+                    const currentStep = document.querySelector('.step.active');
+                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
+                    const targetStepNumber = parseInt(step);
+
+                    // Only allow navigation to completed steps or the next available step
+                    if (!this.classList.contains('disabled') || 
+                        (targetStepNumber === currentStepNumber + 1 && checkStepCompletion(currentStepNumber))) {
                         navigateToStep(step);
-                    }
-                });
-            });
-
-            // Back/Next button handlers
-            document.querySelectorAll('.nav-button.back').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentStep = document.querySelector('.step.active');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    if (currentStepNumber > 1) {
-                        navigateToStep((currentStepNumber - 1).toString());
-                    }
-                });
-            });
-
-            document.querySelectorAll('.nav-button.next').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentStep = document.querySelector('.step.active');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    if (checkStepCompletion(currentStepNumber)) {
-                        navigateToStep((currentStepNumber + 1).toString());
                     }
                 });
             });
