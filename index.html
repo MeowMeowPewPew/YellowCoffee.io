@@ -699,6 +699,51 @@
             color: var(--secondary-color);
             font-weight: bold;
         }
+
+        .stage-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+
+        .stage-button {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            background: var(--secondary-bg);
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0.7;
+        }
+
+        .stage-button.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .stage-button:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .stage-button.completed {
+            border-color: #4CAF50;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -711,6 +756,15 @@
         </div>
         <div class="header">
             <h1 id="headerTitle">Place Your Order</h1>
+        </div>
+        
+        <div class="stage-indicators">
+            <button class="stage-button active" data-step="1">1 📍</button>
+            <button class="stage-button" data-step="2">2 👤</button>
+            <button class="stage-button" data-step="3">3 ☕</button>
+            <button class="stage-button" data-step="4">4 💭</button>
+            <button class="stage-button" data-step="5">5 ⏰</button>
+            <button class="stage-button" data-step="6">6 ✅</button>
         </div>
         
         <!-- Step 1: Location -->
@@ -1637,6 +1691,18 @@
                 return; // Can't proceed to summary without time
             }
 
+            // Update stage buttons
+            document.querySelectorAll('.stage-button').forEach(btn => {
+                const btnStep = parseInt(btn.dataset.step);
+                btn.classList.remove('active', 'completed');
+                
+                if (btnStep === targetStepNumber) {
+                    btn.classList.add('active');
+                } else if (btnStep < targetStepNumber) {
+                    btn.classList.add('completed');
+                }
+            });
+
             // Update tab buttons
             document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
                 btn.classList.remove('active');
@@ -2019,6 +2085,21 @@
                 
                 // Show selected menu
                 document.getElementById(`${menu}Menu`).style.display = 'grid';
+            });
+        });
+
+        // Add stage button handlers
+        document.querySelectorAll('.stage-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const step = this.dataset.step;
+                const currentStep = document.querySelector('.step.active');
+                const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
+                const targetStepNumber = parseInt(step);
+
+                // Only allow navigation to completed steps or the next step
+                if (targetStepNumber <= currentStepNumber + 1) {
+                    navigateToStep(step);
+                }
             });
         });
     </script>
