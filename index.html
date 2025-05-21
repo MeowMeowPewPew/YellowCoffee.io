@@ -714,7 +714,7 @@
         </div>
         
         <!-- Step 1: Location -->
-        <div class="step active" id="step1">
+        <div class="page" id="page1">
             <div class="welcome-section">
                 <div class="welcome-icon">☕</div>
                 <div class="welcome-title">Welcome to Yellow Coffee!</div>
@@ -738,22 +738,26 @@
                     </div>
                 </div>
             </div>
+            <div class="navigation">
+                <button class="nav-button" id="toNamePage">Next</button>
+            </div>
         </div>
 
         <!-- Step 2: Name -->
-        <div class="step" id="step2">
+        <div class="page" id="page2" style="display: none;">
             <div class="section">
                 <h2>Enter Your Name</h2>
                 <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15" aria-label="Enter your name">
                 <div class="error-message" id="nameError"></div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="confirmName">Confirm</button>
+                <button class="nav-button" id="backToLocation">Back</button>
+                <button class="nav-button" id="toMenuPage">Next</button>
             </div>
         </div>
         
         <!-- Step 3: Menu Selection -->
-        <div class="step" id="step3">
+        <div class="page" id="page3" style="display: none;">
             <div class="section">
                 <h2>Select Drinks & Food</h2>
                 <div class="tab-buttons">
@@ -789,12 +793,13 @@
                 </div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="confirmStep2">Confirm</button>
+                <button class="nav-button" id="backToName">Back</button>
+                <button class="nav-button" id="toCommentPage">Next</button>
             </div>
         </div>
         
-        <!-- New Step 4: Comment -->
-        <div class="step" id="step4">
+        <!-- Step 4: Comment -->
+        <div class="page" id="page4" style="display: none;">
             <div class="section">
                 <h2>Add Comments (Optional)</h2>
                 <div class="comment-section">
@@ -803,12 +808,13 @@
                 </div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="confirmStep3">Confirm</button>
+                <button class="nav-button" id="backToMenu">Back</button>
+                <button class="nav-button" id="toTimePage">Next</button>
             </div>
         </div>
         
-        <!-- Rename existing step4 to step5 -->
-        <div class="step" id="step5">
+        <!-- Step 5: Time -->
+        <div class="page" id="page5" style="display: none;">
             <div class="section">
                 <h2>Select Pickup Time</h2>
                 <div class="notification" id="shopClosedNotification" style="display: none;">
@@ -820,12 +826,13 @@
                 </div>
             </div>
             <div class="navigation">
-                <button class="nav-button" id="confirmStep4">Confirm</button>
+                <button class="nav-button" id="backToComment">Back</button>
+                <button class="nav-button" id="toSummaryPage">Next</button>
             </div>
         </div>
         
-        <!-- Rename existing step5 to step6 -->
-        <div class="step" id="step6">
+        <!-- Step 6: Summary -->
+        <div class="page" id="page6" style="display: none;">
             <div class="section">
                 <h2>Order Confirmation</h2>
                 <div class="order-summary">
@@ -846,12 +853,13 @@
                 </div>
             </div>
             <div class="navigation">
+                <button class="nav-button" id="backToTime">Back</button>
                 <button class="nav-button" id="confirmOrder">Confirm Order</button>
             </div>
         </div>
         
         <!-- Order Confirmed Screen -->
-        <div class="step" id="orderConfirmed" style="display: none;">
+        <div class="page" id="orderConfirmed" style="display: none;">
             <div class="section">
                 <div class="thank-you-message">Thank you for your order!</div>
                 <div class="order-number">
@@ -1357,33 +1365,6 @@
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
             });
-            
-            // Step navigation
-            document.querySelectorAll('.tab-button[data-step]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const step = this.dataset.step;
-                    navigateToStep(step);
-                });
-            });
-            
-            // Menu tabs
-            document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const menu = this.dataset.menu;
-                    document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    // Hide all menus
-                    document.querySelectorAll('.menu-grid').forEach(menu => {
-                        menu.style.display = 'none';
-                    });
-                    
-                    // Show selected menu
-                    document.getElementById(`${menu}Menu`).style.display = 'grid';
-                });
-            });
 
             // Add location selection handlers
             document.querySelectorAll('.location-option').forEach(option => {
@@ -1398,66 +1379,63 @@
                     
                     // Store selected location
                     orderData.location = this.dataset.location;
-
-                    // Smooth transition to name input
-                    setTimeout(() => {
-                        navigateToStep('2');
-                        const nameInput = document.getElementById('customerName');
-                        nameInput.focus();
-                    }, 300);
                 });
             });
 
-            // Add name confirmation handler
-            document.getElementById('confirmName').addEventListener('click', function() {
-                const nameInput = document.getElementById('customerName').value.trim();
-                const nameError = document.getElementById('nameError');
-                
-                if (nameInput.length === 0) {
-                    nameError.textContent = translations[currentLang].name.error;
+            // Navigation handlers
+            document.getElementById('toNamePage').addEventListener('click', function() {
+                if (!orderData.location) {
+                    alert(translations[currentLang].location.error || 'Please select a location');
                     return;
                 }
-                
-                nameError.textContent = '';
-                orderData.name = nameInput;
-                this.classList.add('completed');
-                navigateToStep('3');
+                showPage('page2');
             });
 
-            // Menu confirmation handler
-            document.getElementById('confirmStep2').addEventListener('click', function() {
-                if (orderData.items.length === 0) {
-                    // Show error message
-                    const summaryContainer = document.getElementById('selectionSummary');
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error || 'Please select at least one item'}</p>`;
+            document.getElementById('backToLocation').addEventListener('click', function() {
+                showPage('page1');
+            });
+
+            document.getElementById('toMenuPage').addEventListener('click', function() {
+                const nameInput = document.getElementById('customerName').value.trim();
+                if (nameInput.length === 0) {
+                    document.getElementById('nameError').textContent = translations[currentLang].name.error;
                     return;
                 }
-                this.classList.add('completed');
-                navigateToStep('4');
-                
-                // Add smooth scroll to comment section
-                setTimeout(() => {
-                    const commentSection = document.querySelector('#step4 .section');
-                    if (commentSection) {
-                        commentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 100);
+                orderData.name = nameInput;
+                showPage('page3');
             });
-            
-            // Comment confirmation handler
-            document.getElementById('confirmStep3').addEventListener('click', function() {
+
+            document.getElementById('backToName').addEventListener('click', function() {
+                showPage('page2');
+            });
+
+            document.getElementById('toCommentPage').addEventListener('click', function() {
+                if (orderData.items.length === 0) {
+                    const summaryContainer = document.getElementById('selectionSummary');
+                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
+                    return;
+                }
+                showPage('page4');
+            });
+
+            document.getElementById('backToMenu').addEventListener('click', function() {
+                showPage('page3');
+            });
+
+            document.getElementById('toTimePage').addEventListener('click', function() {
                 orderData.comment = document.getElementById('orderComment').value.trim();
-                this.classList.add('completed');
-                navigateToStep('5');
+                showPage('page5');
             });
-            
-            // Time confirmation handler
-            document.getElementById('confirmStep4').addEventListener('click', function() {
+
+            document.getElementById('backToComment').addEventListener('click', function() {
+                showPage('page4');
+            });
+
+            document.getElementById('toSummaryPage').addEventListener('click', function() {
                 const currentHour = new Date().getHours();
                 const currentMinutes = new Date().getMinutes();
                 const currentTime = currentHour + (currentMinutes / 60);
                 const selectedTime = parseFloat(timeSlider.value);
-                const timeSelector = document.querySelector('.time-selector');
                 
                 if (currentTime >= 20 || currentTime < 7.5) {
                     showShopClosedNotification();
@@ -1465,31 +1443,18 @@
                 }
 
                 if (selectedTime < currentTime) {
-                    // Show error message
-                    let errorMessage = timeSelector.querySelector('.time-error');
-                    if (!errorMessage) {
-                        errorMessage = document.createElement('div');
-                        errorMessage.className = 'time-error';
-                        errorMessage.style.color = '#e74c3c';
-                        errorMessage.style.marginTop = '10px';
-                        errorMessage.style.textAlign = 'center';
-                        timeSelector.appendChild(errorMessage);
-                    }
-                    errorMessage.textContent = translations[currentLang].time.error;
+                    alert(translations[currentLang].time.error);
                     return;
                 }
 
-                // Clear any error message
-                const errorMessage = timeSelector.querySelector('.time-error');
-                if (errorMessage) {
-                    errorMessage.remove();
-                }
-
                 generateOrderSummary();
-                this.classList.add('completed');
-                navigateToStep('6');
+                showPage('page6');
             });
-            
+
+            document.getElementById('backToTime').addEventListener('click', function() {
+                showPage('page5');
+            });
+
             // Final order confirmation handler
             document.getElementById('confirmOrder').addEventListener('click', async function() {
                 // Validate all required data
@@ -1522,12 +1487,8 @@
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
                 
-                // Hide all steps and show confirmation screen
-                document.querySelectorAll('.step').forEach(step => {
-                    step.classList.remove('active');
-                });
-                const orderConfirmed = document.getElementById('orderConfirmed');
-                orderConfirmed.style.display = 'block';
+                // Show confirmation screen
+                showPage('orderConfirmed');
                 
                 // Format the order message
                 const orderMessage = formatOrderMessage(orderNumber, orderData);
@@ -1549,112 +1510,29 @@
                 if (currentUserId) {
                     await sendTelegramMessage(currentUserId, orderMessage);
                 }
-
-                // Scroll to order number after a short delay
-                setTimeout(() => {
-                    const orderNumberElement = document.getElementById('orderNumber');
-                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
             });
-            
-            // Add error display function
-            function showError(step) {
-                const errorMessages = {
-                    location: translations[currentLang].location.error || 'Please select a location',
-                    name: translations[currentLang].name.error || 'Please enter your name',
-                    menu: translations[currentLang].menu.error || 'Please select at least one item',
-                    time: translations[currentLang].time.error || 'Please select a valid time'
-                };
-
-                const errorMessage = errorMessages[step];
-                const summaryContainer = document.getElementById('summaryItems');
-                if (summaryContainer) {
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c; text-align: center; padding: 10px;">${errorMessage}</p>`;
-                }
-            }
             
             // New Order Button
             document.getElementById('newOrderButton').addEventListener('click', function() {
                 resetOrderData();
-                navigateToStep('1');
-            });
-
-            // Add step navigation buttons
-            document.querySelectorAll('.nav-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentStep = document.querySelector('.step.active');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    const nextStepNumber = currentStepNumber + 1;
-                    
-                    // Validate current step before proceeding
-                    if (currentStepNumber === 1 && !orderData.location) {
-                        return;
-                    }
-                    if (currentStepNumber === 2 && !orderData.name) {
-                        const nameInput = document.getElementById('customerName').value.trim();
-                        if (nameInput.length === 0) {
-                            document.getElementById('nameError').textContent = translations[currentLang].name.error;
-                            return;
-                        }
-                    }
-                    if (currentStepNumber === 3 && orderData.items.length === 0) {
-                        const summaryContainer = document.getElementById('selectionSummary');
-                        summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
-                        return;
-                    }
-                    
-                    navigateToStep(nextStepNumber.toString());
-                });
+                showPage('page1');
             });
         }
-        
-        // Navigate to specific step
-        function navigateToStep(step) {
-            // Validate previous steps
-            const currentStep = document.querySelector('.step.active');
-            const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
-            const targetStepNumber = parseInt(step);
 
-            // Check if trying to skip steps
-            if (targetStepNumber > currentStepNumber + 1) {
-                return; // Don't allow skipping steps
-            }
-
-            // Validate required data for each step
-            if (targetStepNumber === 2 && !orderData.location) {
-                return; // Can't proceed to name without location
-            }
-            if (targetStepNumber === 3 && !orderData.name) {
-                return; // Can't proceed to menu without name
-            }
-            if (targetStepNumber === 4 && orderData.items.length === 0) {
-                return; // Can't proceed to comment without items
-            }
-            if (targetStepNumber === 5 && !orderData.comment) {
-                // Comment is optional, but we still need to set it
-                orderData.comment = '';
-            }
-            if (targetStepNumber === 6 && !orderData.time) {
-                return; // Can't proceed to summary without time
-            }
-
-            // Update tab buttons
-            document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
-                btn.classList.remove('active');
+        // Show specific page and hide others
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
             });
-            document.querySelector(`.tab-button[data-step="${step}"]`)?.classList.add('active');
             
-            // Update visible step
-            document.querySelectorAll('.step').forEach(s => {
-                s.classList.remove('active');
-            });
-            const nextStep = document.getElementById(`step${step}`);
-            nextStep.classList.add('active');
+            // Show requested page
+            document.getElementById(pageId).style.display = 'block';
             
-            // Smooth scroll to the top of the next step
-            nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Scroll to top
+            window.scrollTo(0, 0);
         }
-        
+
         // Add notification functions
         function showShopClosedNotification() {
             const notification = document.getElementById('shopClosedNotification');
