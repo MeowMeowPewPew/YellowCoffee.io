@@ -470,15 +470,14 @@
 
         .nav-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 4px;
             margin: 8px auto;
             padding: 4px;
             background: var(--secondary-bg);
             border-radius: var(--border-radius);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 200px;
+            max-width: 400px;
         }
 
         .nav-grid-item {
@@ -557,13 +556,14 @@
 
         .nav-buttons {
             display: flex;
-            gap: 4px;
+            gap: 8px;
+            margin-top: 8px;
         }
 
         .nav-button {
             flex: 1;
-            padding: 8px;
-            font-size: 12px;
+            padding: 12px;
+            font-size: 14px;
             border-radius: 8px;
         }
 
@@ -945,6 +945,12 @@
                     </div>
                 </div>
             </div>
+            <div class="navigation">
+                <div class="nav-buttons">
+                    <button class="nav-button back" disabled>${translations[currentLang].buttons.back}</button>
+                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
+                </div>
+            </div>
         </div>
 
         <!-- Step 2: Name -->
@@ -953,6 +959,12 @@
                 <h2>Enter Your Name</h2>
                 <input type="text" class="input" id="customerName" placeholder="Your name (max 15 letters)" maxlength="15" aria-label="Enter your name">
                 <div class="error-message" id="nameError"></div>
+            </div>
+            <div class="navigation">
+                <div class="nav-buttons">
+                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
+                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
+                </div>
             </div>
         </div>
         
@@ -992,6 +1004,12 @@
                     <p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>
                 </div>
             </div>
+            <div class="navigation">
+                <div class="nav-buttons">
+                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
+                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
+                </div>
+            </div>
         </div>
         
         <!-- New Step 4: Comment -->
@@ -1001,6 +1019,12 @@
                 <div class="comment-section">
                     <textarea class="comment-input" id="orderComment" placeholder="Enter any special requests or comments about your order (max 90 characters)" maxlength="90" aria-label="Order comments"></textarea>
                     <div class="word-count"><span id="charCount">0</span>/90 characters</div>
+                </div>
+            </div>
+            <div class="navigation">
+                <div class="nav-buttons">
+                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
+                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
                 </div>
             </div>
         </div>
@@ -1015,6 +1039,12 @@
                 <div class="time-selector">
                     <input type="range" class="time-slider" id="timeSlider" min="7.5" max="20" step="0.016666667" value="12" aria-label="Select pickup time">
                     <div class="time-display" id="timeDisplay">12:00</div>
+                </div>
+            </div>
+            <div class="navigation">
+                <div class="nav-buttons">
+                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
+                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
                 </div>
             </div>
         </div>
@@ -1038,6 +1068,12 @@
                         <span><strong>Total:</strong></span>
                         <span id="summaryTotal"></span>
                     </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <div class="nav-buttons">
+                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
+                    <button class="nav-button next">${translations[currentLang].buttons.confirm}</button>
                 </div>
             </div>
         </div>
@@ -2288,6 +2324,27 @@
                     if (!this.classList.contains('disabled') || 
                         (targetStepNumber === currentStepNumber + 1 && checkStepCompletion(currentStepNumber))) {
                         navigateToStep(step);
+                    }
+                });
+            });
+
+            // Back/Next button handlers
+            document.querySelectorAll('.nav-button.back').forEach(button => {
+                button.addEventListener('click', function() {
+                    const currentStep = document.querySelector('.step.active');
+                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
+                    if (currentStepNumber > 1) {
+                        navigateToStep((currentStepNumber - 1).toString());
+                    }
+                });
+            });
+
+            document.querySelectorAll('.nav-button.next').forEach(button => {
+                button.addEventListener('click', function() {
+                    const currentStep = document.querySelector('.step.active');
+                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
+                    if (checkStepCompletion(currentStepNumber)) {
+                        navigateToStep((currentStepNumber + 1).toString());
                     }
                 });
             });
