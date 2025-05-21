@@ -1549,7 +1549,6 @@
         // Initialize function
         function init() {
             populateMenus();
-            initNavigation();
             
             // Set initial language to Russian
             currentLang = 'ru';
@@ -1627,30 +1626,31 @@
                 }
             });
 
-            // Initialize navigation buttons
-            document.querySelectorAll('.nav-button.next').forEach(button => {
+            // Initialize navigation
+            initNavigation();
+        }
+
+        // Initialize navigation
+        function initNavigation() {
+            // Add click handlers for navigation buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
                 button.addEventListener('click', function() {
                     const currentStep = this.closest('.step');
                     const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    const nextStepNumber = currentStepNumber + 1;
                     
-                    if (checkStepCompletion(currentStepNumber)) {
-                        navigateToStep(nextStepNumber.toString());
+                    if (this.classList.contains('next')) {
+                        if (checkStepCompletion(currentStepNumber)) {
+                            navigateToStep((currentStepNumber + 1).toString());
+                        }
+                    } else if (this.classList.contains('back')) {
+                        if (currentStepNumber > 1) {
+                            navigateToStep((currentStepNumber - 1).toString());
+                        }
                     }
                 });
             });
 
-            document.querySelectorAll('.nav-button.back').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentStep = this.closest('.step');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    if (currentStepNumber > 1) {
-                        navigateToStep((currentStepNumber - 1).toString());
-                    }
-                });
-            });
-
-            // Initialize navigation grid items
+            // Add click handlers for navigation grid items
             document.querySelectorAll('.nav-grid-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const step = this.dataset.step;
@@ -1658,7 +1658,6 @@
                     const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
                     const targetStepNumber = parseInt(step);
 
-                    // Only allow navigation to completed steps or the next available step
                     if (!this.classList.contains('disabled') || 
                         (targetStepNumber === currentStepNumber + 1 && checkStepCompletion(currentStepNumber))) {
                         navigateToStep(step);
@@ -1666,31 +1665,29 @@
                 });
             });
         }
-        
+
         // Navigate to specific step
         function navigateToStep(step) {
-            // Validate previous steps
             const currentStep = document.querySelector('.step.active');
             const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
             const targetStepNumber = parseInt(step);
 
-            // Check if trying to skip steps
+            // Don't allow skipping steps
             if (targetStepNumber > currentStepNumber + 1) {
-                return; // Don't allow skipping steps
+                return;
             }
 
-            // Add transition class based on direction
+            // Hide current step
             if (currentStep) {
-                currentStep.classList.add(targetStepNumber > currentStepNumber ? 'previous' : 'next');
+                currentStep.classList.remove('active');
             }
 
-            // Update visible step
-            document.querySelectorAll('.step').forEach(s => {
-                s.classList.remove('active', 'previous', 'next');
-            });
-            const nextStep = document.getElementById(`step${step}`);
-            nextStep.classList.add('active');
-            
+            // Show target step
+            const targetStep = document.getElementById(`step${step}`);
+            if (targetStep) {
+                targetStep.classList.add('active');
+            }
+
             // Update navigation state
             updateNavigationState(step);
             
@@ -1710,29 +1707,31 @@
                 if (itemStep === stepNumber) {
                     item.classList.add('active');
                 } else if (itemStep < stepNumber) {
-                    // Check if previous step was completed successfully
                     const isCompleted = checkStepCompletion(itemStep);
                     item.classList.add(isCompleted ? 'completed' : 'error');
                 } else if (itemStep === stepNumber + 1 && checkStepCompletion(stepNumber)) {
-                    // Enable next step if current step is completed
                     item.classList.remove('disabled');
                 } else if (itemStep > stepNumber) {
                     item.classList.add('disabled');
                 }
             });
 
-            // Update back/next buttons
-            const backButton = document.querySelector('.nav-button.back');
-            const nextButton = document.querySelector('.nav-button.next');
-            
-            backButton.disabled = stepNumber === 1;
-            nextButton.disabled = !checkStepCompletion(stepNumber);
-
-            // Update button text based on step
-            if (stepNumber === 6) {
-                nextButton.textContent = translations[currentLang].buttons.confirm;
-            } else {
-                nextButton.textContent = translations[currentLang].buttons.next;
+            // Update buttons for current step
+            const currentStepElement = document.getElementById(`step${stepNumber}`);
+            if (currentStepElement) {
+                const backButton = currentStepElement.querySelector('.nav-button.back');
+                const nextButton = currentStepElement.querySelector('.nav-button.next');
+                
+                if (backButton) {
+                    backButton.disabled = stepNumber === 1;
+                }
+                
+                if (nextButton) {
+                    nextButton.disabled = !checkStepCompletion(stepNumber);
+                    nextButton.textContent = stepNumber === 6 ? 
+                        translations[currentLang].buttons.confirm : 
+                        translations[currentLang].buttons.next;
+                }
             }
         }
 
@@ -2138,46 +2137,6 @@
                 default:
                     return false;
             }
-        }
-
-        // Update navigation event listeners
-        function initNavigation() {
-            // Grid item click handlers
-            document.querySelectorAll('.nav-grid-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const step = this.dataset.step;
-                    const currentStep = document.querySelector('.step.active');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    const targetStepNumber = parseInt(step);
-
-                    // Only allow navigation to completed steps or the next available step
-                    if (!this.classList.contains('disabled') || 
-                        (targetStepNumber === currentStepNumber + 1 && checkStepCompletion(currentStepNumber))) {
-                        navigateToStep(step);
-                    }
-                });
-            });
-
-            // Back/Next button handlers
-            document.querySelectorAll('.nav-button.back').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentStep = document.querySelector('.step.active');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    if (currentStepNumber > 1) {
-                        navigateToStep((currentStepNumber - 1).toString());
-                    }
-                });
-            });
-
-            document.querySelectorAll('.nav-button.next').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentStep = document.querySelector('.step.active');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    if (checkStepCompletion(currentStepNumber)) {
-                        navigateToStep((currentStepNumber + 1).toString());
-                    }
-                });
-            });
         }
     </script>
 </body>
