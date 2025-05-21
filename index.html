@@ -923,7 +923,6 @@
         <!-- Step 1: Location -->
         <div class="step active" id="step1">
             <div class="welcome-section">
-                <div class="welcome-icon">☕</div>
                 <div class="welcome-title">Welcome to Yellow Coffee!</div>
                 <div class="welcome-text">
                     We're excited to serve you today! Please select your preferred location to start your order.<br>
@@ -1606,6 +1605,9 @@
                     if (nextButton) {
                         nextButton.disabled = false;
                     }
+
+                    // Update navigation state
+                    updateNavigationState('1');
                 });
             });
 
