@@ -458,12 +458,13 @@
         }
 
         .navigation {
-            position: sticky;
+            position: fixed;
             bottom: 0;
+            left: 0;
+            right: 0;
             background: var(--bg-color);
-            padding: 16px;
-            margin-top: 20px;
-            box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+            padding: 8px;
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
             z-index: 100;
         }
 
@@ -471,77 +472,117 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 4px;
+            margin-bottom: 8px;
         }
 
         .nav-grid-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px;
-            border-radius: var(--border-radius);
+            padding: 4px;
+            border-radius: 8px;
             background: var(--secondary-bg);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
-        }
-
-        .nav-grid-item.completed {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-        }
-
-        .nav-grid-item.error {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-        }
-
-        .nav-grid-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            font-size: 12px;
         }
 
         .nav-grid-item-number {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .nav-grid-item-label {
-            font-size: 12px;
+            font-size: 10px;
             text-align: center;
+            line-height: 1.1;
         }
 
         .nav-buttons {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 4px;
         }
 
         .nav-button {
             flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
+            padding: 8px;
+            font-size: 12px;
+            border-radius: 8px;
         }
 
-        .nav-button.back {
-            background: var(--secondary-bg);
-            color: var(--text-color);
+        /* Page transition styles */
+        .step {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform: translateX(100%);
         }
 
-        .nav-button.next {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
+        .step.active {
+            position: relative;
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
         }
 
-        .nav-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .step.previous {
+            transform: translateX(-100%);
+        }
+
+        .container {
+            position: relative;
+            padding-bottom: 120px; /* Add space for fixed navigation */
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Adjust section margins for better spacing */
+        .section {
+            margin-bottom: 12px;
+        }
+
+        /* Make menu items more compact */
+        .menu-grid {
+            gap: 8px;
+        }
+
+        .menu-item {
+            padding: 8px;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .menu-name {
+            font-size: 12px;
+            min-height: 28px;
+        }
+
+        .menu-price {
+            font-size: 12px;
+        }
+
+        .quantity-controls {
+            margin-top: 8px;
+            gap: 8px;
+        }
+
+        .quantity-btn {
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+        }
+
+        .quantity-display {
+            font-size: 14px;
         }
 
         .welcome-section {
@@ -759,6 +800,31 @@
         .selection-item-price {
             color: var(--secondary-color);
             font-weight: bold;
+        }
+
+        .nav-grid-item.completed {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+        .nav-grid-item.error {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        .nav-grid-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .nav-button.back {
+            background: var(--secondary-bg);
+            color: var(--text-color);
+        }
+        .nav-button.next {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -1714,41 +1780,60 @@
                 return; // Don't allow skipping steps
             }
 
-            // Validate required data for each step
-            if (targetStepNumber === 2 && !orderData.location) {
-                return; // Can't proceed to name without location
-            }
-            if (targetStepNumber === 3 && !orderData.name) {
-                return; // Can't proceed to menu without name
-            }
-            if (targetStepNumber === 4 && orderData.items.length === 0) {
-                return; // Can't proceed to comment without items
-            }
-            if (targetStepNumber === 5 && !orderData.comment) {
-                // Comment is optional, but we still need to set it
-                orderData.comment = '';
-            }
-            if (targetStepNumber === 6 && !orderData.time) {
-                return; // Can't proceed to summary without time
+            // Add transition class based on direction
+            if (currentStep) {
+                currentStep.classList.add(targetStepNumber > currentStepNumber ? 'previous' : 'next');
             }
 
-            // Update tab buttons
-            document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`.tab-button[data-step="${step}"]`)?.classList.add('active');
-            
             // Update visible step
             document.querySelectorAll('.step').forEach(s => {
-                s.classList.remove('active');
+                s.classList.remove('active', 'previous', 'next');
             });
             const nextStep = document.getElementById(`step${step}`);
             nextStep.classList.add('active');
             
-            // Smooth scroll to the top of the next step
-            nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Update navigation state
+            updateNavigationState(step);
+            
+            // Reset scroll position
+            window.scrollTo(0, 0);
         }
-        
+
+        // Update navigation state
+        function updateNavigationState(currentStep) {
+            const stepNumber = parseInt(currentStep);
+            
+            // Update grid items
+            document.querySelectorAll('.nav-grid-item').forEach(item => {
+                const itemStep = parseInt(item.dataset.step);
+                item.classList.remove('active', 'completed', 'error', 'disabled');
+                
+                if (itemStep === stepNumber) {
+                    item.classList.add('active');
+                } else if (itemStep < stepNumber) {
+                    // Check if previous step was completed successfully
+                    const isCompleted = checkStepCompletion(itemStep);
+                    item.classList.add(isCompleted ? 'completed' : 'error');
+                } else {
+                    item.classList.add('disabled');
+                }
+            });
+
+            // Update back/next buttons
+            const backButton = document.querySelector('.nav-button.back');
+            const nextButton = document.querySelector('.nav-button.next');
+            
+            backButton.disabled = stepNumber === 1;
+            nextButton.disabled = !checkStepCompletion(stepNumber);
+
+            // Update button text based on step
+            if (stepNumber === 6) {
+                nextButton.textContent = translations[currentLang].buttons.confirm;
+            } else {
+                nextButton.textContent = translations[currentLang].buttons.next;
+            }
+        }
+
         // Add notification functions
         function showShopClosedNotification() {
             const notification = document.getElementById('shopClosedNotification');
@@ -2133,34 +2218,6 @@
             next: "Далее"
         };
 
-        // Update navigation state
-        function updateNavigationState(currentStep) {
-            const stepNumber = parseInt(currentStep);
-            
-            // Update grid items
-            document.querySelectorAll('.nav-grid-item').forEach(item => {
-                const itemStep = parseInt(item.dataset.step);
-                item.classList.remove('active', 'completed', 'error', 'disabled');
-                
-                if (itemStep === stepNumber) {
-                    item.classList.add('active');
-                } else if (itemStep < stepNumber) {
-                    // Check if previous step was completed successfully
-                    const isCompleted = checkStepCompletion(itemStep);
-                    item.classList.add(isCompleted ? 'completed' : 'error');
-                } else {
-                    item.classList.add('disabled');
-                }
-            });
-
-            // Update back/next buttons
-            const backButton = document.querySelector('.nav-button.back');
-            const nextButton = document.querySelector('.nav-button.next');
-            
-            backButton.disabled = stepNumber === 1;
-            nextButton.disabled = !checkStepCompletion(stepNumber);
-        }
-
         // Check if a step is completed successfully
         function checkStepCompletion(step) {
             switch(step) {
@@ -2211,322 +2268,6 @@
                     if (checkStepCompletion(currentStepNumber)) {
                         navigateToStep((currentStepNumber + 1).toString());
                     }
-                });
-            });
-        }
-
-        // Update navigateToStep function
-        function navigateToStep(step) {
-            // Validate previous steps
-            const currentStep = document.querySelector('.step.active');
-            const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
-            const targetStepNumber = parseInt(step);
-
-            // Check if trying to skip steps
-            if (targetStepNumber > currentStepNumber + 1) {
-                return; // Don't allow skipping steps
-            }
-
-            // Update visible step
-            document.querySelectorAll('.step').forEach(s => {
-                s.classList.remove('active');
-            });
-            const nextStep = document.getElementById(`step${step}`);
-            nextStep.classList.add('active');
-            
-            // Update navigation state
-            updateNavigationState(step);
-            
-            // Smooth scroll to the top of the next step
-            nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        // Update init function
-        function init() {
-            populateMenus();
-            initNavigation();
-            
-            // Set initial language to Russian
-            currentLang = 'ru';
-            switchLanguage('ru');
-            
-            // Set initial time to current time + 10 minutes
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + 10);
-            let currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-            
-            // Calculate minimum time (current time + 10 minutes)
-            const minTime = currentHour + (currentMinute / 60);
-            
-            // Update time slider and display
-            const timeSlider = document.getElementById('timeSlider');
-            const timeDisplay = document.getElementById('timeDisplay');
-            
-            // Set minimum value to max of 7:30 or current time + 10 minutes
-            timeSlider.min = Math.max(7.5, minTime);
-            timeSlider.max = 20; // Shop closes at 20:00
-            
-            // Set initial value to current time + 10 minutes
-            const sliderValue = Math.max(7.5, minTime);
-            timeSlider.value = sliderValue;
-            timeDisplay.textContent = formatTime(sliderValue);
-            orderData.time = formatTime(sliderValue);
-            
-            // Time slider event listener
-            timeSlider.addEventListener('input', function() {
-                const value = parseFloat(this.value);
-                const timeString = formatTime(value);
-                timeDisplay.textContent = timeString;
-                orderData.time = timeString;
-            });
-            
-            // Step navigation
-            document.querySelectorAll('.tab-button[data-step]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const step = this.dataset.step;
-                    navigateToStep(step);
-                });
-            });
-            
-            // Menu tabs
-            document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const menu = this.dataset.menu;
-                    document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    // Hide all menus
-                    document.querySelectorAll('.menu-grid').forEach(menu => {
-                        menu.style.display = 'none';
-                    });
-                    
-                    // Show selected menu
-                    document.getElementById(`${menu}Menu`).style.display = 'grid';
-                });
-            });
-            
-            // Add location selection handlers
-            document.querySelectorAll('.location-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options
-                    document.querySelectorAll('.location-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                    
-                    // Store selected location
-                    orderData.location = this.dataset.location;
-
-                    // Smooth transition to name input
-                    setTimeout(() => {
-                        navigateToStep('2');
-                        const nameInput = document.getElementById('customerName');
-                        nameInput.focus();
-                    }, 300);
-                });
-            });
-
-            // Add name confirmation handler
-            document.getElementById('confirmName').addEventListener('click', function() {
-                const nameInput = document.getElementById('customerName').value.trim();
-                const nameError = document.getElementById('nameError');
-                
-                if (nameInput.length === 0) {
-                    nameError.textContent = translations[currentLang].name.error;
-                    return;
-                }
-                
-                nameError.textContent = '';
-                orderData.name = nameInput;
-                this.classList.add('completed');
-                navigateToStep('3');
-            });
-
-            // Menu confirmation handler
-            document.getElementById('confirmStep2').addEventListener('click', function() {
-                if (orderData.items.length === 0) {
-                    // Show error message
-                    const summaryContainer = document.getElementById('selectionSummary');
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error || 'Please select at least one item'}</p>`;
-                    return;
-                }
-                this.classList.add('completed');
-                navigateToStep('4');
-                
-                // Add smooth scroll to comment section
-                setTimeout(() => {
-                    const commentSection = document.querySelector('#step4 .section');
-                    if (commentSection) {
-                        commentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 100);
-            });
-            
-            // Comment confirmation handler
-            document.getElementById('confirmStep3').addEventListener('click', function() {
-                orderData.comment = document.getElementById('orderComment').value.trim();
-                this.classList.add('completed');
-                navigateToStep('5');
-            });
-            
-            // Time confirmation handler
-            document.getElementById('confirmStep4').addEventListener('click', function() {
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                const selectedTime = parseFloat(timeSlider.value);
-                const timeSelector = document.querySelector('.time-selector');
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-
-                if (selectedTime < currentTime) {
-                    // Show error message
-                    let errorMessage = timeSelector.querySelector('.time-error');
-                    if (!errorMessage) {
-                        errorMessage = document.createElement('div');
-                        errorMessage.className = 'time-error';
-                        errorMessage.style.color = '#e74c3c';
-                        errorMessage.style.marginTop = '10px';
-                        errorMessage.style.textAlign = 'center';
-                        timeSelector.appendChild(errorMessage);
-                    }
-                    errorMessage.textContent = translations[currentLang].time.error;
-                    return;
-                }
-
-                // Clear any error message
-                const errorMessage = timeSelector.querySelector('.time-error');
-                if (errorMessage) {
-                    errorMessage.remove();
-                }
-
-                generateOrderSummary();
-                this.classList.add('completed');
-                navigateToStep('6');
-            });
-            
-            // Final order confirmation handler
-            document.getElementById('confirmOrder').addEventListener('click', async function() {
-                // Validate all required data
-                if (!orderData.location) {
-                    showError('location');
-                    return;
-                }
-                if (!orderData.name) {
-                    showError('name');
-                    return;
-                }
-                if (orderData.items.length === 0) {
-                    showError('menu');
-                    return;
-                }
-                if (!orderData.time) {
-                    showError('time');
-                    return;
-                }
-
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-                
-                const orderNumber = generateOrderNumber();
-                document.getElementById('orderNumber').textContent = orderNumber;
-                
-                // Hide all steps and show confirmation screen
-                document.querySelectorAll('.step').forEach(step => {
-                    step.classList.remove('active');
-                });
-                const orderConfirmed = document.getElementById('orderConfirmed');
-                orderConfirmed.style.display = 'block';
-                
-                // Format the order message
-                const orderMessage = formatOrderMessage(orderNumber, orderData);
-                
-                // List of all kitchen bot users who should receive the message
-                const kitchenBotUsers = [
-                    "517070445", // Main kitchen bot user
-                    "261442211", // Additional kitchen bot user
-                    "1057756574", // New kitchen bot user
-                    "-1002152072922", // Group chat
-                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
-                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
-                ];
-                
-                // Send to all kitchen bot users
-                await sendTelegramMessage(kitchenBotUsers, orderMessage);
-                
-                // Send to order creator if we have their ID
-                if (currentUserId) {
-                    await sendTelegramMessage(currentUserId, orderMessage);
-                }
-
-                // Scroll to order number after a short delay
-                setTimeout(() => {
-                    const orderNumberElement = document.getElementById('orderNumber');
-                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-            });
-            
-            // Add error display function
-            function showError(step) {
-                const errorMessages = {
-                    location: translations[currentLang].location.error || 'Please select a location',
-                    name: translations[currentLang].name.error || 'Please enter your name',
-                    menu: translations[currentLang].menu.error || 'Please select at least one item',
-                    time: translations[currentLang].time.error || 'Please select a valid time'
-                };
-
-                const errorMessage = errorMessages[step];
-                const summaryContainer = document.getElementById('summaryItems');
-                if (summaryContainer) {
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c; text-align: center; padding: 10px;">${errorMessage}</p>`;
-                }
-            }
-            
-            // New Order Button
-            document.getElementById('newOrderButton').addEventListener('click', function() {
-                resetOrderData();
-                navigateToStep('1');
-            });
-
-            // Add step navigation buttons
-            document.querySelectorAll('.nav-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentStep = document.querySelector('.step.active');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    const nextStepNumber = currentStepNumber + 1;
-                    
-                    // Validate current step before proceeding
-                    if (currentStepNumber === 1 && !orderData.location) {
-                        return;
-                    }
-                    if (currentStepNumber === 2 && !orderData.name) {
-                        const nameInput = document.getElementById('customerName').value.trim();
-                        if (nameInput.length === 0) {
-                            document.getElementById('nameError').textContent = translations[currentLang].name.error;
-                            return;
-                        }
-                    }
-                    if (currentStepNumber === 3 && orderData.items.length === 0) {
-                        const summaryContainer = document.getElementById('selectionSummary');
-                        summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
-                        return;
-                    }
-                    
-                    navigateToStep(nextStepNumber.toString());
                 });
             });
         }
