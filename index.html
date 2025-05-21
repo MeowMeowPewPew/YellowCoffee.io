@@ -30,6 +30,7 @@
             max-width: 100%;
             padding: 16px;
             animation: fadeIn 0.5s ease;
+            padding-bottom: 80px; /* Add space for fixed navigation */
         }
 
         @keyframes fadeIn {
@@ -558,6 +559,7 @@
             display: flex;
             gap: 8px;
             margin-top: 8px;
+            padding: 0 16px;
         }
 
         .nav-button {
@@ -569,13 +571,9 @@
 
         /* Page transition styles */
         .step {
-            position: absolute;
+            position: relative;
             width: 100%;
-            left: 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            transform: translateX(100%);
+            margin-bottom: 60px; /* Add space for navigation buttons */
         }
 
         .step.active {
@@ -672,7 +670,7 @@
         }
 
         .location-section {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .location-options {
@@ -680,6 +678,7 @@
             grid-template-columns: 1fr;
             gap: 10px;
             margin-top: 12px;
+            margin-bottom: 60px; /* Add space for navigation buttons */
         }
 
         .location-option {
@@ -690,6 +689,7 @@
             cursor: pointer;
             transition: var(--transition);
             position: relative;
+            margin-bottom: 8px;
         }
 
         .location-option:hover {
