@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food & Drink Order Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -30,7 +30,6 @@
             max-width: 100%;
             padding: 16px;
             animation: fadeIn 0.5s ease;
-            padding-bottom: 80px; /* Add space for fixed navigation */
         }
 
         @keyframes fadeIn {
@@ -40,14 +39,14 @@
 
         .header {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 24px;
             position: relative;
         }
 
         .header h1 {
-            font-size: 1.2em;
+            font-size: 2em;
             margin: 0;
-            padding: 4px;
+            padding: 10px;
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -380,12 +379,12 @@
             .tab-buttons {
                 gap: 4px;
                 padding: 4px;
-            }
+        }
 
             .tab-button {
                 padding: 10px;
                 font-size: 13px;
-            }
+        }
         }
 
         .order-summary {
@@ -459,237 +458,82 @@
         }
 
         .navigation {
-            position: fixed;
+            position: sticky;
             bottom: 0;
-            left: 0;
-            right: 0;
             background: var(--bg-color);
-            padding: 8px;
-            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+            padding: 16px;
+            margin-top: 20px;
+            box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
             z-index: 100;
         }
 
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 4px;
-            margin: 4px auto;
-            padding: 4px;
-            background: var(--secondary-bg);
+        .nav-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: #FFFFFF;
+            border: none;
             border-radius: var(--border-radius);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 400px;
-        }
-
-        .nav-grid-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 3px;
-            border-radius: 6px;
-            background: var(--bg-color);
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
+            width: 100%;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
             transition: var(--transition);
             position: relative;
-            aspect-ratio: 1;
-        }
-
-        .nav-grid-item-number {
-            position: absolute;
-            top: 1px;
-            left: 1px;
-            font-size: 9px;
-            font-weight: bold;
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        .nav-grid-item-emoji {
-            font-size: 16px;
-            line-height: 1;
-        }
-
-        .nav-grid-item.active {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            transform: scale(1.05);
-        }
-
-        .nav-grid-item.active .nav-grid-item-number,
-        .nav-grid-item.active .nav-grid-item-emoji {
-            color: white;
-            opacity: 1;
-        }
-
-        .nav-grid-item.completed {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-        }
-
-        .nav-grid-item.completed .nav-grid-item-number,
-        .nav-grid-item.completed .nav-grid-item-emoji {
-            color: white;
-            opacity: 1;
-        }
-
-        .nav-grid-item.error {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-        }
-
-        .nav-grid-item.error .nav-grid-item-number,
-        .nav-grid-item.error .nav-grid-item-emoji {
-            color: white;
-            opacity: 1;
-        }
-
-        .nav-grid-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .nav-grid-item:hover:not(.disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .nav-grid-item.active:hover {
-            transform: scale(1.05) translateY(-2px);
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 0 16px;
-        }
-
-        .nav-button {
-            flex: 1;
-            padding: 12px;
-            font-size: 14px;
-            border-radius: 8px;
-        }
-
-        /* Page transition styles */
-        .step {
-            position: relative;
-            width: 100%;
-            margin-bottom: 60px; /* Add space for navigation buttons */
-        }
-
-        .step.active {
-            position: relative;
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(0);
-        }
-
-        .step.previous {
-            transform: translateX(-100%);
-        }
-
-        .container {
-            position: relative;
-            padding-bottom: 120px; /* Add space for fixed navigation */
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Adjust section margins for better spacing */
-        .section {
-            margin-bottom: 12px;
-        }
-
-        /* Make menu items more compact */
-        .menu-grid {
-            gap: 8px;
-        }
-
-        .menu-item {
-            padding: 8px;
-        }
-
-        .menu-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        .menu-name {
-            font-size: 12px;
-            min-height: 28px;
-        }
-
-        .menu-price {
-            font-size: 12px;
-        }
-
-        .quantity-controls {
-            margin-top: 8px;
-            gap: 8px;
-        }
-
-        .quantity-btn {
-            width: 24px;
-            height: 24px;
-            font-size: 14px;
-        }
-
-        .quantity-display {
-            font-size: 14px;
+            overflow: hidden;
         }
 
         .welcome-section {
             text-align: center;
-            padding: 8px;
-            margin-bottom: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
             animation: fadeIn 1s ease;
         }
 
         .welcome-title {
-            font-size: 18px;
+            font-size: 24px;
             color: var(--primary-color);
-            margin-bottom: 4px;
+            margin-bottom: 15px;
             font-weight: bold;
         }
 
         .welcome-text {
-            font-size: 13px;
-            line-height: 1.3;
+            font-size: 16px;
+            line-height: 1.6;
             color: var(--text-color);
-            margin-bottom: 8px;
+            margin-bottom: 20px;
         }
 
         .welcome-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
+            font-size: 48px;
+            margin-bottom: 20px;
             animation: bounce 2s infinite;
         }
 
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-10px); }
         }
 
         .location-section {
-            margin-bottom: 12px;
+            margin-bottom: 30px;
         }
 
         .location-options {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
-            margin-top: 12px;
-            margin-bottom: 60px; /* Add space for navigation buttons */
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .location-option {
             background: var(--secondary-bg);
             border: 2px solid var(--primary-color);
             border-radius: var(--border-radius);
-            padding: 12px;
+            padding: 20px;
             cursor: pointer;
             transition: var(--transition);
             position: relative;
-            margin-bottom: 8px;
         }
 
         .location-option:hover {
@@ -703,23 +547,23 @@
         }
 
         .location-name {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: var(--primary-color);
-            margin-bottom: 2px;
+            margin-bottom: 5px;
         }
 
         .location-address {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-color);
         }
 
         .location-icon {
             position: absolute;
-            right: 12px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 20px;
+            font-size: 24px;
             opacity: 0.5;
         }
 
@@ -727,19 +571,19 @@
             display: flex;
             gap: 10px;
             justify-content: center;
-            margin-bottom: 8px;
+            margin-bottom: 24px;
         }
 
         .language-btn {
             background: var(--secondary-bg);
             border: 2px solid var(--primary-color);
             border-radius: var(--border-radius);
-            padding: 8px 16px;
+            padding: 12px 24px;
             cursor: pointer;
             transition: var(--transition);
             font-weight: bold;
-            font-size: 14px;
-            min-width: 60px;
+            font-size: 16px;
+            min-width: 80px;
         }
 
         .language-btn.active {
@@ -855,31 +699,6 @@
             color: var(--secondary-color);
             font-weight: bold;
         }
-
-        .nav-grid-item.completed {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-        }
-        .nav-grid-item.error {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-        }
-        .nav-grid-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .nav-button.back {
-            background: var(--secondary-bg);
-            color: var(--text-color);
-        }
-        .nav-button.next {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-        .nav-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 <body>
@@ -888,33 +707,7 @@
             <div class="language-selector">
                 <button class="language-btn" data-lang="en">EN</button>
                 <button class="language-btn active" data-lang="ru">RU</button>
-            </div>
-            <div class="nav-grid">
-                <div class="nav-grid-item active" data-step="1">
-                    <div class="nav-grid-item-number">1</div>
-                    <div class="nav-grid-item-emoji">📍</div>
-                </div>
-                <div class="nav-grid-item disabled" data-step="2">
-                    <div class="nav-grid-item-number">2</div>
-                    <div class="nav-grid-item-emoji">👤</div>
-                </div>
-                <div class="nav-grid-item disabled" data-step="3">
-                    <div class="nav-grid-item-number">3</div>
-                    <div class="nav-grid-item-emoji">☕</div>
-                </div>
-                <div class="nav-grid-item disabled" data-step="4">
-                    <div class="nav-grid-item-number">4</div>
-                    <div class="nav-grid-item-emoji">💭</div>
-                </div>
-                <div class="nav-grid-item disabled" data-step="5">
-                    <div class="nav-grid-item-number">5</div>
-                    <div class="nav-grid-item-emoji">⏰</div>
-                </div>
-                <div class="nav-grid-item disabled" data-step="6">
-                    <div class="nav-grid-item-number">6</div>
-                    <div class="nav-grid-item-emoji">✅</div>
-                </div>
-            </div>
+        </div>
         </div>
         <div class="header">
             <h1 id="headerTitle">Place Your Order</h1>
@@ -923,6 +716,7 @@
         <!-- Step 1: Location -->
         <div class="step active" id="step1">
             <div class="welcome-section">
+                <div class="welcome-icon">☕</div>
                 <div class="welcome-title">Welcome to Yellow Coffee!</div>
                 <div class="welcome-text">
                     We're excited to serve you today! Please select your preferred location to start your order.<br>
@@ -944,12 +738,6 @@
                     </div>
                 </div>
             </div>
-            <div class="navigation">
-                <div class="nav-buttons">
-                    <button class="nav-button back" disabled>Back</button>
-                    <button class="nav-button next">Next</button>
-                </div>
-            </div>
         </div>
 
         <!-- Step 2: Name -->
@@ -960,10 +748,7 @@
                 <div class="error-message" id="nameError"></div>
             </div>
             <div class="navigation">
-                <div class="nav-buttons">
-                    <button class="nav-button back">Back</button>
-                    <button class="nav-button next">Next</button>
-                </div>
+                <button class="nav-button" id="confirmName">Confirm</button>
             </div>
         </div>
         
@@ -972,11 +757,11 @@
             <div class="section">
                 <h2>Select Drinks & Food</h2>
                 <div class="tab-buttons">
-                    <div class="tab-button active" data-menu="classicCoffee">Classic Coffee</div>
-                    <div class="tab-button" data-menu="signatureDrinks">Signature Drinks</div>
-                    <div class="tab-button" data-menu="premiumCollection">Premium Collection</div>
-                    <div class="tab-button" data-menu="nonCoffee">Non-Coffee Beverages</div>
-                    <div class="tab-button" data-menu="food">Food</div>
+                    <div class="tab-button active" data-menu="classicCoffee">${translations[currentLang].menu.classicCoffee}</div>
+                    <div class="tab-button" data-menu="signatureDrinks">${translations[currentLang].menu.signatureDrinks}</div>
+                    <div class="tab-button" data-menu="premiumCollection">${translations[currentLang].menu.premiumCollection}</div>
+                    <div class="tab-button" data-menu="nonCoffee">${translations[currentLang].menu.nonCoffee}</div>
+                    <div class="tab-button" data-menu="food">${translations[currentLang].menu.food}</div>
                 </div>
                 
                 <div class="menu-grid" id="classicCoffeeMenu">
@@ -1000,14 +785,11 @@
                 </div>
                 
                 <div id="selectionSummary" class="order-summary" style="margin-top: 16px;">
-                    <p>Selected items: <span id="selectedCount">0</span></p>
+                    <p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>
                 </div>
             </div>
             <div class="navigation">
-                <div class="nav-buttons">
-                    <button class="nav-button back">Back</button>
-                    <button class="nav-button next">Next</button>
-                </div>
+                <button class="nav-button" id="confirmStep2">Confirm</button>
             </div>
         </div>
         
@@ -1021,10 +803,7 @@
                 </div>
             </div>
             <div class="navigation">
-                <div class="nav-buttons">
-                    <button class="nav-button back">Back</button>
-                    <button class="nav-button next">Next</button>
-                </div>
+                <button class="nav-button" id="confirmStep3">Confirm</button>
             </div>
         </div>
         
@@ -1041,10 +820,7 @@
                 </div>
             </div>
             <div class="navigation">
-                <div class="nav-buttons">
-                    <button class="nav-button back">Back</button>
-                    <button class="nav-button next">Next</button>
-                </div>
+                <button class="nav-button" id="confirmStep4">Confirm</button>
             </div>
         </div>
         
@@ -1070,10 +846,7 @@
                 </div>
             </div>
             <div class="navigation">
-                <div class="nav-buttons">
-                    <button class="nav-button back">Back</button>
-                    <button class="nav-button next">Confirm Order</button>
-                </div>
+                <button class="nav-button" id="confirmOrder">Confirm Order</button>
             </div>
         </div>
         
@@ -1585,6 +1358,33 @@
                 orderData.time = timeString;
             });
             
+            // Step navigation
+            document.querySelectorAll('.tab-button[data-step]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const step = this.dataset.step;
+                    navigateToStep(step);
+                });
+            });
+            
+            // Menu tabs
+            document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const menu = this.dataset.menu;
+                    document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Hide all menus
+                    document.querySelectorAll('.menu-grid').forEach(menu => {
+                        menu.style.display = 'none';
+                    });
+                    
+                    // Show selected menu
+                    document.getElementById(`${menu}Menu`).style.display = 'grid';
+                });
+            });
+            
             // Add location selection handlers
             document.querySelectorAll('.location-option').forEach(option => {
                 option.addEventListener('click', function() {
@@ -1598,143 +1398,263 @@
                     
                     // Store selected location
                     orderData.location = this.dataset.location;
-                    
-                    // Enable next button
-                    const nextButton = this.closest('.step').querySelector('.nav-button.next');
-                    if (nextButton) {
-                        nextButton.disabled = false;
-                    }
 
-                    // Update navigation state
-                    updateNavigationState('1');
+                    // Smooth transition to name input
+                    setTimeout(() => {
+                        navigateToStep('2');
+                        const nameInput = document.getElementById('customerName');
+                        nameInput.focus();
+                    }, 300);
                 });
             });
 
-            // Add name input handler
-            document.getElementById('customerName').addEventListener('input', function() {
-                const nameInput = this.value.trim();
+            // Add name confirmation handler
+            document.getElementById('confirmName').addEventListener('click', function() {
+                const nameInput = document.getElementById('customerName').value.trim();
                 const nameError = document.getElementById('nameError');
-                const nextButton = this.closest('.step').querySelector('.nav-button.next');
                 
                 if (nameInput.length === 0) {
                     nameError.textContent = translations[currentLang].name.error;
-                    nextButton.disabled = true;
-                } else {
-                    nameError.textContent = '';
-                    nextButton.disabled = false;
-                    orderData.name = nameInput;
+                    return;
                 }
+                
+                nameError.textContent = '';
+                orderData.name = nameInput;
+                this.classList.add('completed');
+                navigateToStep('3');
+            });
+            
+            // Menu confirmation handler
+            document.getElementById('confirmStep2').addEventListener('click', function() {
+                if (orderData.items.length === 0) {
+                    // Show error message
+                    const summaryContainer = document.getElementById('selectionSummary');
+                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error || 'Please select at least one item'}</p>`;
+                    return;
+                }
+                this.classList.add('completed');
+                navigateToStep('4');
+                
+                // Add smooth scroll to comment section
+                setTimeout(() => {
+                    const commentSection = document.querySelector('#step4 .section');
+                    if (commentSection) {
+                        commentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            });
+            
+            // Comment confirmation handler
+            document.getElementById('confirmStep3').addEventListener('click', function() {
+                orderData.comment = document.getElementById('orderComment').value.trim();
+                this.classList.add('completed');
+                navigateToStep('5');
+            });
+            
+            // Time confirmation handler
+            document.getElementById('confirmStep4').addEventListener('click', function() {
+                const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
+                const selectedTime = parseFloat(timeSlider.value);
+                const timeSelector = document.querySelector('.time-selector');
+                
+                if (currentTime >= 20 || currentTime < 7.5) {
+                    showShopClosedNotification();
+                    return;
+                }
+
+                if (selectedTime < currentTime) {
+                    // Show error message
+                    let errorMessage = timeSelector.querySelector('.time-error');
+                    if (!errorMessage) {
+                        errorMessage = document.createElement('div');
+                        errorMessage.className = 'time-error';
+                        errorMessage.style.color = '#e74c3c';
+                        errorMessage.style.marginTop = '10px';
+                        errorMessage.style.textAlign = 'center';
+                        timeSelector.appendChild(errorMessage);
+                    }
+                    errorMessage.textContent = translations[currentLang].time.error;
+                    return;
+                }
+
+                // Clear any error message
+                const errorMessage = timeSelector.querySelector('.time-error');
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+
+                generateOrderSummary();
+                this.classList.add('completed');
+                navigateToStep('6');
+            });
+            
+            // Final order confirmation handler
+            document.getElementById('confirmOrder').addEventListener('click', async function() {
+                // Validate all required data
+                if (!orderData.location) {
+                    showError('location');
+                    return;
+                }
+                if (!orderData.name) {
+                    showError('name');
+                    return;
+                }
+                if (orderData.items.length === 0) {
+                    showError('menu');
+                    return;
+                }
+                if (!orderData.time) {
+                    showError('time');
+                    return;
+                }
+
+                const currentHour = new Date().getHours();
+                const currentMinutes = new Date().getMinutes();
+                const currentTime = currentHour + (currentMinutes / 60);
+                
+                if (currentTime >= 20 || currentTime < 7.5) {
+                    showShopClosedNotification();
+                    return;
+                }
+                
+                const orderNumber = generateOrderNumber();
+                document.getElementById('orderNumber').textContent = orderNumber;
+                
+                // Hide all steps and show confirmation screen
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                });
+                const orderConfirmed = document.getElementById('orderConfirmed');
+                orderConfirmed.style.display = 'block';
+                
+                // Format the order message
+                const orderMessage = formatOrderMessage(orderNumber, orderData);
+                
+                // List of all kitchen bot users who should receive the message
+                const kitchenBotUsers = [
+                    "517070445", // Main kitchen bot user
+                    "261442211", // Additional kitchen bot user
+                    "1057756574", // New kitchen bot user
+                    "-1002152072922", // Group chat
+                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
+                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
+                ];
+                
+                // Send to all kitchen bot users
+                await sendTelegramMessage(kitchenBotUsers, orderMessage);
+                
+                // Send to order creator if we have their ID
+                if (currentUserId) {
+                    await sendTelegramMessage(currentUserId, orderMessage);
+                }
+
+                // Scroll to order number after a short delay
+                setTimeout(() => {
+                    const orderNumberElement = document.getElementById('orderNumber');
+                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            });
+            
+            // Add error display function
+            function showError(step) {
+                const errorMessages = {
+                    location: translations[currentLang].location.error || 'Please select a location',
+                    name: translations[currentLang].name.error || 'Please enter your name',
+                    menu: translations[currentLang].menu.error || 'Please select at least one item',
+                    time: translations[currentLang].time.error || 'Please select a valid time'
+                };
+
+                const errorMessage = errorMessages[step];
+                const summaryContainer = document.getElementById('summaryItems');
+                if (summaryContainer) {
+                    summaryContainer.innerHTML = `<p style="color: #e74c3c; text-align: center; padding: 10px;">${errorMessage}</p>`;
+                }
+            }
+            
+            // New Order Button
+            document.getElementById('newOrderButton').addEventListener('click', function() {
+                resetOrderData();
+                navigateToStep('1');
             });
 
-            // Initialize navigation
-            initNavigation();
-        }
-
-        // Initialize navigation
-        function initNavigation() {
-            // Add click handlers for navigation buttons
+            // Add step navigation buttons
             document.querySelectorAll('.nav-button').forEach(button => {
                 button.addEventListener('click', function() {
-                    const currentStep = this.closest('.step');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    
-                    if (this.classList.contains('next')) {
-                        if (checkStepCompletion(currentStepNumber)) {
-                            navigateToStep((currentStepNumber + 1).toString());
-                        }
-                    } else if (this.classList.contains('back')) {
-                        if (currentStepNumber > 1) {
-                            navigateToStep((currentStepNumber - 1).toString());
-                        }
-                    }
-                });
-            });
-
-            // Add click handlers for navigation grid items
-            document.querySelectorAll('.nav-grid-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const step = this.dataset.step;
                     const currentStep = document.querySelector('.step.active');
                     const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    const targetStepNumber = parseInt(step);
-
-                    if (!this.classList.contains('disabled') || 
-                        (targetStepNumber === currentStepNumber + 1 && checkStepCompletion(currentStepNumber))) {
-                        navigateToStep(step);
+                    const nextStepNumber = currentStepNumber + 1;
+                    
+                    // Validate current step before proceeding
+                    if (currentStepNumber === 1 && !orderData.location) {
+                        return;
                     }
+                    if (currentStepNumber === 2 && !orderData.name) {
+                        const nameInput = document.getElementById('customerName').value.trim();
+                        if (nameInput.length === 0) {
+                            document.getElementById('nameError').textContent = translations[currentLang].name.error;
+                            return;
+                        }
+                    }
+                    if (currentStepNumber === 3 && orderData.items.length === 0) {
+                        const summaryContainer = document.getElementById('selectionSummary');
+                        summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
+                        return;
+                    }
+                    
+                    navigateToStep(nextStepNumber.toString());
                 });
             });
         }
-
+        
         // Navigate to specific step
         function navigateToStep(step) {
+            // Validate previous steps
             const currentStep = document.querySelector('.step.active');
             const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
             const targetStepNumber = parseInt(step);
 
-            // Don't allow skipping steps
+            // Check if trying to skip steps
             if (targetStepNumber > currentStepNumber + 1) {
-                return;
+                return; // Don't allow skipping steps
             }
 
-            // Hide current step
-            if (currentStep) {
-                currentStep.classList.remove('active');
+            // Validate required data for each step
+            if (targetStepNumber === 2 && !orderData.location) {
+                return; // Can't proceed to name without location
+            }
+            if (targetStepNumber === 3 && !orderData.name) {
+                return; // Can't proceed to menu without name
+            }
+            if (targetStepNumber === 4 && orderData.items.length === 0) {
+                return; // Can't proceed to comment without items
+            }
+            if (targetStepNumber === 5 && !orderData.comment) {
+                // Comment is optional, but we still need to set it
+                orderData.comment = '';
+            }
+            if (targetStepNumber === 6 && !orderData.time) {
+                return; // Can't proceed to summary without time
             }
 
-            // Show target step
-            const targetStep = document.getElementById(`step${step}`);
-            if (targetStep) {
-                targetStep.classList.add('active');
-            }
-
-            // Update navigation state
-            updateNavigationState(step);
-            
-            // Reset scroll position
-            window.scrollTo(0, 0);
-        }
-
-        // Update navigation state
-        function updateNavigationState(currentStep) {
-            const stepNumber = parseInt(currentStep);
-            
-            // Update grid items
-            document.querySelectorAll('.nav-grid-item').forEach(item => {
-                const itemStep = parseInt(item.dataset.step);
-                item.classList.remove('active', 'completed', 'error', 'disabled');
-                
-                if (itemStep === stepNumber) {
-                    item.classList.add('active');
-                } else if (itemStep < stepNumber) {
-                    const isCompleted = checkStepCompletion(itemStep);
-                    item.classList.add(isCompleted ? 'completed' : 'error');
-                } else if (itemStep === stepNumber + 1 && checkStepCompletion(stepNumber)) {
-                    item.classList.remove('disabled');
-                } else if (itemStep > stepNumber) {
-                    item.classList.add('disabled');
-                }
+            // Update tab buttons
+            document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
+                btn.classList.remove('active');
             });
-
-            // Update buttons for current step
-            const currentStepElement = document.getElementById(`step${stepNumber}`);
-            if (currentStepElement) {
-                const backButton = currentStepElement.querySelector('.nav-button.back');
-                const nextButton = currentStepElement.querySelector('.nav-button.next');
-                
-                if (backButton) {
-                    backButton.disabled = stepNumber === 1;
-                }
-                
-                if (nextButton) {
-                    nextButton.disabled = !checkStepCompletion(stepNumber);
-                    nextButton.textContent = stepNumber === 6 ? 
-                        translations[currentLang].buttons.confirm : 
-                        translations[currentLang].buttons.next;
-                }
-            }
+            document.querySelector(`.tab-button[data-step="${step}"]`)?.classList.add('active');
+            
+            // Update visible step
+            document.querySelectorAll('.step').forEach(s => {
+                s.classList.remove('active');
+            });
+            const nextStep = document.getElementById(`step${step}`);
+            nextStep.classList.add('active');
+            
+            // Smooth scroll to the top of the next step
+            nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-
+        
         // Add notification functions
         function showShopClosedNotification() {
             const notification = document.getElementById('shopClosedNotification');
@@ -1828,9 +1748,7 @@
                     forwarding: "Your order details have been sent to our kitchen bot."
                 },
                 buttons: {
-                    confirm: "Confirm",
-                    back: "Back",
-                    next: "Next"
+                    confirm: "Confirm"
                 },
                 shopClosed: {
                     evening: "I apologize, the coffee shop is no longer open today, we will wait for your order tomorrow",
@@ -1898,9 +1816,7 @@
                     forwarding: "Детали вашего заказа отправлены нашему кухонному боту."
                 },
                 buttons: {
-                    confirm: "Подтвердить",
-                    back: "Назад",
-                    next: "Далее"
+                    confirm: "Подтвердить"
                 },
                 shopClosed: {
                     evening: "Приносим извинения, кофейня уже закрыта сегодня, мы будем ждать ваш заказ завтра",
@@ -2106,38 +2022,6 @@
                 document.getElementById(`${menu}Menu`).style.display = 'grid';
             });
         });
-
-        // Add translations for navigation buttons
-        translations.en.buttons = {
-            ...translations.en.buttons,
-            back: "Back",
-            next: "Next"
-        };
-        translations.ru.buttons = {
-            ...translations.ru.buttons,
-            back: "Назад",
-            next: "Далее"
-        };
-
-        // Check if a step is completed successfully
-        function checkStepCompletion(step) {
-            switch(step) {
-                case 1:
-                    return !!orderData.location;
-                case 2:
-                    return !!orderData.name;
-                case 3:
-                    return orderData.items.length > 0;
-                case 4:
-                    return true; // Comment is optional
-                case 5:
-                    return !!orderData.time;
-                case 6:
-                    return true; // Summary step
-                default:
-                    return false;
-            }
-        }
     </script>
 </body>
 </html>
