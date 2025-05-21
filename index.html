@@ -699,6 +699,76 @@
             color: var(--secondary-color);
             font-weight: bold;
         }
+
+        /* Add new styles for stage navigation */
+        .stage-navigation {
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            padding: 10px 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .stage-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stage-button {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stage-button.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .stage-button.completed {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .stage-button.completed::after {
+            content: "✓";
+            margin-left: 4px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--secondary-bg);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 480px) {
+            .stage-button {
+                font-size: 12px;
+                padding: 6px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -711,6 +781,21 @@
         </div>
         <div class="header">
             <h1 id="headerTitle">Place Your Order</h1>
+        </div>
+
+        <!-- Add stage navigation -->
+        <div class="stage-navigation">
+            <div class="stage-buttons">
+                <button class="stage-button" data-page="page1">1. Location</button>
+                <button class="stage-button" data-page="page2">2. Name</button>
+                <button class="stage-button" data-page="page3">3. Menu</button>
+                <button class="stage-button" data-page="page4">4. Comment</button>
+                <button class="stage-button" data-page="page5">5. Time</button>
+                <button class="stage-button" data-page="page6">6. Summary</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
         
         <!-- Step 1: Location -->
@@ -1335,6 +1420,42 @@
             currentLang = 'ru';
             switchLanguage('ru');
             
+            // Add stage button click handlers
+            document.querySelectorAll('.stage-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetPage = this.dataset.page;
+                    const currentPage = document.querySelector('.page[style="display: block;"]').id;
+                    const currentPageNum = parseInt(currentPage.replace('page', ''));
+                    const targetPageNum = parseInt(targetPage.replace('page', ''));
+
+                    // Validate navigation
+                    if (targetPageNum > currentPageNum + 1) {
+                        // Check if all previous stages are completed
+                        for (let i = 1; i < targetPageNum; i++) {
+                            const pageId = `page${i}`;
+                            if (i === 1 && !orderData.location) {
+                                alert(translations[currentLang].location.error);
+                                return;
+                            }
+                            if (i === 2 && !orderData.name) {
+                                alert(translations[currentLang].name.error);
+                                return;
+                            }
+                            if (i === 3 && orderData.items.length === 0) {
+                                alert(translations[currentLang].menu.error);
+                                return;
+                            }
+                            if (i === 5 && !orderData.time) {
+                                alert(translations[currentLang].time.error);
+                                return;
+                            }
+                        }
+                    }
+
+                    showPage(targetPage);
+                });
+            });
+
             // Set initial time to current time + 10 minutes
             const now = new Date();
             now.setMinutes(now.getMinutes() + 10);
@@ -1364,6 +1485,7 @@
                 const timeString = formatTime(value);
                 timeDisplay.textContent = timeString;
                 orderData.time = timeString;
+                updateCompletedStages();
             });
 
             // Add location selection handlers
@@ -1379,7 +1501,27 @@
                     
                     // Store selected location
                     orderData.location = this.dataset.location;
+                    updateCompletedStages();
                 });
+            });
+
+            // Add name input handler
+            document.getElementById('customerName').addEventListener('input', function() {
+                orderData.name = this.value.trim();
+                updateCompletedStages();
+            });
+
+            // Add menu item selection handlers
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    updateCompletedStages();
+                });
+            });
+
+            // Add comment input handler
+            document.getElementById('orderComment').addEventListener('input', function() {
+                orderData.comment = this.value.trim();
+                updateCompletedStages();
             });
 
             // Navigation handlers
@@ -1517,6 +1659,9 @@
                 resetOrderData();
                 showPage('page1');
             });
+
+            // Show initial page
+            showPage('page1');
         }
 
         // Show specific page and hide others
@@ -1529,8 +1674,44 @@
             // Show requested page
             document.getElementById(pageId).style.display = 'block';
             
+            // Update stage buttons
+            document.querySelectorAll('.stage-button').forEach(button => {
+                button.classList.remove('active');
+                if (button.dataset.page === pageId) {
+                    button.classList.add('active');
+                }
+            });
+
+            // Update progress bar
+            const pageNumber = parseInt(pageId.replace('page', ''));
+            const progress = ((pageNumber - 1) / 5) * 100; // 5 is the number of steps before summary
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            // Update completed stages
+            updateCompletedStages();
+            
             // Scroll to top
             window.scrollTo(0, 0);
+        }
+
+        // Update completed stages
+        function updateCompletedStages() {
+            const stages = {
+                page1: !!orderData.location,
+                page2: !!orderData.name,
+                page3: orderData.items.length > 0,
+                page4: true, // Comment is optional
+                page5: !!orderData.time
+            };
+
+            document.querySelectorAll('.stage-button').forEach(button => {
+                const pageId = button.dataset.page;
+                if (stages[pageId]) {
+                    button.classList.add('completed');
+                } else {
+                    button.classList.remove('completed');
+                }
+            });
         }
 
         // Add notification functions
