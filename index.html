@@ -473,56 +473,86 @@
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(2, 1fr);
             gap: 4px;
-            margin: 8px 0;
+            margin: 8px auto;
             padding: 8px;
             background: var(--secondary-bg);
             border-radius: var(--border-radius);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 300px;
         }
 
         .nav-grid-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 4px;
+            justify-content: center;
+            padding: 8px;
             border-radius: 8px;
             background: var(--bg-color);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
-            font-size: 12px;
+            aspect-ratio: 1;
         }
 
         .nav-grid-item-number {
-            font-size: 14px;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 2px;
+            color: var(--text-color);
+            opacity: 0.7;
         }
 
-        .nav-grid-item-label {
-            font-size: 10px;
-            text-align: center;
-            line-height: 1.1;
+        .nav-grid-item-emoji {
+            font-size: 24px;
+            line-height: 1;
         }
 
         .nav-grid-item.active {
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            transform: scale(1.05);
+        }
+
+        .nav-grid-item.active .nav-grid-item-number,
+        .nav-grid-item.active .nav-grid-item-emoji {
             color: white;
+            opacity: 1;
         }
 
         .nav-grid-item.completed {
             background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .nav-grid-item.completed .nav-grid-item-number,
+        .nav-grid-item.completed .nav-grid-item-emoji {
             color: white;
+            opacity: 1;
         }
 
         .nav-grid-item.error {
             background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .nav-grid-item.error .nav-grid-item-number,
+        .nav-grid-item.error .nav-grid-item-emoji {
             color: white;
+            opacity: 1;
         }
 
         .nav-grid-item.disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .nav-grid-item:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-grid-item.active:hover {
+            transform: scale(1.05) translateY(-2px);
         }
 
         .nav-buttons {
@@ -862,27 +892,27 @@
             <div class="nav-grid">
                 <div class="nav-grid-item active" data-step="1">
                     <div class="nav-grid-item-number">1</div>
-                    <div class="nav-grid-item-label" data-label="location">Location</div>
+                    <div class="nav-grid-item-emoji">📍</div>
                 </div>
                 <div class="nav-grid-item disabled" data-step="2">
                     <div class="nav-grid-item-number">2</div>
-                    <div class="nav-grid-item-label" data-label="name">Name</div>
+                    <div class="nav-grid-item-emoji">👤</div>
                 </div>
                 <div class="nav-grid-item disabled" data-step="3">
                     <div class="nav-grid-item-number">3</div>
-                    <div class="nav-grid-item-label" data-label="menu">Menu</div>
+                    <div class="nav-grid-item-emoji">☕</div>
                 </div>
                 <div class="nav-grid-item disabled" data-step="4">
                     <div class="nav-grid-item-number">4</div>
-                    <div class="nav-grid-item-label" data-label="comment">Comment</div>
+                    <div class="nav-grid-item-emoji">💭</div>
                 </div>
                 <div class="nav-grid-item disabled" data-step="5">
                     <div class="nav-grid-item-number">5</div>
-                    <div class="nav-grid-item-label">${translations[currentLang].time.title}</div>
+                    <div class="nav-grid-item-emoji">⏰</div>
                 </div>
                 <div class="nav-grid-item disabled" data-step="6">
                     <div class="nav-grid-item-number">6</div>
-                    <div class="nav-grid-item-label">${translations[currentLang].order.title}</div>
+                    <div class="nav-grid-item-emoji">✅</div>
                 </div>
             </div>
         </div>
@@ -919,27 +949,27 @@
                 <div class="nav-grid">
                     <div class="nav-grid-item active" data-step="1">
                         <div class="nav-grid-item-number">1</div>
-                        <div class="nav-grid-item-label">${translations[currentLang].location.title}</div>
+                        <div class="nav-grid-item-emoji">📍</div>
                     </div>
                     <div class="nav-grid-item disabled" data-step="2">
                         <div class="nav-grid-item-number">2</div>
-                        <div class="nav-grid-item-label">${translations[currentLang].name.title}</div>
+                        <div class="nav-grid-item-emoji">👤</div>
                     </div>
                     <div class="nav-grid-item disabled" data-step="3">
                         <div class="nav-grid-item-number">3</div>
-                        <div class="nav-grid-item-label">${translations[currentLang].menu.title}</div>
+                        <div class="nav-grid-item-emoji">☕</div>
                     </div>
                     <div class="nav-grid-item disabled" data-step="4">
                         <div class="nav-grid-item-number">4</div>
-                        <div class="nav-grid-item-label">${translations[currentLang].comment.title}</div>
+                        <div class="nav-grid-item-emoji">💭</div>
                     </div>
                     <div class="nav-grid-item disabled" data-step="5">
                         <div class="nav-grid-item-number">5</div>
-                        <div class="nav-grid-item-label">${translations[currentLang].time.title}</div>
+                        <div class="nav-grid-item-emoji">⏰</div>
                     </div>
                     <div class="nav-grid-item disabled" data-step="6">
                         <div class="nav-grid-item-number">6</div>
-                        <div class="nav-grid-item-label">${translations[currentLang].order.title}</div>
+                        <div class="nav-grid-item-emoji">✅</div>
                     </div>
                 </div>
                 <div class="nav-buttons">
