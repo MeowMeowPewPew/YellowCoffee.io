@@ -44,9 +44,9 @@
         }
 
         .header h1 {
-            font-size: 2em;
+            font-size: 1.5em;
             margin: 0;
-            padding: 10px;
+            padding: 8px;
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -641,34 +641,34 @@
 
         .welcome-section {
             text-align: center;
-            padding: 20px;
-            margin-bottom: 30px;
+            padding: 12px;
+            margin-bottom: 20px;
             animation: fadeIn 1s ease;
         }
 
         .welcome-title {
-            font-size: 24px;
+            font-size: 20px;
             color: var(--primary-color);
-            margin-bottom: 15px;
+            margin-bottom: 8px;
             font-weight: bold;
         }
 
         .welcome-text {
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 1.4;
             color: var(--text-color);
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .welcome-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: 36px;
+            margin-bottom: 12px;
             animation: bounce 2s infinite;
         }
 
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
 
         .location-section {
@@ -947,8 +947,8 @@
             </div>
             <div class="navigation">
                 <div class="nav-buttons">
-                    <button class="nav-button back" disabled>${translations[currentLang].buttons.back}</button>
-                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
+                    <button class="nav-button back" disabled>Back</button>
+                    <button class="nav-button next">Next</button>
                 </div>
             </div>
         </div>
@@ -962,8 +962,8 @@
             </div>
             <div class="navigation">
                 <div class="nav-buttons">
-                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
-                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
+                    <button class="nav-button back">Back</button>
+                    <button class="nav-button next">Next</button>
                 </div>
             </div>
         </div>
@@ -973,11 +973,11 @@
             <div class="section">
                 <h2>Select Drinks & Food</h2>
                 <div class="tab-buttons">
-                    <div class="tab-button active" data-menu="classicCoffee">${translations[currentLang].menu.classicCoffee}</div>
-                    <div class="tab-button" data-menu="signatureDrinks">${translations[currentLang].menu.signatureDrinks}</div>
-                    <div class="tab-button" data-menu="premiumCollection">${translations[currentLang].menu.premiumCollection}</div>
-                    <div class="tab-button" data-menu="nonCoffee">${translations[currentLang].menu.nonCoffee}</div>
-                    <div class="tab-button" data-menu="food">${translations[currentLang].menu.food}</div>
+                    <div class="tab-button active" data-menu="classicCoffee">Classic Coffee</div>
+                    <div class="tab-button" data-menu="signatureDrinks">Signature Drinks</div>
+                    <div class="tab-button" data-menu="premiumCollection">Premium Collection</div>
+                    <div class="tab-button" data-menu="nonCoffee">Non-Coffee Beverages</div>
+                    <div class="tab-button" data-menu="food">Food</div>
                 </div>
                 
                 <div class="menu-grid" id="classicCoffeeMenu">
@@ -1001,13 +1001,13 @@
                 </div>
                 
                 <div id="selectionSummary" class="order-summary" style="margin-top: 16px;">
-                    <p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>
+                    <p>Selected items: <span id="selectedCount">0</span></p>
                 </div>
             </div>
             <div class="navigation">
                 <div class="nav-buttons">
-                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
-                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
+                    <button class="nav-button back">Back</button>
+                    <button class="nav-button next">Next</button>
                 </div>
             </div>
         </div>
@@ -1023,8 +1023,8 @@
             </div>
             <div class="navigation">
                 <div class="nav-buttons">
-                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
-                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
+                    <button class="nav-button back">Back</button>
+                    <button class="nav-button next">Next</button>
                 </div>
             </div>
         </div>
@@ -1043,8 +1043,8 @@
             </div>
             <div class="navigation">
                 <div class="nav-buttons">
-                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
-                    <button class="nav-button next">${translations[currentLang].buttons.next}</button>
+                    <button class="nav-button back">Back</button>
+                    <button class="nav-button next">Next</button>
                 </div>
             </div>
         </div>
@@ -1072,8 +1072,8 @@
             </div>
             <div class="navigation">
                 <div class="nav-buttons">
-                    <button class="nav-button back">${translations[currentLang].buttons.back}</button>
-                    <button class="nav-button next">${translations[currentLang].buttons.confirm}</button>
+                    <button class="nav-button back">Back</button>
+                    <button class="nav-button next">Confirm Order</button>
                 </div>
             </div>
         </div>
@@ -1587,33 +1587,6 @@
                 orderData.time = timeString;
             });
             
-            // Step navigation
-            document.querySelectorAll('.tab-button[data-step]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const step = this.dataset.step;
-                    navigateToStep(step);
-                });
-            });
-            
-            // Menu tabs
-            document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const menu = this.dataset.menu;
-                    document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    // Hide all menus
-                    document.querySelectorAll('.menu-grid').forEach(menu => {
-                        menu.style.display = 'none';
-                    });
-                    
-                    // Show selected menu
-                    document.getElementById(`${menu}Menu`).style.display = 'grid';
-                });
-            });
-            
             // Add location selection handlers
             document.querySelectorAll('.location-option').forEach(option => {
                 option.addEventListener('click', function() {
@@ -1627,214 +1600,69 @@
                     
                     // Store selected location
                     orderData.location = this.dataset.location;
-
-                    // Smooth transition to name input
-                    setTimeout(() => {
-                        navigateToStep('2');
-                        const nameInput = document.getElementById('customerName');
-                        nameInput.focus();
-                    }, 300);
+                    
+                    // Enable next button
+                    const nextButton = this.closest('.step').querySelector('.nav-button.next');
+                    if (nextButton) {
+                        nextButton.disabled = false;
+                    }
                 });
             });
 
-            // Add name confirmation handler
-            document.getElementById('confirmName').addEventListener('click', function() {
-                const nameInput = document.getElementById('customerName').value.trim();
+            // Add name input handler
+            document.getElementById('customerName').addEventListener('input', function() {
+                const nameInput = this.value.trim();
                 const nameError = document.getElementById('nameError');
+                const nextButton = this.closest('.step').querySelector('.nav-button.next');
                 
                 if (nameInput.length === 0) {
                     nameError.textContent = translations[currentLang].name.error;
-                    return;
+                    nextButton.disabled = true;
+                } else {
+                    nameError.textContent = '';
+                    nextButton.disabled = false;
+                    orderData.name = nameInput;
                 }
-                
-                nameError.textContent = '';
-                orderData.name = nameInput;
-                this.classList.add('completed');
-                navigateToStep('3');
             });
 
-            // Menu confirmation handler
-            document.getElementById('confirmStep2').addEventListener('click', function() {
-                if (orderData.items.length === 0) {
-                    // Show error message
-                    const summaryContainer = document.getElementById('selectionSummary');
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error || 'Please select at least one item'}</p>`;
-                    return;
-                }
-                this.classList.add('completed');
-                navigateToStep('4');
-                
-                // Add smooth scroll to comment section
-                setTimeout(() => {
-                    const commentSection = document.querySelector('#step4 .section');
-                    if (commentSection) {
-                        commentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 100);
-            });
-            
-            // Comment confirmation handler
-            document.getElementById('confirmStep3').addEventListener('click', function() {
-                orderData.comment = document.getElementById('orderComment').value.trim();
-                this.classList.add('completed');
-                navigateToStep('5');
-            });
-            
-            // Time confirmation handler
-            document.getElementById('confirmStep4').addEventListener('click', function() {
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                const selectedTime = parseFloat(timeSlider.value);
-                const timeSelector = document.querySelector('.time-selector');
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-
-                if (selectedTime < currentTime) {
-                    // Show error message
-                    let errorMessage = timeSelector.querySelector('.time-error');
-                    if (!errorMessage) {
-                        errorMessage = document.createElement('div');
-                        errorMessage.className = 'time-error';
-                        errorMessage.style.color = '#e74c3c';
-                        errorMessage.style.marginTop = '10px';
-                        errorMessage.style.textAlign = 'center';
-                        timeSelector.appendChild(errorMessage);
-                    }
-                    errorMessage.textContent = translations[currentLang].time.error;
-                    return;
-                }
-
-                // Clear any error message
-                const errorMessage = timeSelector.querySelector('.time-error');
-                if (errorMessage) {
-                    errorMessage.remove();
-                }
-
-                generateOrderSummary();
-                this.classList.add('completed');
-                navigateToStep('6');
-            });
-            
-            // Final order confirmation handler
-            document.getElementById('confirmOrder').addEventListener('click', async function() {
-                // Validate all required data
-                if (!orderData.location) {
-                    showError('location');
-                    return;
-                }
-                if (!orderData.name) {
-                    showError('name');
-                    return;
-                }
-                if (orderData.items.length === 0) {
-                    showError('menu');
-                    return;
-                }
-                if (!orderData.time) {
-                    showError('time');
-                    return;
-                }
-
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-                
-                const orderNumber = generateOrderNumber();
-                document.getElementById('orderNumber').textContent = orderNumber;
-                
-                // Hide all steps and show confirmation screen
-                document.querySelectorAll('.step').forEach(step => {
-                    step.classList.remove('active');
-                });
-                const orderConfirmed = document.getElementById('orderConfirmed');
-                orderConfirmed.style.display = 'block';
-                
-                // Format the order message
-                const orderMessage = formatOrderMessage(orderNumber, orderData);
-                
-                // List of all kitchen bot users who should receive the message
-                const kitchenBotUsers = [
-                    "517070445", // Main kitchen bot user
-                    "261442211", // Additional kitchen bot user
-                    "1057756574", // New kitchen bot user
-                    "-1002152072922", // Group chat
-                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
-                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
-                ];
-                
-                // Send to all kitchen bot users
-                await sendTelegramMessage(kitchenBotUsers, orderMessage);
-                
-                // Send to order creator if we have their ID
-                if (currentUserId) {
-                    await sendTelegramMessage(currentUserId, orderMessage);
-                }
-
-                // Scroll to order number after a short delay
-                setTimeout(() => {
-                    const orderNumberElement = document.getElementById('orderNumber');
-                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-            });
-            
-            // Add error display function
-            function showError(step) {
-                const errorMessages = {
-                    location: translations[currentLang].location.error || 'Please select a location',
-                    name: translations[currentLang].name.error || 'Please enter your name',
-                    menu: translations[currentLang].menu.error || 'Please select at least one item',
-                    time: translations[currentLang].time.error || 'Please select a valid time'
-                };
-
-                const errorMessage = errorMessages[step];
-                const summaryContainer = document.getElementById('summaryItems');
-                if (summaryContainer) {
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c; text-align: center; padding: 10px;">${errorMessage}</p>`;
-                }
-            }
-            
-            // New Order Button
-            document.getElementById('newOrderButton').addEventListener('click', function() {
-                resetOrderData();
-                navigateToStep('1');
-            });
-
-            // Add step navigation buttons
-            document.querySelectorAll('.nav-button').forEach(button => {
+            // Update navigation state when switching steps
+            document.querySelectorAll('.nav-button.next').forEach(button => {
                 button.addEventListener('click', function() {
-                    const currentStep = document.querySelector('.step.active');
+                    const currentStep = this.closest('.step');
                     const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
                     const nextStepNumber = currentStepNumber + 1;
                     
-                    // Validate current step before proceeding
-                    if (currentStepNumber === 1 && !orderData.location) {
-                        return;
+                    if (checkStepCompletion(currentStepNumber)) {
+                        navigateToStep(nextStepNumber.toString());
                     }
-                    if (currentStepNumber === 2 && !orderData.name) {
-                        const nameInput = document.getElementById('customerName').value.trim();
-                        if (nameInput.length === 0) {
-                            document.getElementById('nameError').textContent = translations[currentLang].name.error;
-                            return;
-                        }
-                    }
-                    if (currentStepNumber === 3 && orderData.items.length === 0) {
-                        const summaryContainer = document.getElementById('selectionSummary');
-                        summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
-                        return;
-                    }
-                    
-                    navigateToStep(nextStepNumber.toString());
                 });
             });
+
+            // Update button text based on language
+            function updateButtonTexts() {
+                document.querySelectorAll('.nav-button.back').forEach(button => {
+                    button.textContent = translations[currentLang].buttons.back;
+                });
+                document.querySelectorAll('.nav-button.next').forEach(button => {
+                    if (button.closest('#step6')) {
+                        button.textContent = translations[currentLang].buttons.confirm;
+                    } else {
+                        button.textContent = translations[currentLang].buttons.next;
+                    }
+                });
+            }
+
+            // Call updateButtonTexts when language changes
+            const languageButtons = document.querySelectorAll('.language-btn');
+            languageButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchLanguage(this.dataset.lang);
+                    updateButtonTexts();
+                });
+            });
+
+            // Initial button text update
+            updateButtonTexts();
         }
         
         // Navigate to specific step
