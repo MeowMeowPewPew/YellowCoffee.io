@@ -24,6 +24,119 @@
             color: var(--text-color);
             background-color: var(--bg-color);
             line-height: 1.6;
+            padding-top: 80px; /* Add space for fixed progress bar */
+        }
+
+        /* Progress Bar Styles */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-color);
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            max-width: 100%;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .progress-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0.5;
+            position: relative;
+        }
+
+        .progress-step.active {
+            opacity: 1;
+        }
+
+        .progress-step.completed {
+            opacity: 1;
+        }
+
+        .progress-step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--secondary-bg);
+            border: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            transition: var(--transition);
+            margin-bottom: 4px;
+        }
+
+        .progress-step.active .progress-step-circle {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .progress-step.completed .progress-step-circle {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+
+        .progress-step.completed .progress-step-circle::after {
+            content: "✓";
+            font-size: 16px;
+        }
+
+        .progress-step-label {
+            font-size: 10px;
+            text-align: center;
+            color: var(--text-color);
+            font-weight: 500;
+            line-height: 1.2;
+            max-width: 50px;
+            word-wrap: break-word;
+        }
+
+        .progress-step.active .progress-step-label {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .progress-connector {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            width: calc(100% + 20px);
+            height: 2px;
+            background: var(--secondary-bg);
+            z-index: -1;
+        }
+
+        .progress-step.completed .progress-connector {
+            background: var(--primary-color);
+        }
+
+        .progress-step:last-child .progress-connector {
+            display: none;
         }
 
         .container {
@@ -119,51 +232,6 @@
             margin-top: 15px;
         }
 
-        .menu-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .menu-scroll-indicator {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 30px;
-            background: rgba(255, 215, 0, 0.8);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .menu-container:hover .menu-scroll-indicator {
-            opacity: 1;
-        }
-
-        .menu-scroll-left {
-            left: 10px;
-        }
-
-        .menu-scroll-right {
-            right: 10px;
-        }
-
-        .menu-scroll-indicator:hover {
-            background: rgba(255, 165, 0, 0.9);
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .menu-scroll-indicator:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
         .menu-item {
             border: 2px solid var(--primary-color);
             border-radius: var(--border-radius);
@@ -183,13 +251,6 @@
         .menu-item.selected {
             border-color: var(--secondary-color);
             background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
-        }
-
-        .menu-item-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 1;
         }
 
         .menu-icon {
@@ -325,7 +386,7 @@
 
         .notification {
             position: fixed;
-            top: 20px;
+            top: 90px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
@@ -373,18 +434,6 @@
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             color: white;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-
-        @media (max-width: 480px) {
-            .tab-buttons {
-                gap: 4px;
-                padding: 4px;
-        }
-
-            .tab-button {
-                padding: 10px;
-                font-size: 13px;
-        }
         }
 
         .order-summary {
@@ -465,22 +514,6 @@
             margin-top: 20px;
             box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
             z-index: 100;
-        }
-
-        .nav-button {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: #FFFFFF;
-            border: none;
-            border-radius: var(--border-radius);
-            padding: 14px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
         }
 
         .welcome-section {
@@ -700,53 +733,69 @@
             font-weight: bold;
         }
 
-        .stage-indicators {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            padding: 0 10px;
+        .step {
+            display: none;
         }
 
-        .stage-button {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 12px;
-            border: 2px solid var(--primary-color);
-            border-radius: var(--border-radius);
-            background: var(--secondary-bg);
-            color: var(--text-color);
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-            opacity: 0.7;
+        .step.active {
+            display: block;
         }
 
-        .stage-button.active {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            opacity: 1;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .stage-button:hover {
-            opacity: 1;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .stage-button.completed {
-            border-color: #4CAF50;
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-            opacity: 0.9;
+        /* Responsive adjustments for progress bar */
+        @media (max-width: 480px) {
+            .progress-step-label {
+                font-size: 9px;
+                max-width: 45px;
+            }
+            
+            .progress-step-circle {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .progress-connector {
+                top: 14px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1">
+                <div class="progress-step-circle">1</div>
+                <div class="progress-step-label">Location</div>
+                <div class="progress-connector"></div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="progress-step-circle">2</div>
+                <div class="progress-step-label">Name</div>
+                <div class="progress-connector"></div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="progress-step-circle">3</div>
+                <div class="progress-step-label">Menu</div>
+                <div class="progress-connector"></div>
+            </div>
+            <div class="progress-step" data-step="4">
+                <div class="progress-step-circle">4</div>
+                <div class="progress-step-label">Comments</div>
+                <div class="progress-connector"></div>
+            </div>
+            <div class="progress-step" data-step="5">
+                <div class="progress-step-circle">5</div>
+                <div class="progress-step-label">Time</div>
+                <div class="progress-connector"></div>
+            </div>
+            <div class="progress-step" data-step="6">
+                <div class="progress-step-circle">6</div>
+                <div class="progress-step-label">Confirm</div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <div class="language-selector">
@@ -756,15 +805,6 @@
         </div>
         <div class="header">
             <h1 id="headerTitle">Place Your Order</h1>
-        </div>
-        
-        <div class="stage-indicators">
-            <button class="stage-button active" data-step="1">1 📍</button>
-            <button class="stage-button" data-step="2">2 👤</button>
-            <button class="stage-button" data-step="3">3 ☕</button>
-            <button class="stage-button" data-step="4">4 💭</button>
-            <button class="stage-button" data-step="5">5 ⏰</button>
-            <button class="stage-button" data-step="6">6 ✅</button>
         </div>
         
         <!-- Step 1: Location -->
@@ -810,11 +850,11 @@
             <div class="section">
                 <h2>Select Drinks & Food</h2>
                 <div class="tab-buttons">
-                    <div class="tab-button active" data-menu="classicCoffee">${translations[currentLang].menu.classicCoffee}</div>
-                    <div class="tab-button" data-menu="signatureDrinks">${translations[currentLang].menu.signatureDrinks}</div>
-                    <div class="tab-button" data-menu="premiumCollection">${translations[currentLang].menu.premiumCollection}</div>
-                    <div class="tab-button" data-menu="nonCoffee">${translations[currentLang].menu.nonCoffee}</div>
-                    <div class="tab-button" data-menu="food">${translations[currentLang].menu.food}</div>
+                    <div class="tab-button active" data-menu="classicCoffee">Classic Coffee</div>
+                    <div class="tab-button" data-menu="signatureDrinks">Signature Drinks</div>
+                    <div class="tab-button" data-menu="premiumCollection">Premium Collection</div>
+                    <div class="tab-button" data-menu="nonCoffee">Non-Coffee Beverages</div>
+                    <div class="tab-button" data-menu="food">Food</div>
                 </div>
                 
                 <div class="menu-grid" id="classicCoffeeMenu">
@@ -838,7 +878,7 @@
                 </div>
                 
                 <div id="selectionSummary" class="order-summary" style="margin-top: 16px;">
-                    <p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>
+                    <p>Selected items: <span id="selectedCount">0</span></p>
                 </div>
             </div>
             <div class="navigation">
@@ -846,7 +886,7 @@
             </div>
         </div>
         
-        <!-- New Step 4: Comment -->
+        <!-- Step 4: Comment -->
         <div class="step" id="step4">
             <div class="section">
                 <h2>Add Comments (Optional)</h2>
@@ -860,7 +900,7 @@
             </div>
         </div>
         
-        <!-- Rename existing step4 to step5 -->
+        <!-- Step 5: Time -->
         <div class="step" id="step5">
             <div class="section">
                 <h2>Select Pickup Time</h2>
@@ -877,7 +917,7 @@
             </div>
         </div>
         
-        <!-- Rename existing step5 to step6 -->
+        <!-- Step 6: Order Confirmation -->
         <div class="step" id="step6">
             <div class="section">
                 <h2>Order Confirmation</h2>
@@ -953,11 +993,11 @@
                 targetUserId: "261442211",
                 recipientUserId: "261442211",
                 meowmeowpewUsername: "@meowmeowpew",
-                ichsterbeUsername: "@ichsterbe" // Add new bot username
+                ichsterbeUsername: "@ichsterbe"
             }
         };
         
-        // Menu data - can be replaced with actual items
+        // Menu data
         const menuData = {
             classicCoffee: [
                 { id: "cc1", name: { en: "Espresso", ru: "Эспрессо" }, price: 99, icon: "☕" },
@@ -1040,730 +1080,6 @@
                 { id: "f12", name: { en: "Salmon Bagel", ru: "Бейгл с Лососем" }, price: 269, icon: "🥯" }
             ]
         };
-        
-        // Populate menus
-        function populateMenus() {
-            // Populate each menu category
-            Object.keys(menuData).forEach(category => {
-                const menuContainer = document.getElementById(`${category}Menu`);
-                if (menuContainer) {
-                    menuContainer.innerHTML = '';
-                    menuData[category].forEach(item => {
-                        menuContainer.innerHTML += `
-                            <div class="menu-item" data-id="${item.id}" data-name="${item.name[currentLang]}" data-price="${item.price}">
-                                <div class="menu-icon" aria-hidden="true">${item.icon}</div>
-                                <div class="menu-name">${item.name[currentLang]}</div>
-                                <div class="menu-price">${item.price} ₽</div>
-                                <div class="quantity-controls">
-                                    <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
-                                    <div class="quantity-display">0</div>
-                                    <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
-                    </div>
-                    </div>
-                `;
-                    });
-                }
-            });
-            
-            // Add event listeners to menu items
-            document.querySelectorAll('.menu-item').forEach(item => {
-                const decreaseBtn = item.querySelector('.decrease');
-                const increaseBtn = item.querySelector('.increase');
-                const quantityDisplay = item.querySelector('.quantity-display');
-                
-                decreaseBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    updateItemQuantity(item, -1);
-                });
-                
-                increaseBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    updateItemQuantity(item, 1);
-                });
-            });
-        }
-        
-        // Toggle menu item selection
-        function toggleMenuItem() {
-            const id = this.dataset.id;
-            const name = this.dataset.name;
-            const price = parseFloat(this.dataset.price);
-            
-            // Check if item is already selected
-            const existingItem = orderData.items.find(item => item.id === id);
-            
-            if (existingItem) {
-                // Item exists, increase quantity
-                existingItem.quantity += 1;
-                
-                // Update or add selection count badge
-                let countBadge = this.querySelector('.selection-count');
-                if (countBadge) {
-                    countBadge.textContent = existingItem.quantity;
-                } else {
-                    const badge = document.createElement('div');
-                    badge.className = 'selection-count';
-                    badge.textContent = existingItem.quantity;
-                    this.appendChild(badge);
-                }
-            } else {
-                // Add new item
-                orderData.items.push({
-                    id: id,
-                    name: name,
-                    price: price,
-                    quantity: 1
-                });
-                
-                // Add selection class and count badge
-                this.classList.add('selected');
-                const badge = document.createElement('div');
-                badge.className = 'selection-count';
-                badge.textContent = '1';
-                this.appendChild(badge);
-            }
-            
-            // Update total and selection count
-            updateOrderSummary();
-        }
-        
-        // Update order summary
-        function updateOrderSummary() {
-            let total = 0;
-            let count = 0;
-            
-            const summaryContainer = document.getElementById('selectionSummary');
-            summaryContainer.innerHTML = '';
-            
-            if (orderData.items.length === 0) {
-                summaryContainer.innerHTML = `<p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>`;
-                return;
-            }
-            
-            const summaryDiv = document.createElement('div');
-            summaryDiv.className = 'selection-summary';
-            
-            orderData.items.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                count += item.quantity;
-                
-                summaryDiv.innerHTML += `
-                    <div class="selection-item">
-                        <div class="selection-item-controls">
-                            <div class="selection-item-quantity">
-                                <div class="quantity-btn decrease" data-id="${item.id}" aria-label="Decrease quantity">-</div>
-                                <div class="quantity-display">${item.quantity}</div>
-                                <div class="quantity-btn increase" data-id="${item.id}" aria-label="Increase quantity">+</div>
-                            </div>
-                            <div class="selection-item-name">${item.name}</div>
-                        </div>
-                        <div class="selection-item-price">${itemTotal} ₽</div>
-                    </div>
-                `;
-            });
-            
-            summaryDiv.innerHTML += `
-                <div class="selection-item" style="margin-top: 10px; border-top: 2px solid var(--primary-color);">
-                    <div>${translations[currentLang].menu.selected} <span id="selectedCount">${count}</span></div>
-                    <div class="selection-item-price">${total} ₽</div>
-                </div>
-            `;
-            
-            summaryContainer.appendChild(summaryDiv);
-            
-            // Add event listeners to summary quantity controls
-            summaryDiv.querySelectorAll('.quantity-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = btn.dataset.id;
-                    const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
-                    if (menuItem) {
-                        updateItemQuantity(menuItem, btn.classList.contains('increase') ? 1 : -1);
-                    }
-                });
-            });
-            
-            orderData.total = total;
-        }
-        
-        // Generate order summary for confirmation
-        function generateOrderSummary() {
-            document.getElementById('summaryName').textContent = orderData.name;
-            document.getElementById('summaryTime').textContent = orderData.time;
-            
-            const summaryItems = document.getElementById('summaryItems');
-            summaryItems.innerHTML = '';
-            
-            // Add location to summary
-            const locationName = orderData.location === 'dmitrovka' ? translations[currentLang].location.dmitrovka : translations[currentLang].location.tekhnopark;
-            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
-            
-            summaryItems.innerHTML += `
-                <div class="order-item">
-                    <span><strong>${translations[currentLang].order.location}:</strong></span>
-                    <span>${locationName}</span>
-                </div>
-                <div class="order-item">
-                    <span><strong>${translations[currentLang].order.address}:</strong></span>
-                    <span>${locationAddress}</span>
-                </div>
-            `;
-            
-            if (orderData.items.length === 0) {
-                summaryItems.innerHTML += '<p>No items selected</p>';
-            } else {
-                orderData.items.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    summaryItems.innerHTML += `
-                        <div class="order-item">
-                            <span>${item.quantity}x ${item.name}</span>
-                            <span>${itemTotal} ₽</span>
-                        </div>
-                    `;
-                });
-            }
-            
-            if (orderData.comment) {
-                summaryItems.innerHTML += `
-                    <div class="order-item">
-                        <span><strong>${translations[currentLang].order.comments || 'Comments'}:</strong></span>
-                        <span>${orderData.comment}</span>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('summaryTotal').textContent = `${orderData.total} ₽`;
-        }
-        
-        // Generate a random order number
-        function generateOrderNumber() {
-            const date = new Date();
-            const dateStr = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-            const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-            return `${dateStr}-${randomNum}`;
-        }
-        
-        // Send message using Telegram Bot API
-        async function sendTelegramMessage(chatId, text) {
-            const botToken = "8157403295:AAHd1WwtupOBw_-jFD-vQopThdd_1_OqMms";
-            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            
-            // If chatId is an array, send to all recipients
-            if (Array.isArray(chatId)) {
-                const promises = chatId.map(id => 
-                    fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            chat_id: id,
-                            text: text,
-                            parse_mode: 'HTML'
-                        })
-                    })
-                );
-                
-                try {
-                    await Promise.all(promises);
-                } catch (error) {
-                    console.error('Error sending messages:', error);
-                }
-                return;
-            }
-            
-            // Single recipient
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: text,
-                        parse_mode: 'HTML'
-                    })
-                });
-                
-                const data = await response.json();
-                if (!data.ok) {
-                    console.error('Error sending message:', data);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-        
-        // Format order message for user
-        function formatOrderMessage(orderNumber, orderData) {
-            const t = translations[currentLang];
-            const locationName = orderData.location === 'dmitrovka' ? t.location.dmitrovka : t.location.tekhnopark;
-            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
-            
-            let message = `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
-                   `<b>👤 ${t.order.name}:</b> ${orderData.name}\n` +
-                   `<b>📍 ${t.order.location}:</b> ${locationName}\n` +
-                   `<b>🏠 ${t.order.address}:</b> ${locationAddress}\n` +
-                   `<b>⏰ ${t.order.time}:</b> ${orderData.time}\n\n` +
-                   `<b>📋 ${t.order.items}:</b>\n` +
-                   orderData.items.map(item => 
-                       `• ${item.quantity}x ${item.name} - ${item.price * item.quantity} ₽`
-                   ).join('\n') +
-                   `\n\n<b>💰 ${t.order.total}:</b> ${orderData.total} ₽`;
-
-            if (orderData.comment) {
-                message += `\n\n<b>💭 ${t.order.comments || 'Comments'}:</b>\n${orderData.comment}`;
-            }
-
-            return message;
-        }
-        
-        // Reset order data
-        function resetOrderData() {
-            orderData = {
-                name: "",
-                location: "",
-                items: [],
-                comment: "",
-                time: "12:00",
-                total: 0,
-                botInfo: {
-                    forwardToKitchen: true,
-                    kitchenBotUsername: "@ZakazYellow_bot",
-                    targetUserId: "261442211",
-                    recipientUserId: "261442211",
-                    meowmeowpewUsername: "@meowmeowpew",
-                    ichsterbeUsername: "@ichsterbe" // Add new bot username
-                }
-            };
-            
-            // Reset UI elements
-            document.getElementById('customerName').value = '';
-            document.getElementById('timeSlider').value = 12;
-            document.getElementById('timeDisplay').textContent = '12:00';
-            
-            // Reset selected items counter
-            const selectedCountElement = document.getElementById('selectedCount');
-            if (selectedCountElement) {
-                selectedCountElement.textContent = '0';
-            }
-            
-            // Clear selected items
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('selected');
-                const badge = item.querySelector('.selection-count');
-                if (badge) {
-                    badge.remove();
-                }
-            });
-            
-            // Reset menu display
-            document.querySelectorAll('.menu-grid').forEach(menu => {
-                menu.style.display = 'none';
-            });
-            document.querySelector('.tab-button[data-menu="classicCoffee"]').classList.add('active');
-            
-            // Reset comment input
-            const commentInput = document.getElementById('orderComment');
-            if (commentInput) {
-                commentInput.value = '';
-                updateCharCount();
-            }
-        }
-        
-        // Initialize function
-        function init() {
-            populateMenus();
-            
-            // Set initial language to Russian
-            currentLang = 'ru';
-            switchLanguage('ru');
-            
-            // Set initial time to current time + 10 minutes
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + 10);
-            let currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-            
-            // Calculate minimum time (current time + 10 minutes)
-            const minTime = currentHour + (currentMinute / 60);
-            
-            // Update time slider and display
-            const timeSlider = document.getElementById('timeSlider');
-            const timeDisplay = document.getElementById('timeDisplay');
-            
-            // Set minimum value to max of 7:30 or current time + 10 minutes
-            timeSlider.min = Math.max(7.5, minTime);
-            timeSlider.max = 20; // Shop closes at 20:00
-            
-            // Set initial value to current time + 10 minutes
-            const sliderValue = Math.max(7.5, minTime);
-            timeSlider.value = sliderValue;
-            timeDisplay.textContent = formatTime(sliderValue);
-            orderData.time = formatTime(sliderValue);
-            
-            // Time slider event listener
-            timeSlider.addEventListener('input', function() {
-                const value = parseFloat(this.value);
-                const timeString = formatTime(value);
-                timeDisplay.textContent = timeString;
-                orderData.time = timeString;
-            });
-            
-            // Step navigation
-            document.querySelectorAll('.tab-button[data-step]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const step = this.dataset.step;
-                    navigateToStep(step);
-                });
-            });
-            
-            // Menu tabs
-            document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const menu = this.dataset.menu;
-                    document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    // Hide all menus
-                    document.querySelectorAll('.menu-grid').forEach(menu => {
-                        menu.style.display = 'none';
-                    });
-                    
-                    // Show selected menu
-                    document.getElementById(`${menu}Menu`).style.display = 'grid';
-                });
-            });
-            
-            // Add location selection handlers
-            document.querySelectorAll('.location-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options
-                    document.querySelectorAll('.location-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                    
-                    // Store selected location
-                    orderData.location = this.dataset.location;
-
-                    // Smooth transition to name input
-                    setTimeout(() => {
-                        navigateToStep('2');
-                        const nameInput = document.getElementById('customerName');
-                        nameInput.focus();
-                    }, 300);
-                });
-            });
-
-            // Add name confirmation handler
-            document.getElementById('confirmName').addEventListener('click', function() {
-                const nameInput = document.getElementById('customerName').value.trim();
-                const nameError = document.getElementById('nameError');
-                
-                if (nameInput.length === 0) {
-                    nameError.textContent = translations[currentLang].name.error;
-                    return;
-                }
-                
-                nameError.textContent = '';
-                orderData.name = nameInput;
-                this.classList.add('completed');
-                navigateToStep('3');
-            });
-            
-            // Menu confirmation handler
-            document.getElementById('confirmStep2').addEventListener('click', function() {
-                if (orderData.items.length === 0) {
-                    // Show error message
-                    const summaryContainer = document.getElementById('selectionSummary');
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error || 'Please select at least one item'}</p>`;
-                    return;
-                }
-                this.classList.add('completed');
-                navigateToStep('4');
-                
-                // Add smooth scroll to comment section
-                setTimeout(() => {
-                    const commentSection = document.querySelector('#step4 .section');
-                    if (commentSection) {
-                        commentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 100);
-            });
-            
-            // Comment confirmation handler
-            document.getElementById('confirmStep3').addEventListener('click', function() {
-                orderData.comment = document.getElementById('orderComment').value.trim();
-                this.classList.add('completed');
-                navigateToStep('5');
-            });
-            
-            // Time confirmation handler
-            document.getElementById('confirmStep4').addEventListener('click', function() {
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                const selectedTime = parseFloat(timeSlider.value);
-                const timeSelector = document.querySelector('.time-selector');
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-
-                if (selectedTime < currentTime) {
-                    // Show error message
-                    let errorMessage = timeSelector.querySelector('.time-error');
-                    if (!errorMessage) {
-                        errorMessage = document.createElement('div');
-                        errorMessage.className = 'time-error';
-                        errorMessage.style.color = '#e74c3c';
-                        errorMessage.style.marginTop = '10px';
-                        errorMessage.style.textAlign = 'center';
-                        timeSelector.appendChild(errorMessage);
-                    }
-                    errorMessage.textContent = translations[currentLang].time.error;
-                    return;
-                }
-
-                // Clear any error message
-                const errorMessage = timeSelector.querySelector('.time-error');
-                if (errorMessage) {
-                    errorMessage.remove();
-                }
-
-                generateOrderSummary();
-                this.classList.add('completed');
-                navigateToStep('6');
-            });
-            
-            // Final order confirmation handler
-            document.getElementById('confirmOrder').addEventListener('click', async function() {
-                // Validate all required data
-                if (!orderData.location) {
-                    showError('location');
-                    return;
-                }
-                if (!orderData.name) {
-                    showError('name');
-                    return;
-                }
-                if (orderData.items.length === 0) {
-                    showError('menu');
-                    return;
-                }
-                if (!orderData.time) {
-                    showError('time');
-                    return;
-                }
-
-                const currentHour = new Date().getHours();
-                const currentMinutes = new Date().getMinutes();
-                const currentTime = currentHour + (currentMinutes / 60);
-                
-                if (currentTime >= 20 || currentTime < 7.5) {
-                    showShopClosedNotification();
-                    return;
-                }
-                
-                const orderNumber = generateOrderNumber();
-                document.getElementById('orderNumber').textContent = orderNumber;
-                
-                // Hide all steps and show confirmation screen
-                document.querySelectorAll('.step').forEach(step => {
-                    step.classList.remove('active');
-                });
-                const orderConfirmed = document.getElementById('orderConfirmed');
-                orderConfirmed.style.display = 'block';
-                
-                // Format the order message
-                const orderMessage = formatOrderMessage(orderNumber, orderData);
-                
-                // List of all kitchen bot users who should receive the message
-                const kitchenBotUsers = [
-                    "517070445", // Main kitchen bot user
-                    "261442211", // Additional kitchen bot user
-                    "1057756574", // New kitchen bot user
-                    "-1002152072922", // Group chat
-                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
-                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
-                ];
-                
-                // Send to all kitchen bot users
-                await sendTelegramMessage(kitchenBotUsers, orderMessage);
-                
-                // Send to order creator if we have their ID
-                if (currentUserId) {
-                    await sendTelegramMessage(currentUserId, orderMessage);
-                }
-
-                // Scroll to order number after a short delay
-                setTimeout(() => {
-                    const orderNumberElement = document.getElementById('orderNumber');
-                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-            });
-            
-            // Add error display function
-            function showError(step) {
-                const errorMessages = {
-                    location: translations[currentLang].location.error || 'Please select a location',
-                    name: translations[currentLang].name.error || 'Please enter your name',
-                    menu: translations[currentLang].menu.error || 'Please select at least one item',
-                    time: translations[currentLang].time.error || 'Please select a valid time'
-                };
-
-                const errorMessage = errorMessages[step];
-                const summaryContainer = document.getElementById('summaryItems');
-                if (summaryContainer) {
-                    summaryContainer.innerHTML = `<p style="color: #e74c3c; text-align: center; padding: 10px;">${errorMessage}</p>`;
-                }
-            }
-            
-            // New Order Button
-            document.getElementById('newOrderButton').addEventListener('click', function() {
-                resetOrderData();
-                navigateToStep('1');
-            });
-
-            // Add step navigation buttons
-            document.querySelectorAll('.nav-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentStep = document.querySelector('.step.active');
-                    const currentStepNumber = parseInt(currentStep.id.replace('step', ''));
-                    const nextStepNumber = currentStepNumber + 1;
-                    
-                    // Validate current step before proceeding
-                    if (currentStepNumber === 1 && !orderData.location) {
-                        return;
-                    }
-                    if (currentStepNumber === 2 && !orderData.name) {
-                        const nameInput = document.getElementById('customerName').value.trim();
-                        if (nameInput.length === 0) {
-                            document.getElementById('nameError').textContent = translations[currentLang].name.error;
-                            return;
-                        }
-                    }
-                    if (currentStepNumber === 3 && orderData.items.length === 0) {
-                        const summaryContainer = document.getElementById('selectionSummary');
-                        summaryContainer.innerHTML = `<p style="color: #e74c3c;">${translations[currentLang].menu.error}</p>`;
-                        return;
-                    }
-                    
-                    navigateToStep(nextStepNumber.toString());
-                });
-            });
-        }
-        
-        // Navigate to specific step
-        function navigateToStep(step) {
-            // Validate previous steps
-            const currentStep = document.querySelector('.step.active');
-            const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
-            const targetStepNumber = parseInt(step);
-
-            // Check if trying to skip steps
-            if (targetStepNumber > currentStepNumber + 1) {
-                return; // Don't allow skipping steps
-            }
-
-            // Validate required data for each step
-            if (targetStepNumber === 2 && !orderData.location) {
-                return; // Can't proceed to name without location
-            }
-            if (targetStepNumber === 3 && !orderData.name) {
-                return; // Can't proceed to menu without name
-            }
-            if (targetStepNumber === 4 && orderData.items.length === 0) {
-                return; // Can't proceed to comment without items
-            }
-            if (targetStepNumber === 5 && !orderData.comment) {
-                // Comment is optional, but we still need to set it
-                orderData.comment = '';
-            }
-            if (targetStepNumber === 6 && !orderData.time) {
-                return; // Can't proceed to summary without time
-            }
-
-            // Update stage buttons
-            document.querySelectorAll('.stage-button').forEach(btn => {
-                const btnStep = parseInt(btn.dataset.step);
-                btn.classList.remove('active', 'completed');
-                
-                if (btnStep === targetStepNumber) {
-                    btn.classList.add('active');
-                } else if (btnStep < targetStepNumber) {
-                    btn.classList.add('completed');
-                }
-            });
-
-            // Update tab buttons
-            document.querySelectorAll('.tab-button[data-step]').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`.tab-button[data-step="${step}"]`)?.classList.add('active');
-            
-            // Update visible step
-            document.querySelectorAll('.step').forEach(s => {
-                s.classList.remove('active');
-            });
-            const nextStep = document.getElementById(`step${step}`);
-            nextStep.classList.add('active');
-            
-            // Smooth scroll to the top of the next step
-            nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        
-        // Add notification functions
-        function showShopClosedNotification() {
-            const notification = document.getElementById('shopClosedNotification');
-            const currentHour = new Date().getHours();
-            const currentMinutes = new Date().getMinutes();
-            const currentTime = currentHour + (currentMinutes / 60);
-
-            if (currentTime >= 20) {
-                notification.textContent = translations[currentLang].shopClosed.evening;
-            } else if (currentTime < 7.5) {
-                notification.textContent = translations[currentLang].shopClosed.morning;
-            }
-            
-            notification.style.display = 'block';
-            
-            // Disable the confirm button
-            document.getElementById('confirmStep4').disabled = true;
-            
-            // Hide notification after 5 seconds
-            setTimeout(() => {
-                hideShopClosedNotification();
-            }, 5000);
-        }
-        
-        function hideShopClosedNotification() {
-            const notification = document.getElementById('shopClosedNotification');
-            notification.style.display = 'none';
-            
-            // Re-enable the confirm button
-            document.getElementById('confirmStep4').disabled = false;
-        }
-        
-        // Helper function to format time
-        function formatTime(value) {
-            const hours = Math.floor(value);
-            const minutes = Math.round((value % 1) * 60);
-            return `${hours}:${minutes.toString().padStart(2, '0')}`;
-        }
-        
-        // Add smooth scrolling to the page
-        document.documentElement.style.scrollBehavior = 'smooth';
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', init);
         
         // Add translations
         const translations = {
@@ -1907,130 +1223,69 @@
 
         let currentLang = 'ru';
 
-        // Language switching function
-        function switchLanguage(lang) {
-            currentLang = lang;
-            const t = translations[lang];
-
-            // Update header
-            document.getElementById('headerTitle').textContent = t.header.title;
-
-            // Update welcome section
-            document.querySelector('.welcome-title').textContent = t.welcome.title;
-            document.querySelector('.welcome-text').textContent = t.welcome.text;
-
-            // Update location section
-            document.querySelector('.location-section h2').textContent = t.location.title;
-            document.querySelector('[data-location="dmitrovka"] .location-name').textContent = t.location.dmitrovka;
-            document.querySelector('[data-location="tekhnopark"] .location-name').textContent = t.location.tekhnopark;
-
-            // Update name section
-            document.querySelector('#step2 .section h2').textContent = t.name.title;
-            document.getElementById('customerName').placeholder = t.name.placeholder;
-            document.getElementById('confirmName').textContent = t.name.confirm;
-
-            // Update menu section
-            document.querySelector('#step3 .section h2').textContent = t.menu.title;
-            document.querySelector('[data-menu="classicCoffee"]').textContent = t.menu.classicCoffee;
-            document.querySelector('[data-menu="signatureDrinks"]').textContent = t.menu.signatureDrinks;
-            document.querySelector('[data-menu="premiumCollection"]').textContent = t.menu.premiumCollection;
-            document.querySelector('[data-menu="nonCoffee"]').textContent = t.menu.nonCoffee;
-            document.querySelector('[data-menu="food"]').textContent = t.menu.food;
-            document.querySelector('#selectionSummary p').textContent = t.menu.selected;
-
-            // Update menu items
-            document.querySelectorAll('.menu-item').forEach(item => {
-                const id = item.dataset.id;
-                const menuItem = [...menuData.classicCoffee, ...menuData.signatureDrinks, ...menuData.premiumCollection, ...menuData.nonCoffee, ...menuData.food].find(mi => mi.id === id);
-                if (menuItem) {
-                    item.querySelector('.menu-name').textContent = menuItem.name[lang];
-                    item.dataset.name = menuItem.name[lang];
-                }
+        // Progress bar update function
+        function updateProgressBar(activeStep) {
+            // Remove active and completed classes from all steps
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.remove('active', 'completed');
             });
-
-            // Update comment section
-            document.querySelector('#step4 .section h2').textContent = t.comment.title;
-            const commentInput = document.getElementById('orderComment');
-            if (commentInput) {
-                commentInput.placeholder = t.comment.placeholder;
-            }
-            document.querySelector('.word-count').innerHTML = `<span id="charCount">0</span>/90 ${t.comment.charCount}`;
-
-            // Update time section
-            document.querySelector('#step5 .section h2').textContent = t.time.title;
-
-            // Update order section
-            document.querySelector('#step6 .section h2').textContent = t.order.title;
-            document.getElementById('confirmOrder').textContent = t.order.confirm;
-            document.querySelector('.forwarding-notice').textContent = t.order.forwarding;
-
-            // Update thank you section
-            document.querySelector('.thank-you-message').textContent = t.thankYou.message;
-            document.querySelector('.order-number p').textContent = t.thankYou.number;
-            document.querySelector('.screenshot-notice').textContent = t.thankYou.screenshot;
-            document.getElementById('newOrderButton').textContent = t.thankYou.newOrder;
-
-            // Update owl section
-            const owlMessage = document.querySelector('.owl-message');
-            const owlButton = document.querySelector('.owl-button');
-            if (owlMessage && owlButton) {
-                owlMessage.textContent = t.thankYou.owl.message;
-                owlButton.textContent = t.thankYou.owl.button;
-                owlButton.href = "https://t.me/notwise_bot";
-            }
-
-            // Update confirm buttons
-            document.querySelectorAll('.nav-button').forEach(button => {
-                if (button.id !== 'confirmOrder') {
-                    button.textContent = t.buttons.confirm;
-                }
-            });
-
-            // Update language buttons
-            document.querySelectorAll('.language-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.lang === lang);
-            });
-
-            // Update order summary if it exists
-            if (orderData.items.length > 0) {
-                updateOrderSummary();
-            }
-        }
-
-        // Initialize owl button text on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set initial owl button text
-            const owlMessage = document.querySelector('.owl-message');
-            const owlButton = document.querySelector('.owl-button');
-            if (owlMessage && owlButton) {
-                owlMessage.textContent = translations[currentLang].thankYou.owl.message;
-                owlButton.textContent = translations[currentLang].thankYou.owl.button;
-                owlButton.href = "https://t.me/notwise_bot";
-            }
-        });
-
-        // Add language button handlers
-        document.querySelectorAll('.language-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                switchLanguage(this.dataset.lang);
-            });
-        });
-
-        // Replace word count functionality with character count
-        function updateCharCount() {
-            const commentInput = document.getElementById('orderComment');
-            const charCountDisplay = document.getElementById('charCount');
-            const charCount = commentInput.value.length;
-            charCountDisplay.textContent = charCount;
             
-            // Disable/enable confirm button based on character count
-            const confirmButton = document.getElementById('confirmStep3');
-            if (confirmButton) {
-                confirmButton.disabled = charCount > 90;
+            // Add completed class to all previous steps
+            for (let i = 1; i < parseInt(activeStep); i++) {
+                const step = document.querySelector(`[data-step="${i}"]`);
+                if (step) {
+                    step.classList.add('completed');
+                }
+            }
+            
+            // Add active class to current step
+            const currentStep = document.querySelector(`[data-step="${activeStep}"]`);
+            if (currentStep) {
+                currentStep.classList.add('active');
             }
         }
 
-        // Add updateItemQuantity function
+        // Populate menus
+        function populateMenus() {
+            Object.keys(menuData).forEach(category => {
+                const menuContainer = document.getElementById(`${category}Menu`);
+                if (menuContainer) {
+                    menuContainer.innerHTML = '';
+                    menuData[category].forEach(item => {
+                        menuContainer.innerHTML += `
+                            <div class="menu-item" data-id="${item.id}" data-name="${item.name[currentLang]}" data-price="${item.price}">
+                                <div class="menu-icon" aria-hidden="true">${item.icon}</div>
+                                <div class="menu-name">${item.name[currentLang]}</div>
+                                <div class="menu-price">${item.price} ₽</div>
+                                <div class="quantity-controls">
+                                    <div class="quantity-btn decrease" aria-label="Decrease quantity">-</div>
+                                    <div class="quantity-display">0</div>
+                                    <div class="quantity-btn increase" aria-label="Increase quantity">+</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+            
+            // Add event listeners to menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const decreaseBtn = item.querySelector('.decrease');
+                const increaseBtn = item.querySelector('.increase');
+                
+                decreaseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateItemQuantity(item, -1);
+                });
+                
+                increaseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateItemQuantity(item, 1);
+                });
+            });
+        }
+
+        // Update item quantity
         function updateItemQuantity(item, change) {
             const id = item.dataset.id;
             const name = item.dataset.name;
@@ -2050,6 +1305,10 @@
                 if (existingItem) {
                     orderData.items = orderData.items.filter(item => item.id !== id);
                     item.classList.remove('selected');
+                    const badge = item.querySelector('.selection-count');
+                    if (badge) {
+                        badge.remove();
+                    }
                 }
             } else {
                 if (existingItem) {
@@ -2063,45 +1322,66 @@
                     });
                     item.classList.add('selected');
                 }
+                
+                // Update or add selection count badge
+                let countBadge = item.querySelector('.selection-count');
+                if (countBadge) {
+                    countBadge.textContent = newQuantity;
+                } else {
+                    const badge = document.createElement('div');
+                    badge.className = 'selection-count';
+                    badge.textContent = newQuantity;
+                    item.appendChild(badge);
+                }
             }
             
             // Update summary
             updateOrderSummary();
         }
-
-        // Update menu tab switching
-        document.querySelectorAll('.tab-button[data-menu]').forEach(button => {
-            button.addEventListener('click', function() {
-                const menu = this.dataset.menu;
-                document.querySelectorAll('.tab-button[data-menu]').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                this.classList.add('active');
+        
+        // Update order summary
+        function updateOrderSummary() {
+            let total = 0;
+            let count = 0;
+            
+            const summaryContainer = document.getElementById('selectionSummary');
+            summaryContainer.innerHTML = '';
+            
+            if (orderData.items.length === 0) {
+                summaryContainer.innerHTML = `<p>${translations[currentLang].menu.selected} <span id="selectedCount">0</span></p>`;
+                return;
+            }
+            
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'selection-summary';
+            
+            orderData.items.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                count += item.quantity;
                 
-                // Hide all menus
-                document.querySelectorAll('.menu-grid').forEach(menu => {
-                    menu.style.display = 'none';
-                });
-                
-                // Show selected menu
-                document.getElementById(`${menu}Menu`).style.display = 'grid';
+                summaryDiv.innerHTML += `
+                    <div class="selection-item">
+                        <div class="selection-item-controls">
+                            <div class="selection-item-quantity">
+                                <div class="quantity-btn decrease" data-id="${item.id}" aria-label="Decrease quantity">-</div>
+                                <div class="quantity-display">${item.quantity}</div>
+                                <div class="quantity-btn increase" data-id="${item.id}" aria-label="Increase quantity">+</div>
+                            </div>
+                            <div class="selection-item-name">${item.name}</div>
+                        </div>
+                        <div class="selection-item-price">${itemTotal} ₽</div>
+                    </div>
+                `;
             });
-        });
-
-        // Add stage button handlers
-        document.querySelectorAll('.stage-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const step = this.dataset.step;
-                const currentStep = document.querySelector('.step.active');
-                const currentStepNumber = currentStep ? parseInt(currentStep.id.replace('step', '')) : 0;
-                const targetStepNumber = parseInt(step);
-
-                // Only allow navigation to completed steps or the next step
-                if (targetStepNumber <= currentStepNumber + 1) {
-                    navigateToStep(step);
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+            
+            summaryDiv.innerHTML += `
+                <div class="selection-item" style="margin-top: 10px; border-top: 2px solid var(--primary-color);">
+                    <div>${translations[currentLang].menu.selected} <span id="selectedCount">${count}</span></div>
+                    <div class="selection-item-price">${total} ₽</div>
+                </div>
+            `;
+            
+            summaryContainer.appendChild(summaryDiv);
+            
+            // Ad
