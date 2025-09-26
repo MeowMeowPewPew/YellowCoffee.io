@@ -839,6 +839,12 @@
                         <span id="summaryTotal"></span>
                     </div>
                 </div>
+                <div id="sbpInterim" style="display:none; margin-top: 12px;">
+                    <a id="sbpInterimLink" class="button" target="_blank" rel="noopener noreferrer"></a>
+                    <div class="navigation" style="margin-top: 10px;">
+                        <button class="nav-button" id="sbpContinue">${translations[currentLang]?.buttons?.confirm || 'Confirm'}</button>
+                    </div>
+                </div>
             </div>
             <div class="navigation">
                 <button class="nav-button" id="confirmOrder">Confirm Order</button>
@@ -1551,42 +1557,60 @@
                 
                 const orderNumber = generateOrderNumber();
                 document.getElementById('orderNumber').textContent = orderNumber;
-                
+
+                // Before final screen: show SBP interim block in this step
+                const sbpInterim = document.getElementById('sbpInterim');
+                const sbpInterimLink = document.getElementById('sbpInterimLink');
+                if (sbpInterim && sbpInterimLink) {
+                    const link = buildSbpLink(orderNumber);
+                    if (link) {
+                        sbpInterimLink.href = link;
+                        sbpInterimLink.textContent = translations[currentLang].payments.sbpPay;
+                        sbpInterim.style.display = 'block';
+                        const continueBtn = document.getElementById('sbpContinue');
+                        if (continueBtn) {
+                            continueBtn.onclick = async () => {
+                                // Proceed to final confirmation screen and messaging
+                                proceedAfterSbp(orderNumber);
+                            };
+                        }
+                        return; // Wait for user to click Continue
+                    }
+                }
+                // If no SBP link configured, proceed immediately
+                await proceedAfterSbp(orderNumber);
+            });
+
+            async function proceedAfterSbp(orderNumber) {
                 // Hide all steps and show confirmation screen
                 document.querySelectorAll('.step').forEach(step => {
                     step.classList.remove('active');
                 });
                 const orderConfirmed = document.getElementById('orderConfirmed');
                 orderConfirmed.style.display = 'block';
-                
+
                 // Format the order message
                 const orderMessage = formatOrderMessage(orderNumber, orderData);
-                
+
                 // List of all kitchen bot users who should receive the message
                 const kitchenBotUsers = [
-                    "517070445", // Main kitchen bot user
-                    "261442211", // Additional kitchen bot user
-                    "1057756574", // New kitchen bot user
-                    "-1002711764047", // Group chat
-                    orderData.botInfo.ichsterbeUsername, // ichsterbe bot
-                    orderData.botInfo.meowmeowpewUsername // meowmeowpew bot
+                    "517070445",
+                    "261442211",
+                    "1057756574",
+                    "-1002711764047",
+                    orderData.botInfo.ichsterbeUsername,
+                    orderData.botInfo.meowmeowpewUsername
                 ];
-                
+
                 // Send to all kitchen bot users
                 await sendTelegramMessage(kitchenBotUsers, orderMessage);
-                
+
                 // Send to order creator if we have their ID
                 if (currentUserId) {
                     await sendTelegramMessage(currentUserId, orderMessage);
                 }
 
-                // Scroll to order number after a short delay
-                setTimeout(() => {
-                    const orderNumberElement = document.getElementById('orderNumber');
-                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-
-                // Render SBP payment link if configured
+                // Render SBP link also on final screen (optional)
                 const sbpContainer = document.getElementById('sbpPayContainer');
                 const sbpLink = document.getElementById('sbpPayLink');
                 if (sbpContainer && sbpLink) {
@@ -1599,7 +1623,13 @@
                         sbpContainer.style.display = 'none';
                     }
                 }
-            });
+
+                // Scroll to order number after a short delay
+                setTimeout(() => {
+                    const orderNumberElement = document.getElementById('orderNumber');
+                    orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
             
             // Add error display function
             function showError(step) {
