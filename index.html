@@ -912,8 +912,9 @@
         const sbpConfig = {
             enabled: true,
             baseUrl: "https://qr.nspk.ru/BS1A000AKQHHTVVL9JIBKJVU3F3GP6LS?type=01&bank=100000000008&crc=0FE7",
-            amountParam: "amount", // or 'sum' depending on issuer
-            commentParam: "purpose" // or 'name'/'comment' depending on issuer
+            amountParam: "amount", // e.g. 'amount' or 'sum'
+            amountInRubles: true,   // true: передавать рубли (2 знака после запятой); false: копейки (целое число)
+            commentParam: "purpose" // e.g. 'purpose' | 'name' | 'comment'
         };
         
         // Menu data - can be replaced with actual items
@@ -1199,8 +1200,14 @@
             if (!sbpConfig.enabled || !sbpConfig.baseUrl) return null;
             try {
                 const url = new URL(sbpConfig.baseUrl);
-                const amountKopecks = Math.round((Number(orderData.total) || 0) * 100);
-                if (amountKopecks > 0) {
+                const total = Number(orderData.total) || 0;
+                if (sbpConfig.amountInRubles) {
+                    // передаём сумму в рублях с 2 знаками
+                    const amountRub = total.toFixed(2);
+                    url.searchParams.set(sbpConfig.amountParam, amountRub);
+                } else {
+                    // передаём сумму в копейках
+                    const amountKopecks = Math.round(total * 100);
                     url.searchParams.set(sbpConfig.amountParam, amountKopecks.toString());
                 }
                 const comment = `${translations[currentLang].order.title} #${orderNumber}`;
