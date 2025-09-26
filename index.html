@@ -839,12 +839,7 @@
                         <span id="summaryTotal"></span>
                     </div>
                 </div>
-                <div id="sbpInterim" style="display:none; margin-top: 12px;">
-                    <a id="sbpInterimLink" class="button" target="_blank" rel="noopener noreferrer"></a>
-                    <div class="navigation" style="margin-top: 10px;">
-                        <button class="nav-button" id="sbpContinue">${translations[currentLang]?.buttons?.confirm || 'Confirm'}</button>
-                    </div>
-                </div>
+                
             </div>
             <div class="navigation">
                 <button class="nav-button" id="confirmOrder">Confirm Order</button>
@@ -864,9 +859,7 @@
                 <div class="owl-button-container">
                     <a href="https://t.me/notwise_bot" class="owl-button" target="_blank"></a>
                 </div>
-                <div id="sbpPayContainer" style="display:none; margin-top: 12px;">
-                    <a id="sbpPayLink" class="button" target="_blank" rel="noopener noreferrer"></a>
-                </div>
+                
                 <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
                 <button class="button" id="newOrderButton">Make Another Order</button>
             </div>
@@ -909,17 +902,7 @@
         };
 
         // SBP payment configuration (set baseUrl to your NSPK dynamic QR URL)
-        const sbpConfig = {
-            enabled: true,
-            baseUrl: "https://qr.nspk.ru/BS1A000AKQHHTVVL9JIBKJVU3F3GP6LS?type=01&bank=100000000008&crc=0FE7",
-            amountParamRub: "amount",     // не используется для Альфа
-            amountParamKopecks: "sum",    // Альфа: сумма в копейках
-            sendBothAmountParams: false,   // Альфа: отправляем только 'sum'
-            amountInRubles: false,         // Альфа: не отправляем рубли, только копейки
-            commentParam: "purpose",       // назначение платежа
-            currencyParam: null,           // не требуется
-            currencyValue: null            // не требуется
-        };
+        // SBP payment removed
         
         // Menu data - can be replaced with actual items
         const menuData = {
@@ -1200,35 +1183,7 @@
         }
 
         // Build SBP payment link
-        function buildSbpLink(orderNumber) {
-            if (!sbpConfig.enabled || !sbpConfig.baseUrl) return null;
-            try {
-                const url = new URL(sbpConfig.baseUrl);
-                const total = Number(orderData.total) || 0;
-                const amountRub = total.toFixed(2); // десятичная точка
-                const amountKopecks = Math.round(total * 100);
-
-                // Передаём сумму в рублях
-                if (sbpConfig.amountInRubles && sbpConfig.amountParamRub) {
-                    url.searchParams.set(sbpConfig.amountParamRub, amountRub);
-                }
-                // И/или сумму в копейках (часто требуется param 'sum')
-                if (sbpConfig.sendBothAmountParams && sbpConfig.amountParamKopecks) {
-                    url.searchParams.set(sbpConfig.amountParamKopecks, String(amountKopecks));
-                }
-
-                // Валюта (если поддерживается)
-                if (sbpConfig.currencyParam && sbpConfig.currencyValue) {
-                    url.searchParams.set(sbpConfig.currencyParam, sbpConfig.currencyValue);
-                }
-                const comment = `${translations[currentLang].order.title} #${orderNumber}`;
-                url.searchParams.set(sbpConfig.commentParam, comment);
-                return url.toString();
-            } catch (e) {
-                console.warn('SBP link build failed:', e);
-                return null;
-            }
-        }
+        // SBP payment link logic removed
         
         // Generate a random order number
         function generateOrderNumber() {
@@ -1366,11 +1321,7 @@
                 updateCharCount();
             }
 
-            // Hide SBP button until order is confirmed
-            const sbpContainer = document.getElementById('sbpPayContainer');
-            if (sbpContainer) {
-                sbpContainer.style.display = 'none';
-            }
+            
         }
         
         // Initialize function
@@ -1577,25 +1528,6 @@
                 document.getElementById('orderNumber').textContent = orderNumber;
 
                 // Before final screen: show SBP interim block in this step
-                const sbpInterim = document.getElementById('sbpInterim');
-                const sbpInterimLink = document.getElementById('sbpInterimLink');
-                if (sbpInterim && sbpInterimLink) {
-                    const link = buildSbpLink(orderNumber);
-                    if (link) {
-                        sbpInterimLink.href = link;
-                        sbpInterimLink.textContent = translations[currentLang].payments.sbpPay;
-                        sbpInterim.style.display = 'block';
-                        const continueBtn = document.getElementById('sbpContinue');
-                        if (continueBtn) {
-                            continueBtn.onclick = async () => {
-                                // Proceed to final confirmation screen and messaging
-                                proceedAfterSbp(orderNumber);
-                            };
-                        }
-                        return; // Wait for user to click Continue
-                    }
-                }
-                // If no SBP link configured, proceed immediately
                 await proceedAfterSbp(orderNumber);
             });
 
@@ -1628,19 +1560,7 @@
                     await sendTelegramMessage(currentUserId, orderMessage);
                 }
 
-                // Render SBP link also on final screen (optional)
-                const sbpContainer = document.getElementById('sbpPayContainer');
-                const sbpLink = document.getElementById('sbpPayLink');
-                if (sbpContainer && sbpLink) {
-                    const link = buildSbpLink(orderNumber);
-                    if (link) {
-                        sbpLink.href = link;
-                        sbpLink.textContent = translations[currentLang].payments.sbpPay;
-                        sbpContainer.style.display = 'block';
-                    } else {
-                        sbpContainer.style.display = 'none';
-                    }
-                }
+                
 
                 // Scroll to order number after a short delay
                 setTimeout(() => {
@@ -1856,9 +1776,7 @@
                         button: "🦉 Play with Owl"
                     }
                 },
-                payments: {
-                    sbpPay: "Pay via SBP"
-                },
+                
                 comment: {
                     title: "Add Comments (Optional)",
                     placeholder: "Enter any special requests or comments about your order (max 90 characters)",
@@ -1927,9 +1845,7 @@
                         button: "🦉 Перейти к Сове"
                     }
                 },
-                payments: {
-                    sbpPay: "Оплатить по СБП"
-                },
+                
                 comment: {
                     title: "Добавить Комментарии (Необязательно)",
                     placeholder: "Введите особые пожелания или комментарии к заказу (макс. 90 символов)",
