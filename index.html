@@ -1585,10 +1585,9 @@
                 }
             }
             
-            // New Order Button
+            // New Order Button: reload the page to start fresh
             document.getElementById('newOrderButton').addEventListener('click', function() {
-                resetOrderData();
-                navigateToStep('1');
+                window.location.reload();
             });
 
             // Add step navigation buttons
