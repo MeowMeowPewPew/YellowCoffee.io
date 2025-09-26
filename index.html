@@ -1341,6 +1341,12 @@
                 commentInput.value = '';
                 updateCharCount();
             }
+
+            // Hide SBP button until order is confirmed
+            const sbpContainer = document.getElementById('sbpPayContainer');
+            if (sbpContainer) {
+                sbpContainer.style.display = 'none';
+            }
         }
         
         // Initialize function
@@ -2077,5 +2083,4 @@
     </script>
 </body>
 </html>
-
 
