@@ -912,9 +912,13 @@
         const sbpConfig = {
             enabled: true,
             baseUrl: "https://qr.nspk.ru/BS1A000AKQHHTVVL9JIBKJVU3F3GP6LS?type=01&bank=100000000008&crc=0FE7",
-            amountParam: "amount", // e.g. 'amount' or 'sum'
-            amountInRubles: true,   // true: передавать рубли (2 знака после запятой); false: копейки (целое число)
-            commentParam: "purpose" // e.g. 'purpose' | 'name' | 'comment'
+            amountParamRub: "amount",     // не используется для Альфа
+            amountParamKopecks: "sum",    // Альфа: сумма в копейках
+            sendBothAmountParams: false,   // Альфа: отправляем только 'sum'
+            amountInRubles: false,         // Альфа: не отправляем рубли, только копейки
+            commentParam: "purpose",       // назначение платежа
+            currencyParam: null,           // не требуется
+            currencyValue: null            // не требуется
         };
         
         // Menu data - can be replaced with actual items
@@ -1201,14 +1205,21 @@
             try {
                 const url = new URL(sbpConfig.baseUrl);
                 const total = Number(orderData.total) || 0;
-                if (sbpConfig.amountInRubles) {
-                    // передаём сумму в рублях с 2 знаками
-                    const amountRub = total.toFixed(2);
-                    url.searchParams.set(sbpConfig.amountParam, amountRub);
-                } else {
-                    // передаём сумму в копейках
-                    const amountKopecks = Math.round(total * 100);
-                    url.searchParams.set(sbpConfig.amountParam, amountKopecks.toString());
+                const amountRub = total.toFixed(2); // десятичная точка
+                const amountKopecks = Math.round(total * 100);
+
+                // Передаём сумму в рублях
+                if (sbpConfig.amountInRubles && sbpConfig.amountParamRub) {
+                    url.searchParams.set(sbpConfig.amountParamRub, amountRub);
+                }
+                // И/или сумму в копейках (часто требуется param 'sum')
+                if (sbpConfig.sendBothAmountParams && sbpConfig.amountParamKopecks) {
+                    url.searchParams.set(sbpConfig.amountParamKopecks, String(amountKopecks));
+                }
+
+                // Валюта (если поддерживается)
+                if (sbpConfig.currencyParam && sbpConfig.currencyValue) {
+                    url.searchParams.set(sbpConfig.currencyParam, sbpConfig.currencyValue);
                 }
                 const comment = `${translations[currentLang].order.title} #${orderNumber}`;
                 url.searchParams.set(sbpConfig.commentParam, comment);
