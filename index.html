@@ -858,6 +858,9 @@
                 <div class="owl-button-container">
                     <a href="https://t.me/notwise_bot" class="owl-button" target="_blank"></a>
                 </div>
+                <div id="sbpPayContainer" style="display:none; margin-top: 12px;">
+                    <a id="sbpPayLink" class="button" target="_blank" rel="noopener noreferrer"></a>
+                </div>
                 <p class="forwarding-notice">Your order details have been sent to our kitchen bot.</p>
                 <button class="button" id="newOrderButton">Make Another Order</button>
             </div>
@@ -898,6 +901,14 @@
                 ichsterbeUsername: "@ichsterbe" // Add new bot username
             }
         };
+
+        // SBP payment configuration (set baseUrl to your NSPK dynamic QR URL)
+        const sbpConfig = {
+            enabled: true,
+            baseUrl: "https://qr.nspk.ru/BS1A000AKQHHTVVL9JIBKJVU3F3GP6LS?type=01&bank=100000000008&crc=0FE7",
+            amountParam: "amount", // or 'sum' depending on issuer
+            commentParam: "purpose" // or 'name'/'comment' depending on issuer
+        };
         
         // Menu data - can be replaced with actual items
         const menuData = {
@@ -906,49 +917,66 @@
                 { id: "cc2", name: { en: "Americano 200ml", ru: "Американо 200мл" }, price: 139, icon: "☕" },
                 { id: "cc3", name: { en: "Americano 300ml", ru: "Американо 300мл" }, price: 179, icon: "☕" },
                 { id: "cc4", name: { en: "Americano 400ml", ru: "Американо 400мл" }, price: 249, icon: "☕" },
-                { id: "cc5", name: { en: "Cappuccino 200ml", ru: "Капучино 200мл" }, price: 149, icon: "☕" },
-                { id: "cc6", name: { en: "Cappuccino 300ml", ru: "Капучино 300мл" }, price: 199, icon: "☕" },
-                { id: "cc7", name: { en: "Cappuccino 400ml", ru: "Капучино 400мл" }, price: 249, icon: "☕" },
-                { id: "cc8", name: { en: "Latte 300ml", ru: "Латте 300мл" }, price: 199, icon: "☕" },
-                { id: "cc9", name: { en: "Latte 400ml", ru: "Латте 400мл" }, price: 249, icon: "☕" },
-                { id: "cc10", name: { en: "Flat White 200ml", ru: "Флэт Уайт 200мл" }, price: 199, icon: "☕" },
-                { id: "cc11", name: { en: "Flat White 300ml", ru: "Флэт Уайт 300мл" }, price: 249, icon: "☕" },
-                { id: "cc12", name: { en: "Raf Coffee 300ml", ru: "Раф Кофе 300мл" }, price: 249, icon: "☕" },
-                { id: "cc13", name: { en: "Raf Coffee 400ml", ru: "Раф Кофе 400мл" }, price: 299, icon: "☕" },
+                { id: "cc5", name: { en: "Americano 600ml", ru: "Американо 600мл" }, price: 299, icon: "☕" },
+                { id: "cc6", name: { en: "Cappuccino 200ml", ru: "Капучино 200мл" }, price: 149, icon: "☕" },
+                { id: "cc7", name: { en: "Cappuccino 300ml", ru: "Капучино 300мл" }, price: 199, icon: "☕" },
+                { id: "cc8", name: { en: "Cappuccino 400ml", ru: "Капучино 400мл" }, price: 249, icon: "☕" },
+                { id: "cc9", name: { en: "Cappuccino 600ml", ru: "Капучино 600мл" }, price: 299, icon: "☕" },
+                { id: "cc10", name: { en: "Latte 300ml", ru: "Латте 300мл" }, price: 199, icon: "☕" },
+                { id: "cc11", name: { en: "Latte 400ml", ru: "Латте 400мл" }, price: 249, icon: "☕" },
+                { id: "cc12", name: { en: "Latte 600ml", ru: "Латте 600мл" }, price: 299, icon: "☕" },
+                { id: "cc13", name: { en: "Flat White 200ml", ru: "Флэт Уайт 200мл" }, price: 199, icon: "☕" },
+                { id: "cc14", name: { en: "Flat White 300ml", ru: "Флэт Уайт 300мл" }, price: 249, icon: "☕" },
+                { id: "cc15", name: { en: "Raf Coffee 300ml", ru: "Раф Кофе 300мл" }, price: 249, icon: "☕" },
+                { id: "cc16", name: { en: "Raf Coffee 400ml", ru: "Раф Кофе 400мл" }, price: 299, icon: "☕" },
+                { id: "cc17", name: { en: "Raf Coffee 600ml", ru: "Раф Кофе 600мл" }, price: 329, icon: "☕" }
             ],
             signatureDrinks: [
                 { id: "sd2", name: { en: "Citrus Rainbow 300ml", ru: "Цитрусовый Радуга 300мл" }, price: 279, icon: "🌈" },
                 { id: "sd3", name: { en: "Citrus Rainbow 400ml", ru: "Цитрусовый Радуга 400мл" }, price: 349, icon: "🌈" },
+                { id: "sd4", name: { en: "Citrus Rainbow 600ml", ru: "Цитрусовый Радуга 600мл" }, price: 399, icon: "🌈" },
                 { id: "sd5", name: { en: "Hollywood Morning 300ml", ru: "Голливудское Утро 300мл" }, price: 279, icon: "🌅" },
                 { id: "sd6", name: { en: "Hollywood Morning 400ml", ru: "Голливудское Утро 400мл" }, price: 349, icon: "🌅" },
+                { id: "sd7", name: { en: "Hollywood Morning 600ml", ru: "Голливудское Утро 600мл" }, price: 399, icon: "🌅" },
                 { id: "sd8", name: { en: "Spicy Peach 300ml", ru: "Острый Персик 300мл" }, price: 279, icon: "🍑" },
                 { id: "sd9", name: { en: "Spicy Peach 400ml", ru: "Острый Персик 400мл" }, price: 349, icon: "🍑" },
+                { id: "sd10", name: { en: "Spicy Peach 600ml", ru: "Острый Персик 600мл" }, price: 399, icon: "🍑" },
                 { id: "sd11", name: { en: "Lemon Tart 300ml", ru: "Лимонный Тарт 300мл" }, price: 279, icon: "🍋" },
                 { id: "sd12", name: { en: "Lemon Tart 400ml", ru: "Лимонный Тарт 400мл" }, price: 349, icon: "🍋" },
+                { id: "sd13", name: { en: "Lemon Tart 600ml", ru: "Лимонный Тарт 600мл" }, price: 399, icon: "🍋" }
             ],
             premiumCollection: [
                 { id: "pc2", name: { en: "Black Forest 300ml", ru: "Черный Лес 300мл" }, price: 299, icon: "🌲" },
                 { id: "pc3", name: { en: "Black Forest 400ml", ru: "Черный Лес 400мл" }, price: 399, icon: "🌲" },
+                { id: "pc4", name: { en: "Black Forest 600ml", ru: "Черный Лес 600мл" }, price: 499, icon: "🌲" },
                 { id: "pc5", name: { en: "Pistachio Cheesecake 300ml", ru: "Фисташковый Чизкейк 300мл" }, price: 299, icon: "🍰" },
                 { id: "pc6", name: { en: "Pistachio Cheesecake 400ml", ru: "Фисташковый Чизкейк 400мл" }, price: 399, icon: "🍰" },
+                { id: "pc7", name: { en: "Pistachio Cheesecake 600ml", ru: "Фисташковый Чизкейк 600мл" }, price: 499, icon: "🍰" },
                 { id: "pc8", name: { en: "Snickers 300ml", ru: "Сникерс 300мл" }, price: 299, icon: "🍫" },
                 { id: "pc9", name: { en: "Snickers 400ml", ru: "Сникерс 400мл" }, price: 399, icon: "🍫" },
+                { id: "pc10", name: { en: "Snickers 600ml", ru: "Сникерс 600мл" }, price: 499, icon: "🍫" },
                 { id: "pc11", name: { en: "Refreshing Mandarin 300ml", ru: "Освежающий Мандарин 300мл" }, price: 299, icon: "🍊" },
                 { id: "pc12", name: { en: "Refreshing Mandarin 400ml", ru: "Освежающий Мандарин 400мл" }, price: 399, icon: "🍊" },
                 { id: "pc13", name: { en: "Cherry Kiss 300ml", ru: "Вишневый Поцелуй 300мл" }, price: 299, icon: "🍒" },
                 { id: "pc14", name: { en: "Cherry Kiss 400ml", ru: "Вишневый Поцелуй 400мл" }, price: 399, icon: "🍒" },
+                { id: "pc15", name: { en: "Cherry Kiss 600ml", ru: "Вишневый Поцелуй 600мл" }, price: 499, icon: "🍒" },
                 { id: "pc16", name: { en: "Orange Brownie 300ml", ru: "Апельсиновый Брауни 300мл" }, price: 299, icon: "🍊" },
                 { id: "pc17", name: { en: "Orange Brownie 400ml", ru: "Апельсиновый Брауни 400мл" }, price: 399, icon: "🍊" },
+                { id: "pc18", name: { en: "Orange Brownie 600ml", ru: "Апельсиновый Брауни 600мл" }, price: 499, icon: "🍊" }
             ],
             nonCoffee: [
                 { id: "nc1", name: { en: "Matcha 300ml", ru: "Матча 300мл" }, price: 249, icon: "🍵" },
                 { id: "nc2", name: { en: "Matcha 400ml", ru: "Матча 400мл" }, price: 299, icon: "🍵" },
+                { id: "nc3", name: { en: "Matcha 600ml", ru: "Матча 600мл" }, price: 329, icon: "🍵" },
                 { id: "nc4", name: { en: "Cocoa 300ml", ru: "Какао 300мл" }, price: 249, icon: "🍫" },
                 { id: "nc5", name: { en: "Cocoa 400ml", ru: "Какао 400мл" }, price: 299, icon: "🍫" },
+                { id: "nc6", name: { en: "Cocoa 600ml", ru: "Какао 600мл" }, price: 329, icon: "🍫" },
                 { id: "nc7", name: { en: "Sea Buckthorn Berry Tea 300ml", ru: "Чай с Облепихой 300мл" }, price: 249, icon: "🫖" },
                 { id: "nc8", name: { en: "Sea Buckthorn Berry Tea 400ml", ru: "Чай с Облепихой 400мл" }, price: 299, icon: "🫖" },
+                { id: "nc9", name: { en: "Sea Buckthorn Berry Tea 600ml", ru: "Чай с Облепихой 600мл" }, price: 329, icon: "🫖" },
                 { id: "nc10", name: { en: "Black Currant Berry Tea 300ml", ru: "Чай с Черной Смородиной 300мл" }, price: 249, icon: "🫖" },
                 { id: "nc11", name: { en: "Black Currant Berry Tea 400ml", ru: "Чай с Черной Смородиной 400мл" }, price: 299, icon: "🫖" },
+                { id: "nc12", name: { en: "Black Currant Berry Tea 600ml", ru: "Чай с Черной Смородиной 600мл" }, price: 329, icon: "🫖" }
             ],
             food: [
                 { id: "f1", name: { en: "Ham & Cheese Sandwich Roll", ru: "Ролл с Ветчиной и Сыром" }, price: 229, icon: "🥪" },
@@ -1158,6 +1186,24 @@
             }
             
             document.getElementById('summaryTotal').textContent = `${orderData.total} ₽`;
+        }
+
+        // Build SBP payment link
+        function buildSbpLink(orderNumber) {
+            if (!sbpConfig.enabled || !sbpConfig.baseUrl) return null;
+            try {
+                const url = new URL(sbpConfig.baseUrl);
+                const amountKopecks = Math.round((Number(orderData.total) || 0) * 100);
+                if (amountKopecks > 0) {
+                    url.searchParams.set(sbpConfig.amountParam, amountKopecks.toString());
+                }
+                const comment = `${translations[currentLang].order.title} #${orderNumber}`;
+                url.searchParams.set(sbpConfig.commentParam, comment);
+                return url.toString();
+            } catch (e) {
+                console.warn('SBP link build failed:', e);
+                return null;
+            }
         }
         
         // Generate a random order number
@@ -1533,6 +1579,20 @@
                     const orderNumberElement = document.getElementById('orderNumber');
                     orderNumberElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 100);
+
+                // Render SBP payment link if configured
+                const sbpContainer = document.getElementById('sbpPayContainer');
+                const sbpLink = document.getElementById('sbpPayLink');
+                if (sbpContainer && sbpLink) {
+                    const link = buildSbpLink(orderNumber);
+                    if (link) {
+                        sbpLink.href = link;
+                        sbpLink.textContent = translations[currentLang].payments.sbpPay;
+                        sbpContainer.style.display = 'block';
+                    } else {
+                        sbpContainer.style.display = 'none';
+                    }
+                }
             });
             
             // Add error display function
@@ -1742,6 +1802,9 @@
                         button: "🦉 Play with Owl"
                     }
                 },
+                payments: {
+                    sbpPay: "Pay via SBP"
+                },
                 comment: {
                     title: "Add Comments (Optional)",
                     placeholder: "Enter any special requests or comments about your order (max 90 characters)",
@@ -1809,6 +1872,9 @@
                         message: "🦉 Может хотите погладить и покормить свою сову, пока ваш кофе готовится?",
                         button: "🦉 Перейти к Сове"
                     }
+                },
+                payments: {
+                    sbpPay: "Оплатить по СБП"
                 },
                 comment: {
                     title: "Добавить Комментарии (Необязательно)",
