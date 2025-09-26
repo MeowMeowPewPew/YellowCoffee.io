@@ -1337,7 +1337,7 @@
             
             // Set minimum value to max of 7:30 or current time + 10 minutes
             timeSlider.min = Math.max(7.5, minTime);
-            timeSlider.max = 20; // Shop closes at 20:00
+            timeSlider.max = 21; // Shop closes at 21:00
             
             // Set initial value to current time + 10 minutes
             const sliderValue = Math.max(7.5, minTime);
@@ -1454,7 +1454,7 @@
                 const selectedTime = parseFloat(timeSlider.value);
                 const timeSelector = document.querySelector('.time-selector');
                 
-                if (currentTime >= 20 || currentTime < 7.5) {
+                if (currentTime >= 21 || currentTime < 7.5) {
                     showShopClosedNotification();
                     return;
                 }
@@ -1509,7 +1509,7 @@
                 const currentMinutes = new Date().getMinutes();
                 const currentTime = currentHour + (currentMinutes / 60);
                 
-                if (currentTime >= 20 || currentTime < 7.5) {
+                if (currentTime >= 21 || currentTime < 7.5) {
                     showShopClosedNotification();
                     return;
                 }
@@ -1657,7 +1657,7 @@
             const currentMinutes = new Date().getMinutes();
             const currentTime = currentHour + (currentMinutes / 60);
 
-            if (currentTime >= 20) {
+            if (currentTime >= 21) {
                 notification.textContent = translations[currentLang].shopClosed.evening;
             } else if (currentTime < 7.5) {
                 notification.textContent = translations[currentLang].shopClosed.morning;
@@ -2019,3 +2019,4 @@
     </script>
 </body>
 </html>
+
