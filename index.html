@@ -825,17 +825,17 @@
                 <h2>Order Confirmation</h2>
                 <div class="order-summary">
                     <div class="order-item">
-                        <span><strong>Name:</strong></span>
+                        <span><strong id="summaryNameLabel">Name:</strong></span>
                         <span id="summaryName"></span>
                     </div>
                     <div class="order-item">
-                        <span><strong>Pickup Time:</strong></span>
+                        <span><strong id="summaryTimeLabel">Pickup Time:</strong></span>
                         <span id="summaryTime"></span>
                     </div>
-                    <h3>Selected Items:</h3>
+                    <h3 id="summaryItemsLabel">Selected Items:</h3>
                     <div id="summaryItems"></div>
                     <div class="order-item" style="margin-top: 10px;">
-                        <span><strong>Total:</strong></span>
+                        <span><strong id="summaryTotalLabel">Total:</strong></span>
                         <span id="summaryTotal"></span>
                     </div>
                 </div>
@@ -1892,6 +1892,15 @@
             document.querySelector('#step6 .section h2').textContent = t.order.title;
             document.getElementById('confirmOrder').textContent = t.order.confirm;
             document.querySelector('.forwarding-notice').textContent = t.order.forwarding;
+            // Update order confirmation labels
+            const nameLabel = document.getElementById('summaryNameLabel');
+            const timeLabel = document.getElementById('summaryTimeLabel');
+            const itemsLabel = document.getElementById('summaryItemsLabel');
+            const totalLabel = document.getElementById('summaryTotalLabel');
+            if (nameLabel) nameLabel.textContent = `${t.order.name}:`;
+            if (timeLabel) timeLabel.textContent = `${t.order.time}:`;
+            if (itemsLabel) itemsLabel.textContent = t.order.items + ':';
+            if (totalLabel) totalLabel.textContent = `${t.order.total}:`;
 
             // Update thank you section
             document.querySelector('.thank-you-message').textContent = t.thankYou.message;
