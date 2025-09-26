@@ -726,9 +726,9 @@
             <div class="section location-section">
                 <h2>Select Location</h2>
                 <div class="location-options">
-                    <div class="location-option" data-location="dmitrovka">
-                        <div class="location-name">m. Dmitrovka</div>
-                        <div class="location-address">Dmitrovka Street, 7</div>
+                    <div class="location-option" data-location="prokshino">
+                        <div class="location-name">m. prokshino</div>
+                        <div class="location-address">prokshino Street, 7</div>
                         <div class="location-icon">📍</div>
                     </div>
                     <div class="location-option" data-location="tekhnopark">
@@ -1142,8 +1142,8 @@
             summaryItems.innerHTML = '';
             
             // Add location to summary
-            const locationName = orderData.location === 'dmitrovka' ? translations[currentLang].location.dmitrovka : translations[currentLang].location.tekhnopark;
-            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
+            const locationName = orderData.location === 'prokshino' ? translations[currentLang].location.prokshino : translations[currentLang].location.tekhnopark;
+            const locationAddress = orderData.location === 'prokshino' ? 'prokshino Street, 7' : 'Tekhnopark Street, 15';
             
             summaryItems.innerHTML += `
                 <div class="order-item">
@@ -1245,8 +1245,8 @@
         // Format order message for user
         function formatOrderMessage(orderNumber, orderData) {
             const t = translations[currentLang];
-            const locationName = orderData.location === 'dmitrovka' ? t.location.dmitrovka : t.location.tekhnopark;
-            const locationAddress = orderData.location === 'dmitrovka' ? 'Dmitrovka Street, 7' : 'Tekhnopark Street, 15';
+            const locationName = orderData.location === 'prokshino' ? t.location.prokshino : t.location.tekhnopark;
+            const locationAddress = orderData.location === 'prokshino' ? 'prokshino Street, 7' : 'Tekhnopark Street, 15';
             
             let message = `<b>🆕 ${currentLang === 'en' ? 'New Order' : 'Новый Заказ'} #${orderNumber}</b>\n\n` +
                    `<b>👤 ${t.order.name}:</b> ${orderData.name}\n` +
@@ -1712,7 +1712,7 @@
                 },
                 location: {
                     title: "Select Location",
-                    dmitrovka: "m. Dmitrovka",
+                    prokshino: "m. prokshino",
                     tekhnopark: "m. Tekhnopark"
                 },
                 name: {
@@ -1780,8 +1780,8 @@
                 },
                 location: {
                     title: "Выберите Локацию",
-                    dmitrovka: "м. Дмитровка",
-                    tekhnopark: "м. Технопарк"
+                    prokshino: "м. Прокшино",
+                    
                 },
                 name: {
                     title: "Введите Ваше Имя",
@@ -1856,8 +1856,7 @@
 
             // Update location section
             document.querySelector('.location-section h2').textContent = t.location.title;
-            document.querySelector('[data-location="dmitrovka"] .location-name').textContent = t.location.dmitrovka;
-            document.querySelector('[data-location="tekhnopark"] .location-name').textContent = t.location.tekhnopark;
+            document.querySelector('[data-location="prokshino"] .location-name').textContent = t.location.prokshino;
 
             // Update name section
             document.querySelector('#step2 .section h2').textContent = t.name.title;
